@@ -1,0 +1,25 @@
+.investment-header{
+    height: 40px;
+    line-height: 40px;
+}
+
+.investment-header-left{
+    display: inline-block;
+    width: 180px;
+    padding-left: 18px;
+}
+.investment-table-header{
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.tokenName{
+    display: inline-block;
+    width: 150px;
+}
+.investment-table-header-right{
+    width: 200px;
+    display: flex;
+    justify-content: space-around;
+}

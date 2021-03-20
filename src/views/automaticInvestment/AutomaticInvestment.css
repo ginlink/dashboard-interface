@@ -1,0 +1,20 @@
+.prevStateShow{
+    width:330px;
+    height:120px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.prevStateShow-children{
+    width: 150px;
+    height: 100px;
+    background-color: #eee;
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    justify-content: center;
+}
+
+.prevStateShow-children div{
+    text-align: center;
+}
