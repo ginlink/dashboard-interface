@@ -1,15 +1,4 @@
 import { lazy } from 'react'
-// import {
-//   HomeOutlined,
-//   PictureOutlined,
-//   MenuOutlined,
-//   PicLeftOutlined,
-//   SwapLeftOutlined,
-//   BorderTopOutlined,
-//   ClockCircleOutlined,
-//   UserOutlined,
-//   AppstoreOutlined
-// } from '@ant-design/icons'
 const menus = [
   { 
     path: '/',

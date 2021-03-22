@@ -1,14 +1,13 @@
 .prevStateShow{
-    width:330px;
     height:120px;
-    display: flex;
-    justify-content: space-between;
 }
 
 .prevStateShow-children{
+    margin:10px;
+    float: left;
     width: 150px;
     height: 100px;
-    background-color: #eee;
+    background-color: #efefef;
     display: flex;
     flex-direction: column;
     align-self: center;
@@ -17,4 +16,7 @@
 
 .prevStateShow-children div{
     text-align: center;
+}
+.ant-table-wrapper{
+    margin-top: 10px;
 }

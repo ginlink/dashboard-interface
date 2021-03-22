@@ -7,17 +7,29 @@ import "./index.css"
 import menus from "./../../router/menus"
 
 
-const { Header, Content, Sider } = Layout;
+const { Content, Sider } = Layout;
 
 class Index extends React.Component {
     state = {
       collapsed: false,
+      defaultSelectedKeys:["0-0"]
     };
+
+    componentWillMount(){
+      const defaultSelectedKeys = sessionStorage.getItem('defaultSelectedKeys')
+      console.log(defaultSelectedKeys)
+      if( defaultSelectedKeys ){
+        this.setState({
+          defaultSelectedKeys:[defaultSelectedKeys]
+        })
+      }
+    }
   
     onCollapse = collapsed => {
       console.log(collapsed);
       this.setState({ collapsed });
     };
+
   
     render() {
       const { collapsed } = this.state;
@@ -25,12 +37,17 @@ class Index extends React.Component {
         <Layout style={{ minHeight: '100vh' }}>
           <Sider collapsible collapsed={collapsed} onCollapse={this.onCollapse}>
             <div className="logo" />
-            <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
+            <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" defaultSelectedKeys={this.state.defaultSelectedKeys}>
               {menus.map( item => (
                 (item.meta && item.meta.hidden) ? 
                 null :
                 (   
-                        <Menu.Item key={item.key} icon={item.icon}>
+                        <Menu.Item 
+                        key={item.key} 
+                        icon={item.icon}
+                        onClick={()=>{
+                          sessionStorage.setItem("defaultSelectedKeys", [item.key]);
+                        }}>
                             <Link to={item.path}>
                                 {item.title}
                             </Link>
@@ -39,15 +56,6 @@ class Index extends React.Component {
             </Menu>
           </Sider>
           <Layout className="site-layout">
-            <Header className="site-layout-background" style={{ padding: 0 }} >
-                <div className="header">
-                    <span>POOL INFO</span>
-                    <div>
-                        <span className="headerButton" > 一键EARN </span>
-                        <span className="headerButton"> 一键HARVEST </span>
-                    </div>
-                </div>
-            </Header>
             <Content style={{ margin: '0 16px' }}>
                 <Switch>
                     {
@@ -59,6 +67,7 @@ class Index extends React.Component {
                             <Route key={item.key} exact path={item.path} component={item.component}></Route>
                         ) )
                     }
+                    <Redirect key="/" path="/"  to="/investment" ></Redirect> 
                 </Switch>
             </Content>
           </Layout>
