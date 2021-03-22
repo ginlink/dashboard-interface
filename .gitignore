@@ -4,10 +4,14 @@ bin-debug/
 bin-release/
 [Oo]bj/
 [Bb]in/
-/node_modules
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
 # Other files and folders
 .settings/
 /yarn.lock
+/node_modules
 
 # Executables
 *.swf
