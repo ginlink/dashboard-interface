@@ -1,8 +1,12 @@
 // 投资页面
 import { useState , useEffect } from "react"
 import { Collapse , Button , Layout } from 'antd';
+import axios from "axios"
 
 import "./investment.css"
+
+import getWeb3 from "./../../web3/web3"
+import vaultApi from "../../contractAPI/vaultApi"
 
 import {
     getInvestmentList,
@@ -49,14 +53,59 @@ const text = (
 )
 
 const Investment = () => {
+    const [dataArray , setDataArray] = useState([])
     const [ investmentList, setInvestmentList] = useState([])
     const [ nvestmentDetail , setNvestmentDetail ] = useState()
 
     useEffect( ()=>{
-        getInvestmentList().then(res=>{
-            console.log(res)
+        axios.get("https://api.converter.finance/getTokenList").then(res=>{
+            console.log(res.data.data)
+            const data = res.data.data
+            setDataArray(data)
+            const newData = data.map(item=>{
+                
+                const fn = (async function(){
+                    const obj = await getWeb3()
+                    const web3 = obj.web3
+                    const owner = await new web3.eth.Contract(vaultApi, item.vault_address )
+                    // console.log(owner)
+                    let vaultOwner = await owner.methods.owner().call();
+                    console.log(vaultOwner)
+                })()
+
+                return (
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>reward pool地址：</td>
+                                <td>{item.pool_address}</td>
+                            </tr>
+                            <tr>
+                                <td>策略地址：</td>
+                                <td>{item.strategy_address}</td>
+                            </tr>
+                            <tr>
+                                <td>代币地址</td>
+                                <td>{item.underlying_address}</td>
+                            </tr>
+                            <tr>
+                                <td>金库地址</td>
+                                <td>{item.vault_address}</td>
+                            </tr>
+                            <tr>
+                                <td>金库owner</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>策略opwner</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+            )})
+            setInvestmentList(newData)
         })
-    } )
+    } ,[] )
 
     return(
         <div>
@@ -75,23 +124,30 @@ const Investment = () => {
                     <span className="investment-header-right">收益代币</span>
                 </div>
             </div>
-            <Collapse defaultActiveKey={['1']} onChange={callback}>
-                <Panel header={
-                    <div className="investment-table-header">
-                        <div>
-                            <span className="tokenName">MDX-USTD</span>
-                            <span >con</span>
-                        </div>
-                        <div className="investment-table-header-right">
-                            <Button>EARN</Button>
-                            <Button>HARVEST</Button>
-                            <button>⬇️</button>
-                        </div>
-                    </div>
-                } key="1">
-                <p>{text}</p>
-                </Panel>
-            </Collapse>
+            {
+                investmentList.map((item,index)=>{
+                    return(
+                        <Collapse key={index} defaultActiveKey={['1']} onChange={callback}>
+                        <Panel header={
+                            <div className="investment-table-header">
+                                <div>
+                                    <span className="tokenName">{dataArray[index]["underlying_name"]}</span>
+                                    <span >{dataArray[index]["strategy_index"]}</span>
+                                </div>
+                                <div className="investment-table-header-right">
+                                    <Button>EARN</Button>
+                                    <Button>HARVEST</Button>
+                                    <button>⬇️</button>
+                                </div>
+                            </div>
+                        } key="1">
+                        <p>{investmentList[index]}</p>
+                        </Panel>
+                    </Collapse>
+                    )
+                })
+            }
+            
         </div>
     )
 }
