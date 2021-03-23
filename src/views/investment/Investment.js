@@ -91,7 +91,9 @@ const Investment = () => {
 
             setInvestmentList(newData)
         })()
-    })
+
+    } ,[] )
+
     async function earns() {
         addresses.forEach((item, index)=>{
             item.vaultContract.methods.earn().send({ from: account })
