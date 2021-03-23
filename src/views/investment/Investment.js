@@ -148,7 +148,7 @@ const Investment = () => {
                                 </div>
                             </div>
                         } key="1">
-                        <p>{investmentList[index]}</p>
+                        <div>{investmentList[index]}</div>
                         </Panel>
                     </Collapse>
                     )
