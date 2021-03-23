@@ -10,8 +10,6 @@ import vaultApi from "../../contractAPI/vaultApi"
 import stragy from "../../contractAPI/stragy"
 import RewardPool from "../../contractAPI/RewardPool"
 import aabi from "../../contractAPI/stableContract"
-import vaultabi from "../../contractAPI/vaultApi";
-import web3 from "../../web3/web3";
 
 const { Header } = Layout;
 const { Panel } = Collapse;
@@ -23,9 +21,9 @@ function callback(key) {
 const Investment = () => {
     const [account , setAccount] = useState([])
     const [dataArray , setDataArray] = useState([])
-    const [ investmentList, setInvestmentList] = useState([])
-    const [ addresses, setAddresses] = useState([])
-    const [ owners, setOwners] = useState([])
+    const [investmentList, setInvestmentList] = useState([])
+    const [addresses, setAddresses] = useState([])
+    const [owners, setOwners] = useState([])
 
     let web3 = new Web3(window.ethereum)
     web3.eth.requestAccounts().then(accounts => {
@@ -33,32 +31,31 @@ const Investment = () => {
     })
 
 
-    useEffect( ()=>{
+    useEffect( (item, index)=>{
+        async function getAddressesAndOwners(item, index) {
+            let {vault_address, strategy_address, pool_address, underlying_address} = item;
+            addresses[index] = {
+                vaultContract: await new web3.eth.Contract(vaultApi, vault_address),
+                strategyContract: await new web3.eth.Contract(stragy, strategy_address),
+                poolContract: await new web3.eth.Contract(RewardPool, pool_address),
+                stableCoinContract: await new web3.eth.Contract(aabi, underlying_address),
+            }
+            owners[index] = {
+                poolOwner: await addresses[index].poolContract.methods.owner().call(),
+                strategyOwner: await addresses[index].strategyContract.methods.owner().call(),
+            }
+
+            setAddresses(addresses)
+            setOwners(owners)
+        }
+
         axios.get("https://api.converter.finance/getTokenList").then(res=>{
             // console.log(res.data.data)
             const data = res.data.data
             setDataArray(data)
 
-            const newData = data.map((item, index)=>{
-                (async ()=> {
-                    let {vault_address,strategy_address,pool_address,underlying_address} = item;
-                    // let names = 'addr' + item.vault_address;
-                    addresses[index] = {
-                        vaultContract: await new web3.eth.Contract( vaultApi, vault_address),
-                        strategyContract: await new web3.eth.Contract( stragy, strategy_address),
-                        poolContract: await new web3.eth.Contract( RewardPool, pool_address),
-                        stableCoinContract: await new web3.eth.Contract( aabi, underlying_address),
-                    }
-                    setAddresses(addresses)
-                    owners[index] = {
-                        poolOwner: await addresses[index].poolContract.methods.owner().call(),
-                        strategyOwner: await addresses[index].strategyContract.methods.owner().call(),
-                    }
-                    setOwners(owners)
-                    // console.log(owners[index].strategyOwner)
-                })()
-
-                // console.log(addresses)
+            let newData = data.map( (item, index)=>{
+                getAddressesAndOwners(item, index)
 
                 return (
                     <table>
@@ -85,11 +82,12 @@ const Investment = () => {
                             </tr>
                             <tr>
                                 <td>策略owner</td>
-                                <td>{owners[index] ? owners[index].strategyOwner : '-'}</td>
+                                <td>{ owners[index] ? owners[index].strategyOwner : '-'}</td>
                             </tr>
                         </tbody>
                     </table>
-            )})
+                )
+            })
             setInvestmentList(newData)
         })
 
@@ -107,11 +105,12 @@ const Investment = () => {
 
     async function harvests() {
         addresses.forEach((item, index)=>{
-            item.stragyContract.methods.harvest().send({ from: account })
+            item.strategyContract.methods.harvest().send({ from: account })
         })
     }
     async function harvest(index) {
-        addresses[index].stragyContract.methods.harvest().send({ from: account })
+        console.log(addresses[index].strategyContract)
+        addresses[index].strategyContract.methods.harvest().send({ from: account })
     }
 
     return(
@@ -148,7 +147,7 @@ const Investment = () => {
                                 </div>
                             </div>
                         } key="1">
-                        <div>{investmentList[index]}</div>
+                        <div>{item}</div>
                         </Panel>
                     </Collapse>
                     )
