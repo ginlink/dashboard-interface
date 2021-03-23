@@ -99,7 +99,9 @@ const Investment = () => {
             item.vaultContract.methods.earn().send({ from: account })
         })
     }
-    async function earn(index) {
+    async function earn(ev, index) {
+        ev.cancelBubble = true
+        ev.stopPropagation()
         addresses[index].vaultContract.methods.earn().send({ from: account })
     }
 
@@ -108,8 +110,9 @@ const Investment = () => {
             item.strategyContract.methods.harvest().send({ from: account })
         })
     }
-    async function harvest(index) {
-        console.log(addresses[index].strategyContract)
+    async function harvest(ev, index) {
+        ev.cancelBubble = true
+        ev.stopPropagation()
         addresses[index].strategyContract.methods.harvest().send({ from: account })
     }
 
@@ -141,8 +144,8 @@ const Investment = () => {
                                     <span >{dataArray[index]["strategy_index"]}</span>
                                 </div>
                                 <div className="investment-table-header-right">
-                                    <Button onClick={()=>{earn(index)}}>EARN</Button>
-                                    <Button onClick={()=>{harvest(index)}}>HARVEST</Button>
+                                    <Button onClick={(ev)=>{earn(ev,index)}}>EARN</Button>
+                                    <Button onClick={(ev)=>{harvest(ev,index)}}>HARVEST</Button>
                                     <button>⬇️</button>
                                 </div>
                             </div>
