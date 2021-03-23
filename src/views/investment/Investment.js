@@ -21,11 +21,15 @@ function callback(key) {
 }
 
 const Investment = () => {
+    const [account , setAccount] = useState([])
     const [dataArray , setDataArray] = useState([])
     const [ investmentList, setInvestmentList] = useState([])
-    const [ addresses, setAddresses] = useState({})
+    const [ addresses, setAddresses] = useState([])
 
     let web3 = new Web3(window.ethereum)
+    web3.eth.requestAccounts().then(accounts => {
+        setAccount(accounts[0])
+    })
 
 
     useEffect( ()=>{
@@ -34,11 +38,11 @@ const Investment = () => {
             const data = res.data.data
             setDataArray(data)
 
-            const newData = data.map(item=>{
+            const newData = data.map((item, index)=>{
                 (async ()=> {
                     let {vault_address,strategy_address,pool_address,underlying_address} = item;
-                    let names = 'addr' + item.vault_address;
-                    addresses[names] = {
+                    // let names = 'addr' + item.vault_address;
+                    addresses[index] = {
                         vaultContract: await new web3.eth.Contract( vaultApi, vault_address),
                         stragyContract: await new web3.eth.Contract( stragy, strategy_address),
                         poolContract: await new web3.eth.Contract( RewardPool, pool_address),
@@ -85,10 +89,21 @@ const Investment = () => {
     } ,[] )
 
     async function earns() {
-        let account = (await web3.eth.requestAccounts())[0];
-        for (let addr in addresses) {
-            addresses[addr].vaultContract.methods.earn().send({ from: account })
-        }
+        addresses.forEach((item, index)=>{
+            item.vaultContract.methods.earn().send({ from: account })
+        })
+    }
+    async function earn(index) {
+        addresses[index].vaultContract.methods.earn().send({ from: account })
+    }
+
+    async function harvests() {
+        addresses.forEach((item, index)=>{
+            item.stragyContract.methods.harvest().send({ from: account })
+        })
+    }
+    async function harvest(index) {
+        addresses[index].stragyContract.methods.harvest().send({ from: account })
     }
 
     return(
@@ -98,7 +113,7 @@ const Investment = () => {
                     <span>POOL INFO</span>
                     <div>
                         <span className="headerButton" onClick={()=>{earns()}}> 一键EARN </span>
-                        <span className="headerButton"> 一键HARVEST </span>
+                        <span className="headerButton" onClick={()=>{harvests()}}> 一键HARVEST </span>
                     </div>
                 </div>
             </Header>
@@ -119,8 +134,8 @@ const Investment = () => {
                                     <span >{dataArray[index]["strategy_index"]}</span>
                                 </div>
                                 <div className="investment-table-header-right">
-                                    <Button>EARN</Button>
-                                    <Button>HARVEST</Button>
+                                    <Button onClick={()=>{earn(index)}}>EARN</Button>
+                                    <Button onClick={()=>{harvest(index)}}>HARVEST</Button>
                                     <button>⬇️</button>
                                 </div>
                             </div>
