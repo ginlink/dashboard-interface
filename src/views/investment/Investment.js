@@ -5,73 +5,48 @@ import axios from "axios"
 
 import "./investment.css"
 
-import getWeb3 from "./../../web3/web3"
+import Web3 from "web3"
 import vaultApi from "../../contractAPI/vaultApi"
-
-import {
-    getInvestmentList,
-    getInvestmentDetail
-} from "./../../api/investment"
+import stragy from "../../contractAPI/stragy"
+import RewardPool from "../../contractAPI/RewardPool"
+import aabi from "../../contractAPI/stableContract"
+import vaultabi from "../../contractAPI/vaultApi";
+import web3 from "../../web3/web3";
 
 const { Header } = Layout;
-
 const { Panel } = Collapse;
 
 function callback(key) {
   console.log(key);
 }
 
-const text = (
-    <table>
-        <tbody>
-            <tr>
-                <td>reward pool地址：</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>策略地址：</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>代币地址</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>金库地址</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>金库owner</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>策略opwner</td>
-                <td></td>
-            </tr>
-        </tbody>
-    </table>
-)
-
 const Investment = () => {
     const [dataArray , setDataArray] = useState([])
     const [ investmentList, setInvestmentList] = useState([])
-    const [ nvestmentDetail , setNvestmentDetail ] = useState()
+    const [ addresses, setAddresses] = useState({})
+
+    let web3 = new Web3(window.ethereum)
+
 
     useEffect( ()=>{
         axios.get("https://api.converter.finance/getTokenList").then(res=>{
-            console.log(res.data.data)
+            // console.log(res.data.data)
             const data = res.data.data
             setDataArray(data)
+
             const newData = data.map(item=>{
-                
-                const fn = (async function(){
-                    const obj = await getWeb3()
-                    const web3 = obj.web3
-                    const owner = await new web3.eth.Contract(vaultApi, item.vault_address )
-                    // console.log(owner)
-                    let vaultOwner = await owner.methods.owner().call();
-                    console.log(vaultOwner)
+                (async ()=> {
+                    let {vault_address,strategy_address,pool_address,underlying_address} = item;
+                    let names = 'addr' + item.vault_address;
+                    addresses[names] = {
+                        vaultContract: await new web3.eth.Contract( vaultApi, vault_address),
+                        stragyContract: await new web3.eth.Contract( stragy, strategy_address),
+                        poolContract: await new web3.eth.Contract( RewardPool, pool_address),
+                        stableCoinContract: await new web3.eth.Contract( aabi, underlying_address),
+                    }
+                    setAddresses(addresses)
                 })()
+
 
                 return (
                     <table>
@@ -97,7 +72,7 @@ const Investment = () => {
                                 <td></td>
                             </tr>
                             <tr>
-                                <td>策略opwner</td>
+                                <td>策略owner</td>
                                 <td></td>
                             </tr>
                         </tbody>
@@ -105,7 +80,16 @@ const Investment = () => {
             )})
             setInvestmentList(newData)
         })
+
+
     } ,[] )
+
+    async function earns() {
+        let account = (await web3.eth.requestAccounts())[0];
+        for (let addr in addresses) {
+            addresses[addr].vaultContract.methods.earn().send({ from: account })
+        }
+    }
 
     return(
         <div>
@@ -113,7 +97,7 @@ const Investment = () => {
                 <div className="header">
                     <span>POOL INFO</span>
                     <div>
-                        <span className="headerButton" > 一键EARN </span>
+                        <span className="headerButton" onClick={()=>{earns()}}> 一键EARN </span>
                         <span className="headerButton"> 一键HARVEST </span>
                     </div>
                 </div>
@@ -147,7 +131,6 @@ const Investment = () => {
                     )
                 })
             }
-            
         </div>
     )
 }
