@@ -1,4 +1,4 @@
-// 投资页面
+
 import { useState , useEffect } from "react"
 import { Collapse , Button , Layout } from 'antd';
 import axios from "axios"
