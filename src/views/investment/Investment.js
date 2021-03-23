@@ -8,10 +8,10 @@ import "./investment.css"
 import getWeb3 from "./../../web3/web3"
 import vaultApi from "../../contractAPI/vaultApi"
 
-import {
-    getInvestmentList,
-    getInvestmentDetail
-} from "./../../api/investment"
+// import {
+//     getInvestmentList,
+//     getInvestmentDetail
+// } from "./../../api/investment"
 
 const { Header } = Layout;
 
