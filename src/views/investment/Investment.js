@@ -45,14 +45,13 @@ const Investment = () => {
                         poolContract: await new web3.eth.Contract( RewardPool, pool_address),
                         stableCoinContract: await new web3.eth.Contract( aabi, underlying_address),
                     }
-                    setAddresses(addresses)
+                    setAddresses([...addresses])
                     owners[index] = {
                         poolOwner: await addresses[index].poolContract.methods.owner().call(),
                         strategyOwner: await addresses[index].strategyContract.methods.owner().call(),
                     }
-                    setOwners(owners)
+                    setOwners([...owners])
                 })()
-
 
                 return (
                     <table>
