@@ -31,66 +31,66 @@ const Investment = () => {
     })
 
 
-    useEffect( (item, index)=>{
-        async function getAddressesAndOwners(item, index) {
-            let {vault_address, strategy_address, pool_address, underlying_address} = item;
-            addresses[index] = {
-                vaultContract: await new web3.eth.Contract(vaultApi, vault_address),
-                strategyContract: await new web3.eth.Contract(stragy, strategy_address),
-                poolContract: await new web3.eth.Contract(RewardPool, pool_address),
-                stableCoinContract: await new web3.eth.Contract(aabi, underlying_address),
-            }
-            owners[index] = {
-                poolOwner: await addresses[index].poolContract.methods.owner().call(),
-                strategyOwner: await addresses[index].strategyContract.methods.owner().call(),
-            }
+    useEffect( ()=>{
+        async function getAddressesAndOwners(data) {
+            for (let index in data) {
+                let item = data[index]
+                let {vault_address, strategy_address, pool_address, underlying_address} = item;
+                addresses[index] = {
+                    vaultContract: await new web3.eth.Contract(vaultApi, vault_address),
+                    strategyContract: await new web3.eth.Contract(stragy, strategy_address),
+                    poolContract: await new web3.eth.Contract(RewardPool, pool_address),
+                    stableCoinContract: await new web3.eth.Contract(aabi, underlying_address),
+                }
+                owners[index] = {
+                    poolOwner: await addresses[index].poolContract.methods.owner().call(),
+                    strategyOwner: await addresses[index].strategyContract.methods.owner().call(),
+                }
 
-            setAddresses(addresses)
-            setOwners(owners)
+                setAddresses(addresses)
+                setOwners(owners)
+            }
         }
-
-        axios.get("https://api.converter.finance/getTokenList").then(res=>{
-            // console.log(res.data.data)
+        (async ()=>{
+            let res = await axios.get("https://api.converter.finance/getTokenList")
             const data = res.data.data
             setDataArray(data)
-
-            let newData = data.map( (item, index)=>{
-                getAddressesAndOwners(item, index)
-
+            await getAddressesAndOwners(data)
+            let newData = data.map( (item, index)=> {
                 return (
                     <table>
                         <tbody>
-                            <tr>
-                                <td>reward pool地址：</td>
-                                <td>{item.pool_address}</td>
-                            </tr>
-                            <tr>
-                                <td>策略地址：</td>
-                                <td>{item.strategy_address}</td>
-                            </tr>
-                            <tr>
-                                <td>代币地址</td>
-                                <td>{item.underlying_address}</td>
-                            </tr>
-                            <tr>
-                                <td>金库地址</td>
-                                <td>{item.vault_address}</td>
-                            </tr>
-                            <tr>
-                                <td>金库owner</td>
-                                <td>{ owners[index] ? owners[index].poolOwner : '-'}</td>
-                            </tr>
-                            <tr>
-                                <td>策略owner</td>
-                                <td>{ owners[index] ? owners[index].strategyOwner : '-'}</td>
-                            </tr>
+                        <tr>
+                            <td>reward pool地址：</td>
+                            <td>{item.pool_address}</td>
+                        </tr>
+                        <tr>
+                            <td>策略地址：</td>
+                            <td>{item.strategy_address}</td>
+                        </tr>
+                        <tr>
+                            <td>代币地址</td>
+                            <td>{item.underlying_address}</td>
+                        </tr>
+                        <tr>
+                            <td>金库地址</td>
+                            <td>{item.vault_address}</td>
+                        </tr>
+                        <tr>
+                            <td>金库owner</td>
+                            <td>{ owners[index] ? owners[index].poolOwner : '-'}</td>
+                        </tr>
+                        <tr>
+                            <td>策略owner</td>
+                            <td>{ owners[index] ? owners[index].strategyOwner : '-'}</td>
+                        </tr>
                         </tbody>
                     </table>
                 )
             })
-            setInvestmentList(newData)
-        })
 
+            setInvestmentList(newData)
+        })()
 
     } ,[] )
 
