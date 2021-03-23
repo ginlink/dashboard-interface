@@ -1,4 +1,4 @@
-// 投资页面
+
 import { useState , useEffect } from "react"
 import { Collapse , Button , Layout } from 'antd';
 import axios from "axios"
@@ -10,8 +10,6 @@ import vaultApi from "../../contractAPI/vaultApi"
 import stragy from "../../contractAPI/stragy"
 import RewardPool from "../../contractAPI/RewardPool"
 import aabi from "../../contractAPI/stableContract"
-import vaultabi from "../../contractAPI/vaultApi";
-import web3 from "../../web3/web3";
 
 const { Header } = Layout;
 const { Panel } = Collapse;
@@ -35,14 +33,12 @@ const Investment = () => {
 
     useEffect( ()=>{
         axios.get("https://api.converter.finance/getTokenList").then(res=>{
-            // console.log(res.data.data)
             const data = res.data.data
             setDataArray(data)
 
             const newData = data.map((item, index)=>{
                 (async ()=> {
                     let {vault_address,strategy_address,pool_address,underlying_address} = item;
-                    // let names = 'addr' + item.vault_address;
                     addresses[index] = {
                         vaultContract: await new web3.eth.Contract( vaultApi, vault_address),
                         strategyContract: await new web3.eth.Contract( stragy, strategy_address),
@@ -55,10 +51,8 @@ const Investment = () => {
                         strategyOwner: await addresses[index].strategyContract.methods.owner().call(),
                     }
                     setOwners(owners)
-                    // console.log(owners[index].strategyOwner)
                 })()
 
-                // console.log(addresses)
 
                 return (
                     <table>
@@ -92,9 +86,8 @@ const Investment = () => {
             )})
             setInvestmentList(newData)
         })
+    }  ,[])
 
-
-    } ,[] )
 
     async function earns() {
         addresses.forEach((item, index)=>{
@@ -111,6 +104,7 @@ const Investment = () => {
         })
     }
     async function harvest(index) {
+        console.log(addresses[index])
         addresses[index].stragyContract.methods.harvest().send({ from: account })
     }
 
@@ -134,7 +128,7 @@ const Investment = () => {
             {
                 investmentList.map((item,index)=>{
                     return(
-                        <Collapse key={index} defaultActiveKey={['1']} onChange={callback}>
+                        <Collapse key={index} onChange={callback}>
                         <Panel header={
                             <div className="investment-table-header">
                                 <div>
@@ -142,9 +136,15 @@ const Investment = () => {
                                     <span >{dataArray[index]["strategy_index"]}</span>
                                 </div>
                                 <div className="investment-table-header-right">
-                                    <Button onClick={()=>{earn(index)}}>EARN</Button>
-                                    <Button onClick={()=>{harvest(index)}}>HARVEST</Button>
-                                    <button>⬇️</button>
+                                    <Button onClick={(e)=>{
+                                        e.stopPropagation()
+                                        earn(index)}
+                                        }>EARN</Button>
+                                    <Button onClick={(e)=>{
+                                        e.stopPropagation()
+                                        harvest(index)}
+                                        }>HARVEST</Button>
+                                    <Button>⬇️</Button>
                                 </div>
                             </div>
                         } key="1">
