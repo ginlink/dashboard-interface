@@ -18,7 +18,7 @@ const { Header } = Layout;
 const { Panel } = Collapse;
 
 function callback(key) {
-  console.log(key);
+//   console.log(key);
 }
 
 const text = (
@@ -70,7 +70,7 @@ const Investment = () => {
                     const owner = await new web3.eth.Contract(vaultApi, item.vault_address )
                     // console.log(owner)
                     let vaultOwner = await owner.methods.owner().call();
-                    console.log(vaultOwner)
+                    // console.log(vaultOwner)
                 })()
 
                 return (
@@ -97,7 +97,11 @@ const Investment = () => {
                                 <td></td>
                             </tr>
                             <tr>
-                                <td>策略opwner</td>
+                                <td>策略opner</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>poolowner：</td>
                                 <td></td>
                             </tr>
                         </tbody>
@@ -105,7 +109,7 @@ const Investment = () => {
             )})
             setInvestmentList(newData)
         })
-    } ,[] )
+    } ,[])
 
     return(
         <div>
@@ -127,7 +131,7 @@ const Investment = () => {
             {
                 investmentList.map((item,index)=>{
                     return(
-                        <Collapse key={index} defaultActiveKey={['1']} onChange={callback}>
+                        <Collapse key={index} onChange={callback}>
                         <Panel header={
                             <div className="investment-table-header">
                                 <div>
@@ -137,10 +141,10 @@ const Investment = () => {
                                 <div className="investment-table-header-right">
                                     <Button>EARN</Button>
                                     <Button>HARVEST</Button>
-                                    <button>⬇️</button>
+                                    <Button>打开</Button>
                                 </div>
                             </div>
-                        } key="1">
+                        } key={index}>
                         <p>{investmentList[index]}</p>
                         </Panel>
                     </Collapse>

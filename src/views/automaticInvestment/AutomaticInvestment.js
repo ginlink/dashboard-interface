@@ -58,9 +58,8 @@ const IFrom = () => {
             name="theResults"
             rules={[{ message: 'Please input your username!' }]}
             >
-                {/* <Input /> */}
                 <Select
-                defaultValue={theResults}
+                defaultValue= {theResults}
                 style={{
                 width: 80,
                 margin: '0 20px',
@@ -78,7 +77,7 @@ const IFrom = () => {
             rules={[{ message: 'Please input your username!' }]}
             >
                 <Select
-                defaultValue="成功"
+                defaultValue={runningState}
                 style={{
                 width: 80,
                 margin: '0 20px',
@@ -168,7 +167,7 @@ function AutomaticInvestment() {
                 open: (<button>运行</button>)
             },
         ]);
-    }, [dataSource]);
+    }, []);
     return (
         <div>
             <div className="prevStateShow">
