@@ -100,12 +100,12 @@ const Investment = () => {
 
     async function harvests() {
         addresses.forEach((item, index)=>{
-            item.stragyContract.methods.harvest().send({ from: account })
+            item.strategyContract.methods.harvest().send({ from: account })
         })
     }
     async function harvest(index) {
         console.log(addresses[index])
-        addresses[index].stragyContract.methods.harvest().send({ from: account })
+        addresses[index].strategyContract.methods.harvest().send({ from: account })
     }
 
     return(
