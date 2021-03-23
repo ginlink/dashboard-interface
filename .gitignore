@@ -1,17 +1,12 @@
 # Build and Release Folders
-/node_modules
+node_modules/
 bin-debug/
 bin-release/
 [Oo]bj/
 [Bb]in/
-<<<<<<< HEAD
-=======
 
->>>>>>> main
 # Other files and folders
 .settings/
-/yarn.lock
-/node_modules
 
 # Executables
 *.swf

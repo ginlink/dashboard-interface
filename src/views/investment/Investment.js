@@ -15,7 +15,7 @@ const { Header } = Layout;
 const { Panel } = Collapse;
 
 function callback(key) {
-  console.log(key);
+//   console.log(key);
 }
 
 const Investment = () => {
@@ -136,7 +136,7 @@ const Investment = () => {
             {
                 investmentList.map((item,index)=>{
                     return(
-                        <Collapse key={index} defaultActiveKey={['1']} onChange={callback}>
+                        <Collapse key={index} onChange={callback}>
                         <Panel header={
                             <div className="investment-table-header">
                                 <div>
