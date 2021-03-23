@@ -25,6 +25,7 @@ const Investment = () => {
     const [dataArray , setDataArray] = useState([])
     const [ investmentList, setInvestmentList] = useState([])
     const [ addresses, setAddresses] = useState([])
+    const [ owners, setOwners] = useState([])
 
     let web3 = new Web3(window.ethereum)
     web3.eth.requestAccounts().then(accounts => {
@@ -44,13 +45,20 @@ const Investment = () => {
                     // let names = 'addr' + item.vault_address;
                     addresses[index] = {
                         vaultContract: await new web3.eth.Contract( vaultApi, vault_address),
-                        stragyContract: await new web3.eth.Contract( stragy, strategy_address),
+                        strategyContract: await new web3.eth.Contract( stragy, strategy_address),
                         poolContract: await new web3.eth.Contract( RewardPool, pool_address),
                         stableCoinContract: await new web3.eth.Contract( aabi, underlying_address),
                     }
                     setAddresses(addresses)
+                    owners[index] = {
+                        poolOwner: await addresses[index].poolContract.methods.owner().call(),
+                        strategyOwner: await addresses[index].strategyContract.methods.owner().call(),
+                    }
+                    setOwners(owners)
+                    // console.log(owners[index].strategyOwner)
                 })()
 
+                // console.log(addresses)
 
                 return (
                     <table>
@@ -73,11 +81,11 @@ const Investment = () => {
                             </tr>
                             <tr>
                                 <td>金库owner</td>
-                                <td></td>
+                                <td>{ owners[index] ? owners[index].poolOwner : '-'}</td>
                             </tr>
                             <tr>
                                 <td>策略owner</td>
-                                <td></td>
+                                <td>{owners[index] ? owners[index].strategyOwner : '-'}</td>
                             </tr>
                         </tbody>
                     </table>
