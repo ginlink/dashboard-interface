@@ -5,111 +5,116 @@ import axios from "axios"
 
 import "./investment.css"
 
-import getWeb3 from "./../../web3/web3"
+import Web3 from "web3"
 import vaultApi from "../../contractAPI/vaultApi"
-
-import {
-    getInvestmentList,
-    getInvestmentDetail
-} from "./../../api/investment"
+import stragy from "../../contractAPI/stragy"
+import RewardPool from "../../contractAPI/RewardPool"
+import aabi from "../../contractAPI/stableContract"
 
 const { Header } = Layout;
-
 const { Panel } = Collapse;
 
 function callback(key) {
 //   console.log(key);
 }
 
-const text = (
-    <table>
-        <tbody>
-            <tr>
-                <td>reward pool地址：</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>策略地址：</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>代币地址</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>金库地址</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>金库owner</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>策略opwner</td>
-                <td></td>
-            </tr>
-        </tbody>
-    </table>
-)
-
 const Investment = () => {
+    const [account , setAccount] = useState([])
     const [dataArray , setDataArray] = useState([])
-    const [ investmentList, setInvestmentList] = useState([])
-    const [ nvestmentDetail , setNvestmentDetail ] = useState()
+    const [investmentList, setInvestmentList] = useState([])
+    const [addresses, setAddresses] = useState([])
+    const [owners, setOwners] = useState([])
+
+    let web3 = new Web3(window.ethereum)
+    web3.eth.requestAccounts().then(accounts => {
+        setAccount(accounts[0])
+    })
+
 
     useEffect( ()=>{
-        axios.get("https://api.converter.finance/getTokenList").then(res=>{
-            console.log(res.data.data)
+        async function getAddressesAndOwners(data) {
+            for (let index in data) {
+                let item = data[index]
+                let {vault_address, strategy_address, pool_address, underlying_address} = item;
+                addresses[index] = {
+                    vaultContract: await new web3.eth.Contract(vaultApi, vault_address),
+                    strategyContract: await new web3.eth.Contract(stragy, strategy_address),
+                    poolContract: await new web3.eth.Contract(RewardPool, pool_address),
+                    stableCoinContract: await new web3.eth.Contract(aabi, underlying_address),
+                }
+                owners[index] = {
+                    poolOwner: await addresses[index].poolContract.methods.owner().call(),
+                    strategyOwner: await addresses[index].strategyContract.methods.owner().call(),
+                }
+
+                setAddresses(addresses)
+                setOwners(owners)
+            }
+        }
+        (async ()=>{
+            let res = await axios.get("https://api.converter.finance/getTokenList")
             const data = res.data.data
             setDataArray(data)
-            const newData = data.map(item=>{
-                
-                const fn = (async function(){
-                    const obj = await getWeb3()
-                    const web3 = obj.web3
-                    const owner = await new web3.eth.Contract(vaultApi, item.vault_address )
-                    // console.log(owner)
-                    let vaultOwner = await owner.methods.owner().call();
-                    // console.log(vaultOwner)
-                })()
-
+            await getAddressesAndOwners(data)
+            let newData = data.map( (item, index)=> {
                 return (
                     <table>
                         <tbody>
-                            <tr>
-                                <td>reward pool地址：</td>
-                                <td>{item.pool_address}</td>
-                            </tr>
-                            <tr>
-                                <td>策略地址：</td>
-                                <td>{item.strategy_address}</td>
-                            </tr>
-                            <tr>
-                                <td>代币地址</td>
-                                <td>{item.underlying_address}</td>
-                            </tr>
-                            <tr>
-                                <td>金库地址</td>
-                                <td>{item.vault_address}</td>
-                            </tr>
-                            <tr>
-                                <td>金库owner</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>策略opner</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>poolowner：</td>
-                                <td></td>
-                            </tr>
+                        <tr>
+                            <td>reward pool地址：</td>
+                            <td>{item.pool_address}</td>
+                        </tr>
+                        <tr>
+                            <td>策略地址：</td>
+                            <td>{item.strategy_address}</td>
+                        </tr>
+                        <tr>
+                            <td>代币地址</td>
+                            <td>{item.underlying_address}</td>
+                        </tr>
+                        <tr>
+                            <td>金库地址</td>
+                            <td>{item.vault_address}</td>
+                        </tr>
+                        <tr>
+                            <td>金库owner</td>
+                            <td>{ owners[index] ? owners[index].poolOwner : '-'}</td>
+                        </tr>
+                        <tr>
+                            <td>策略owner</td>
+                            <td>{ owners[index] ? owners[index].strategyOwner : '-'}</td>
+                        </tr>
                         </tbody>
                     </table>
-            )})
+                )
+            })
+
             setInvestmentList(newData)
+        })()
+
+    } ,[] )
+
+    async function earns() {
+        addresses.forEach((item, index)=>{
+            item.vaultContract.methods.earn().send({ from: account })
         })
-    } ,[])
+    }
+    async function earn(ev, index) {
+        ev.cancelBubble = true
+        ev.stopPropagation()
+        addresses[index].vaultContract.methods.earn().send({ from: account })
+    }
+
+    async function harvests() {
+        addresses.forEach((item, index)=>{
+            item.strategyContract.methods.harvest().send({ from: account })
+        })
+    }
+    async function harvest(ev, index) {
+        ev.cancelBubble = true
+        ev.stopPropagation()
+        addresses[index].strategyContract.methods.harvest().send({ from: account })
+    }
 
     return(
         <div>
@@ -117,8 +122,8 @@ const Investment = () => {
                 <div className="header">
                     <span>POOL INFO</span>
                     <div>
-                        <span className="headerButton" > 一键EARN </span>
-                        <span className="headerButton"> 一键HARVEST </span>
+                        <span className="headerButton" onClick={()=>{earns()}}> 一键EARN </span>
+                        <span className="headerButton" onClick={()=>{harvests()}}> 一键HARVEST </span>
                     </div>
                 </div>
             </Header>
@@ -139,19 +144,18 @@ const Investment = () => {
                                     <span >{dataArray[index]["strategy_index"]}</span>
                                 </div>
                                 <div className="investment-table-header-right">
-                                    <Button>EARN</Button>
-                                    <Button>HARVEST</Button>
-                                    <Button>打开</Button>
+                                    <Button onClick={(ev)=>{earn(ev,index)}}>EARN</Button>
+                                    <Button onClick={(ev)=>{harvest(ev,index)}}>HARVEST</Button>
+                                    <button>⬇️</button>
                                 </div>
                             </div>
-                        } key={index}>
-                        <p>{investmentList[index]}</p>
+                        } key="1">
+                        <div>{item}</div>
                         </Panel>
                     </Collapse>
                     )
                 })
             }
-            
         </div>
     )
 }
