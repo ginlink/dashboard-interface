@@ -1,15 +1,10 @@
-
+import Web3 from "web3"
 import { useState , useEffect } from "react"
 import { Collapse , Button , Layout } from 'antd';
 import axios from "axios"
+import {useSelector} from "react-redux"  
 
 import "./investment.css"
-
-import Web3 from "web3"
-import vaultApi from "../../contractAPI/vaultApi"
-import stragy from "../../contractAPI/stragy"
-import RewardPool from "../../contractAPI/RewardPool"
-import aabi from "../../contractAPI/stableContract"
 
 const { Header } = Layout;
 const { Panel } = Collapse;
@@ -18,81 +13,56 @@ function callback(key) {
 //   console.log(key);
 }
 
+
+
 const Investment = () => {
-    const [account , setAccount] = useState([])
-    const [dataArray , setDataArray] = useState([])
+
+
     const [investmentList, setInvestmentList] = useState([])
-    const [addresses, setAddresses] = useState([])
-    const [owners, setOwners] = useState([])
 
-    let web3 = new Web3(window.ethereum)
-    web3.eth.requestAccounts().then(accounts => {
-        setAccount(accounts[0])
-    })
+    const web3 = useSelector(state=>state.get("web3"))
+    const account = useSelector(state=>state.get("account"))
+    const addresses = useSelector(state=>state.get("addresses"))
+    const owners = useSelector(state=>state.get("owners"))
+    const dataArray = useSelector(state=>state.get("dataArray"))
 
+    useEffect(() => {
+        let newData = dataArray.map( (item, index)=> {
+            return (
+                <table>
+                    <tbody>
+                    <tr>
+                        <td>reward pool地址：</td>
+                        <td>{item.pool_address}</td>
+                    </tr>
+                    <tr>
+                        <td>策略地址：</td>
+                        <td>{item.strategy_address}</td>
+                    </tr>
+                    <tr>
+                        <td>代币地址</td>
+                        <td>{item.underlying_address}</td>
+                    </tr>
+                    <tr>
+                        <td>金库地址</td>
+                        <td>{item.vault_address}</td>
+                    </tr>
+                    <tr>
+                        <td>金库owner</td>
+                        <td>{ owners[index] ? owners[index].poolOwner : '-'}</td>
+                    </tr>
+                    <tr>
+                        <td>策略owner</td>
+                        <td>{ owners[index] ? owners[index].strategyOwner : '-'}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            )
+        })
 
-    useEffect( ()=>{
-        async function getAddressesAndOwners(data) {
-            for (let index in data) {
-                let item = data[index]
-                let {vault_address, strategy_address, pool_address, underlying_address} = item;
-                addresses[index] = {
-                    vaultContract: await new web3.eth.Contract(vaultApi, vault_address),
-                    strategyContract: await new web3.eth.Contract(stragy, strategy_address),
-                    poolContract: await new web3.eth.Contract(RewardPool, pool_address),
-                    stableCoinContract: await new web3.eth.Contract(aabi, underlying_address),
-                }
-                owners[index] = {
-                    poolOwner: await addresses[index].poolContract.methods.owner().call(),
-                    strategyOwner: await addresses[index].strategyContract.methods.owner().call(),
-                }
+        setInvestmentList(newData)
+    }, []);
 
-                setAddresses(addresses)
-                setOwners(owners)
-            }
-        }
-        (async ()=>{
-            let res = await axios.get("https://api.converter.finance/getTokenList")
-            const data = res.data.data
-            setDataArray(data)
-            await getAddressesAndOwners(data)
-            let newData = data.map( (item, index)=> {
-                return (
-                    <table>
-                        <tbody>
-                        <tr>
-                            <td>reward pool地址：</td>
-                            <td>{item.pool_address}</td>
-                        </tr>
-                        <tr>
-                            <td>策略地址：</td>
-                            <td>{item.strategy_address}</td>
-                        </tr>
-                        <tr>
-                            <td>代币地址</td>
-                            <td>{item.underlying_address}</td>
-                        </tr>
-                        <tr>
-                            <td>金库地址</td>
-                            <td>{item.vault_address}</td>
-                        </tr>
-                        <tr>
-                            <td>金库owner</td>
-                            <td>{ owners[index] ? owners[index].poolOwner : '-'}</td>
-                        </tr>
-                        <tr>
-                            <td>策略owner</td>
-                            <td>{ owners[index] ? owners[index].strategyOwner : '-'}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                )
-            })
-
-            setInvestmentList(newData)
-        })()
-
-    } ,[] )
 
     async function earns() {
         addresses.forEach((item, index)=>{
@@ -121,9 +91,14 @@ const Investment = () => {
             <Header className="site-layout-background" style={{ padding: 0 }} >
                 <div className="header">
                     <span>POOL INFO</span>
-                    <div>
-                        <span className="headerButton" onClick={()=>{earns()}}> 一键EARN </span>
-                        <span className="headerButton" onClick={()=>{harvests()}}> 一键HARVEST </span>
+                    <div className="header_right">
+                        <Button onClick={()=>{earns()}}> 一键EARN </Button>
+                        <Button onClick={()=>{harvests()}}> 一键HARVEST </Button>
+                        <div className="account-name">
+                            <span className="">{account}</span>
+                            <span>...</span>
+                        </div>
+                        
                     </div>
                 </div>
             </Header>
@@ -146,7 +121,7 @@ const Investment = () => {
                                 <div className="investment-table-header-right">
                                     <Button onClick={(ev)=>{earn(ev,index)}}>EARN</Button>
                                     <Button onClick={(ev)=>{harvest(ev,index)}}>HARVEST</Button>
-                                    <button>⬇️</button>
+                                    <Button>⬇</Button>
                                 </div>
                             </div>
                         } key="1">

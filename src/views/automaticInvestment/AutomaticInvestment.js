@@ -1,15 +1,10 @@
 
-// 自动化投资页面
+
 import { Table } from "antd"
 import React , { useState , useEffect } from 'react';
 import { Form, Row, Col, Input, Button,Select } from 'antd';
 
 import "./AutomaticInvestment.css"
-
-import {
-    getAutomaticInvestmentList ,
-    getAutomaticInvestmentScript
-} from "./../../api/automaticInvestment"
 
 const { Option } = Select
 
