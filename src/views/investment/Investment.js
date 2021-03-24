@@ -86,7 +86,7 @@ const Investment = () => {
             )
         })
         setInvestmentList(newData)
-    });
+    }, [investmentList]);
 
     async function earns() {
         addresses.forEach((item, index) => {
