@@ -37,12 +37,16 @@
 }
 .account-name{
     display: flex;
-    width: 60px;
     overflow: hidden;
     margin: 20px;
 }
 .account-name span:nth-child(1){
     overflow: hidden;
-    width: 50px;
+    width: 32px;
+    display: block;
+}
+.account-name span:nth-child(3){
+    overflow: hidden;
+    width: 32px;
     display: block;
 }

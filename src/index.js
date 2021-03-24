@@ -2,8 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from "react-redux"
 
-import Web3 from "web3"
-
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
