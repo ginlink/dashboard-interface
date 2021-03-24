@@ -40,8 +40,17 @@ function App({ dispatch }) {
       owners[index] = {
         poolOwner: await addresses[index].poolContract.methods.owner().call(),
         strategyOwner: await addresses[index].strategyContract.methods.owner().call(),
+
+        vaultOperator: await addresses[index].vaultContract.methods.operator().call(), //金库操作员
+        stragyOperator: await addresses[index].strategyContract.methods.operator().call(),//策略操作员
+        poolOperator: await addresses[index].poolContract.methods.operator().call(),//pool操作员
+
+        // vaultFeeManager: await addresses[index].vaultContract.methods.feeManager().call(),//金库手续费账号
+        // stragyFeeManager: await addresses[index].strategyContract.methods.feeManager().call(),//策略手续费账号
+        poolFeeManager: await addresses[index].poolContract.methods.feeManager().call(),//pool手续费账号
       }
     }
+    console.log(owners)
     dispatch({
       type: types.CHANGEADDRESSES,
       payload: addresses
@@ -62,7 +71,7 @@ function App({ dispatch }) {
       })
       await getAddressesAndOwners(data)
     })()
-  });
+  }, []);
 
 
 

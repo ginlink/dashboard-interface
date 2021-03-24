@@ -13,14 +13,29 @@ const { Content, Sider } = Layout;
 
 class Index extends React.Component {
 
-  constructor(props) {
-    super(props)
-    const defaultSelectedKeys = sessionStorage.getItem('defaultSelectedKeys')
-    this.state = {
-      collapsed: false,
-      defaultSelectedKeys: [defaultSelectedKeys || "0-0"]
-    }
+  // constructor(props) {
+  //   super(props)
+  //   
+  //   this.state = {
+  //     collapsed: false,
+  //     defaultSelectedKeys: [defaultSelectedKeys || "0-0"]
+  //   }
+  // }
+
+  state = {
+    collapsed: false,
+    defaultSelectedKeys: ["0-0"]
   }
+
+  componentWillMount() {
+    const defaultSelectedKeys = sessionStorage.getItem('defaultSelectedKeys')
+    this.setState({
+      defaultSelectedKeys: [defaultSelectedKeys]
+    })
+  }
+
+
+
 
   onCollapse = collapsed => {
     this.setState({ collapsed });

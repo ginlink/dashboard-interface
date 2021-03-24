@@ -13,6 +13,9 @@ function callback(key) {
 
 
 
+
+
+
 const Investment = () => {
 
 
@@ -52,13 +55,38 @@ const Investment = () => {
                             <td>策略owner</td>
                             <td>{owners[index] ? owners[index].strategyOwner : '-'}</td>
                         </tr>
+
+
+                        <tr>
+                            <td>策略operator</td>
+                            <td>{owners[index] ? owners[index].stragyOperator : '-'}</td>
+                        </tr>
+                        <tr>
+                            <td>金库operator</td>
+                            <td>{owners[index] ? owners[index].vaultOperator : '-'}</td>
+                        </tr>
+                        <tr>
+                            <td>pool operator</td>
+                            <td>{owners[index] ? owners[index].poolOperator : '-'}</td>
+                        </tr>
+                        {/* <tr>
+                            <td>策略feeManager</td>
+                            <td>{owners[index] ? owners[index].strategyOwner : '-'}</td>
+                        </tr>
+                        <tr>
+                            <td>金库feeManager</td>
+                            <td>{owners[index] ? owners[index].strategyOwner : '-'}</td>
+                        </tr> */}
+                        <tr>
+                            <td>pool feeManager</td>
+                            <td>{owners[index] ? owners[index].poolFeeManager : '-'}</td>
+                        </tr>
                     </tbody>
                 </table>
             )
         })
-
         setInvestmentList(newData)
-    }, [dataArray, owners]);
+    });
 
     async function earns() {
         addresses.forEach((item, index) => {
