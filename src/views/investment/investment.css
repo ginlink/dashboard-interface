@@ -29,11 +29,14 @@
 }
 .header_right{
     height: 100%;
-    width: 400px;
+    width: 600px;
     margin-right: 20px;
     display: flex;
     justify-content: center;
     align-items:center;
+}
+.header_right>div{
+    width: 200px;
 }
 .account-name{
     display: flex;

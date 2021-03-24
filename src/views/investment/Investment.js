@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react"
-import { Collapse, Button, Layout } from 'antd';
+import { useState, useEffect, useRef } from "react"
+import { Collapse, Button, Layout, Input } from 'antd';
 import { useSelector } from "react-redux"
 
 import "./investment.css"
@@ -18,8 +18,10 @@ function callback(key) {
 
 const Investment = () => {
 
+    const inputRef = useRef()
 
     const [investmentList, setInvestmentList] = useState([])
+    // const [permissionAddress, setPermissionAddress] = useState("")
 
     const account = useSelector(state => state.get("account"))
     const addresses = useSelector(state => state.get("addresses"))
@@ -27,6 +29,10 @@ const Investment = () => {
     const dataArray = useSelector(state => state.get("dataArray"))
 
     useEffect(() => {
+        async function transferAuthorityHandler(name, index) {
+            const value = inputRef.current.input.value
+            addresses[index][name].methods.setOperator(value).send({ from: account })
+        }
         let newData = dataArray.map((item, index) => {
             return (
                 <table>
@@ -60,14 +66,24 @@ const Investment = () => {
                         <tr>
                             <td>策略operator</td>
                             <td>{owners[index] ? owners[index].stragyOperator : '-'}</td>
+                            <td><Button type="primary" shape="round"
+                                onClick={() => {
+                                    transferAuthorityHandler("strategyContract", index)
+                                }}>权限转移</Button></td>
                         </tr>
                         <tr>
                             <td>金库operator</td>
                             <td>{owners[index] ? owners[index].vaultOperator : '-'}</td>
+                            <td><Button type="primary" shape="round" onClick={() => {
+                                transferAuthorityHandler("vaultContract", index)
+                            }}>权限转移</Button></td>
                         </tr>
                         <tr>
                             <td>pool operator</td>
                             <td>{owners[index] ? owners[index].poolOperator : '-'}</td>
+                            <td><Button type="primary" shape="round" onClick={() => {
+                                transferAuthorityHandler("poolContract", index)
+                            }}>权限转移</Button></td>
                         </tr>
                         {/* <tr>
                             <td>策略feeManager</td>
@@ -86,7 +102,9 @@ const Investment = () => {
             )
         })
         setInvestmentList(newData)
-    }, [investmentList]);
+    }, [owners, dataArray, account, addresses]);
+
+
 
     async function earns() {
         addresses.forEach((item, index) => {
@@ -114,8 +132,11 @@ const Investment = () => {
         <div>
             <Header className="site-layout-background" style={{ padding: 0 }} >
                 <div className="header">
-                    <span>POOL INFO</span>
+                    <div>POOL INFO</div>
                     <div className="header_right">
+                        <div>
+                            <Input placeholder="请输入你的权限地址" ref={inputRef} />
+                        </div>
                         <Button onClick={() => { earns() }}> 一键EARN </Button>
                         <Button onClick={() => { harvests() }}> 一键HARVEST </Button>
                         {
@@ -127,10 +148,7 @@ const Investment = () => {
                                     <span>...</span>
                                     <span>{account.substr(-4, 4)}</span>
                                 </div>
-
                         }
-
-
                     </div>
                 </div>
             </Header>

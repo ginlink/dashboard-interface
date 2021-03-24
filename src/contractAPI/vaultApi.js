@@ -706,5 +706,6 @@ module.exports = [
     ],
     "stateMutability": "view",
     "type": "function"
-  }
+  },
+  { "inputs": [{ "internalType": "address", "name": "newOperator", "type": "address" }], "name": "setOperator", "outputs": [], "stateMutability": "nonpayable", "type": "function" }
 ]
