@@ -1,65 +1,42 @@
-
-import { useState , useEffect } from "react"
-import { Collapse , Button , Layout } from 'antd';
-import axios from "axios"
+import { useState, useEffect, useRef } from "react"
+import { Collapse, Button, Layout, Input } from 'antd';
+import { useSelector } from "react-redux"
 
 import "./investment.css"
-
-import Web3 from "web3"
-import vaultApi from "../../contractAPI/vaultApi"
-import stragy from "../../contractAPI/stragy"
-import RewardPool from "../../contractAPI/RewardPool"
-import aabi from "../../contractAPI/stableContract"
 
 const { Header } = Layout;
 const { Panel } = Collapse;
 
 function callback(key) {
-//   console.log(key);
+    //   console.log(key);
 }
 
+
+
+
+
+
 const Investment = () => {
-    const [account , setAccount] = useState([])
-    const [dataArray , setDataArray] = useState([])
+
+    const inputRef = useRef()
+
     const [investmentList, setInvestmentList] = useState([])
-    const [addresses, setAddresses] = useState([])
-    const [owners, setOwners] = useState([])
+    // const [permissionAddress, setPermissionAddress] = useState("")
 
-    let web3 = new Web3(window.ethereum)
-    web3.eth.requestAccounts().then(accounts => {
-        setAccount(accounts[0])
-    })
+    const account = useSelector(state => state.get("account"))
+    const addresses = useSelector(state => state.get("addresses"))
+    const owners = useSelector(state => state.get("owners"))
+    const dataArray = useSelector(state => state.get("dataArray"))
 
-
-    useEffect( ()=>{
-        async function getAddressesAndOwners(data) {
-            for (let index in data) {
-                let item = data[index]
-                let {vault_address, strategy_address, pool_address, underlying_address} = item;
-                addresses[index] = {
-                    vaultContract: await new web3.eth.Contract(vaultApi, vault_address),
-                    strategyContract: await new web3.eth.Contract(stragy, strategy_address),
-                    poolContract: await new web3.eth.Contract(RewardPool, pool_address),
-                    stableCoinContract: await new web3.eth.Contract(aabi, underlying_address),
-                }
-                owners[index] = {
-                    poolOwner: await addresses[index].poolContract.methods.owner().call(),
-                    strategyOwner: await addresses[index].strategyContract.methods.owner().call(),
-                }
-
-                setAddresses(addresses)
-                setOwners(owners)
-            }
+    useEffect(() => {
+        async function transferAuthorityHandler(name, index) {
+            const value = inputRef.current.input.value
+            addresses[index][name].methods.setOperator(value).send({ from: account })
         }
-        (async ()=>{
-            let res = await axios.get("https://api.converter.finance/getTokenList")
-            const data = res.data.data
-            setDataArray(data)
-            await getAddressesAndOwners(data)
-            let newData = data.map( (item, index)=> {
-                return (
-                    <table>
-                        <tbody>
+        let newData = dataArray.map((item, index) => {
+            return (
+                <table>
+                    <tbody>
                         <tr>
                             <td>reward pool地址：</td>
                             <td>{item.pool_address}</td>
@@ -78,24 +55,59 @@ const Investment = () => {
                         </tr>
                         <tr>
                             <td>金库owner</td>
-                            <td>{ owners[index] ? owners[index].poolOwner : '-'}</td>
+                            <td>{owners[index] ? owners[index].poolOwner : '-'}</td>
                         </tr>
                         <tr>
                             <td>策略owner</td>
-                            <td>{ owners[index] ? owners[index].strategyOwner : '-'}</td>
+                            <td>{owners[index] ? owners[index].strategyOwner : '-'}</td>
                         </tr>
-                        </tbody>
-                    </table>
-                )
-            })
 
-            setInvestmentList(newData)
-        })()
 
-    } ,[] )
+                        <tr>
+                            <td>策略operator</td>
+                            <td>{owners[index] ? owners[index].stragyOperator : '-'}</td>
+                            <td><Button type="primary" shape="round"
+                                onClick={() => {
+                                    transferAuthorityHandler("strategyContract", index)
+                                }}>权限转移</Button></td>
+                        </tr>
+                        <tr>
+                            <td>金库operator</td>
+                            <td>{owners[index] ? owners[index].vaultOperator : '-'}</td>
+                            <td><Button type="primary" shape="round" onClick={() => {
+                                transferAuthorityHandler("vaultContract", index)
+                            }}>权限转移</Button></td>
+                        </tr>
+                        <tr>
+                            <td>pool operator</td>
+                            <td>{owners[index] ? owners[index].poolOperator : '-'}</td>
+                            <td><Button type="primary" shape="round" onClick={() => {
+                                transferAuthorityHandler("poolContract", index)
+                            }}>权限转移</Button></td>
+                        </tr>
+                        {/* <tr>
+                            <td>策略feeManager</td>
+                            <td>{owners[index] ? owners[index].strategyOwner : '-'}</td>
+                        </tr>
+                        <tr>
+                            <td>金库feeManager</td>
+                            <td>{owners[index] ? owners[index].strategyOwner : '-'}</td>
+                        </tr> */}
+                        <tr>
+                            <td>pool feeManager</td>
+                            <td>{owners[index] ? owners[index].poolFeeManager : '-'}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            )
+        })
+        setInvestmentList(newData)
+    }, [owners, dataArray, account, addresses]);
+
+
 
     async function earns() {
-        addresses.forEach((item, index)=>{
+        addresses.forEach((item, index) => {
             item.vaultContract.methods.earn().send({ from: account })
         })
     }
@@ -106,7 +118,7 @@ const Investment = () => {
     }
 
     async function harvests() {
-        addresses.forEach((item, index)=>{
+        addresses.forEach((item, index) => {
             item.strategyContract.methods.harvest().send({ from: account })
         })
     }
@@ -116,14 +128,27 @@ const Investment = () => {
         addresses[index].strategyContract.methods.harvest().send({ from: account })
     }
 
-    return(
+    return (
         <div>
             <Header className="site-layout-background" style={{ padding: 0 }} >
                 <div className="header">
-                    <span>POOL INFO</span>
-                    <div>
-                        <span className="headerButton" onClick={()=>{earns()}}> 一键EARN </span>
-                        <span className="headerButton" onClick={()=>{harvests()}}> 一键HARVEST </span>
+                    <div>POOL INFO</div>
+                    <div className="header_right">
+                        <div>
+                            <Input placeholder="请输入你的权限地址" ref={inputRef} />
+                        </div>
+                        <Button onClick={() => { earns() }}> 一键EARN </Button>
+                        <Button onClick={() => { harvests() }}> 一键HARVEST </Button>
+                        {
+                            account === "" ?
+                                ""
+                                :
+                                <div className="account-name">
+                                    <span className="">{account.substr(0, 4)}</span>
+                                    <span>...</span>
+                                    <span>{account.substr(-4, 4)}</span>
+                                </div>
+                        }
                     </div>
                 </div>
             </Header>
@@ -134,25 +159,25 @@ const Investment = () => {
                 </div>
             </div>
             {
-                investmentList.map((item,index)=>{
-                    return(
+                investmentList.map((item, index) => {
+                    return (
                         <Collapse key={index} onChange={callback}>
-                        <Panel header={
-                            <div className="investment-table-header">
-                                <div>
-                                    <span className="tokenName">{dataArray[index]["underlying_name"]}</span>
-                                    <span >{dataArray[index]["strategy_index"]}</span>
+                            <Panel header={
+                                <div className="investment-table-header">
+                                    <div>
+                                        <span className="tokenName">{dataArray[index]["underlying_name"]}</span>
+                                        <span >{dataArray[index]["strategy_index"]}</span>
+                                    </div>
+                                    <div className="investment-table-header-right">
+                                        <Button onClick={(ev) => { earn(ev, index) }}>EARN</Button>
+                                        <Button onClick={(ev) => { harvest(ev, index) }}>HARVEST</Button>
+                                        <Button>⬇</Button>
+                                    </div>
                                 </div>
-                                <div className="investment-table-header-right">
-                                    <Button onClick={(ev)=>{earn(ev,index)}}>EARN</Button>
-                                    <Button onClick={(ev)=>{harvest(ev,index)}}>HARVEST</Button>
-                                    <button>⬇️</button>
-                                </div>
-                            </div>
-                        } key="1">
-                        <div>{item}</div>
-                        </Panel>
-                    </Collapse>
+                            } key="1">
+                                <div>{item}</div>
+                            </Panel>
+                        </Collapse>
                     )
                 })
             }

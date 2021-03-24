@@ -1,4 +1,4 @@
- module.exports = [
+module.exports = [
   {
     "inputs": [],
     "name": "balanceOf",
@@ -25,20 +25,20 @@
     "stateMutability": "nonpayable",
     "type": "function"
   },
-   {
-     "inputs": [],
-     "name": "owner",
-     "outputs": [
-       {
-         "internalType": "address",
-         "name": "",
-         "type": "address"
-       }
-     ],
-     "stateMutability": "view",
-     "type": "function",
-     "constant": true
-   },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
   {
     "inputs": [],
     "name": "borrowed",
@@ -385,5 +385,19 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function"
-  }
+  },
+  {
+    "inputs": [],
+    "name": "operator",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  { "inputs": [{ "internalType": "address", "name": "newOperator", "type": "address" }], "name": "setOperator", "outputs": [], "stateMutability": "nonpayable", "type": "function" }
 ]

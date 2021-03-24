@@ -1,4 +1,4 @@
- module.exports=[
+module.exports = [
   {
     "inputs": [
       {
@@ -693,5 +693,19 @@
     "stateMutability": "view",
     "type": "function",
     "constant": true
-  }
+  },
+  {
+    "inputs": [],
+    "name": "operator",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  { "inputs": [{ "internalType": "address", "name": "newOperator", "type": "address" }], "name": "setOperator", "outputs": [], "stateMutability": "nonpayable", "type": "function" }
 ]

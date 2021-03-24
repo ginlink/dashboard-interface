@@ -27,3 +27,29 @@
     display: flex;
     justify-content: space-around;
 }
+.header_right{
+    height: 100%;
+    width: 600px;
+    margin-right: 20px;
+    display: flex;
+    justify-content: center;
+    align-items:center;
+}
+.header_right>div{
+    width: 200px;
+}
+.account-name{
+    display: flex;
+    overflow: hidden;
+    margin: 20px;
+}
+.account-name span:nth-child(1){
+    overflow: hidden;
+    width: 32px;
+    display: block;
+}
+.account-name span:nth-child(3){
+    overflow: hidden;
+    width: 32px;
+    display: block;
+}

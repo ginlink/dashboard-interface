@@ -1,23 +1,17 @@
 
-// 自动化投资页面
 import { Table } from "antd"
-import React , { useState , useEffect } from 'react';
-import { Form, Row, Col, Input, Button,Select } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Form, Input, Button, Select } from 'antd';
 
 import "./AutomaticInvestment.css"
-
-import {
-    getAutomaticInvestmentList ,
-    getAutomaticInvestmentScript
-} from "./../../api/automaticInvestment"
 
 const { Option } = Select
 
 const layout = {
-    layout:"inline",
+    layout: "inline",
     labelCol: { span: 8 },
-    wrapperCol: { span: 15 , offset:0 },
-  };
+    wrapperCol: { span: 15, offset: 0 },
+};
 
 const tailLayout = {
     wrapperCol: {
@@ -27,12 +21,12 @@ const tailLayout = {
 
 
 const IFrom = () => {
-    const [ theResults , setTheResults ] = useState( "正常" )
-    const [ runningState , setRunningState ] = useState( "成功" )
+    const [theResults, setTheResults] = useState("正常")
+    const [runningState, setRunningState] = useState("成功")
 
     const onFinish = (values) => {
         console.log('Success:', values);
-      };
+    };
     const onTheResultsChange = (newCurrency) => {
         console.log(1)
         setTheResults(newCurrency)
@@ -41,30 +35,30 @@ const IFrom = () => {
         console.log(2)
         setRunningState(newCurrency)
     }
-    return(
+    return (
         <Form
-        {...layout}
-        onFinish={onFinish}
+            {...layout}
+            onFinish={onFinish}
         >
             <Form.Item
-            label="脚本编号"
-            name="scriptCode"
-            rules={[{ message: 'Please input your username!' }]}
+                label="脚本编号"
+                name="scriptCode"
+                rules={[{ message: 'Please input your username!' }]}
             >
-                <Input placeholder="请输入脚本编号"/>
+                <Input placeholder="请输入脚本编号" />
             </Form.Item>
             <Form.Item
-            label="运行结果:"
-            name="theResults"
-            rules={[{ message: 'Please input your username!' }]}
+                label="运行结果:"
+                name="theResults"
+                rules={[{ message: 'Please input your username!' }]}
             >
                 <Select
-                defaultValue= {theResults}
-                style={{
-                width: 80,
-                margin: '0 20px',
-                }}
-                onChange={onTheResultsChange}
+                    defaultValue={theResults}
+                    style={{
+                        width: 80,
+                        margin: '0 20px',
+                    }}
+                    onChange={onTheResultsChange}
                 >
                     <Option value="正常">正常</Option>
                     <Option value="异常">异常</Option>
@@ -72,17 +66,17 @@ const IFrom = () => {
             </Form.Item>
 
             <Form.Item
-            label="运行状态："
-            name={runningState}
-            rules={[{ message: 'Please input your username!' }]}
+                label="运行状态："
+                name={runningState}
+                rules={[{ message: 'Please input your username!' }]}
             >
                 <Select
-                defaultValue={runningState}
-                style={{
-                width: 80,
-                margin: '0 20px',
-                }}
-                onChange={onRunningStateChange}
+                    defaultValue={runningState}
+                    style={{
+                        width: 80,
+                        margin: '0 20px',
+                    }}
+                    onChange={onRunningStateChange}
                 >
                     <Option value="成功">成功</Option>
                     <Option value="失败">失败</Option>
@@ -90,7 +84,7 @@ const IFrom = () => {
             </Form.Item>
             <Form.Item {...tailLayout}>
                 <Button type="primary" htmlType="submit">
-                搜索
+                    搜索
                 </Button>
             </Form.Item>
         </Form>
@@ -136,11 +130,11 @@ const columns = [
 ];
 
 function AutomaticInvestment() {
-    const [ timeDomShow , setTimeDomShow ] = useState(false)
-    const [ dataSource , setDataSource] = useState([])
+    const [timeDomShow, setTimeDomShow] = useState(false)
+    const [dataSource, setDataSource] = useState([])
 
     useEffect(() => {
-        setDataSource ([
+        setDataSource([
             {
                 key: '1',
                 scriptCode: '胡彦斌',
@@ -148,7 +142,7 @@ function AutomaticInvestment() {
                 runningState: '西湖区湖底公园1号',
                 theResults: "成功",
                 lastRunTime: "11-0-1",
-                tunButton: (<button onClick={(e)=>{
+                tunButton: (<button onClick={(e) => {
                     e.stopPropagation()
                 }}>运行</button>),
                 open: (<button>打开</button>),
@@ -161,7 +155,7 @@ function AutomaticInvestment() {
                 runningState: '西湖区湖底公园1号',
                 theResults: "成功",
                 lastRunTime: "11-0-1",
-                tunButton: (<button onClick={(e)=>{
+                tunButton: (<button onClick={(e) => {
                     e.stopPropagation()
                 }}>打开</button>),
                 open: (<button>运行</button>)
@@ -171,19 +165,19 @@ function AutomaticInvestment() {
     return (
         <div>
             <div className="prevStateShow">
-                { 
-                    timeDomShow 
-                    ? (
-                        <div className="prevStateShow-children">
-                            <div>上次运行时间</div>
-                            <div>11::43:54</div>
-                        </div>
-                    ) 
-                    : null
+                {
+                    timeDomShow
+                        ? (
+                            <div className="prevStateShow-children">
+                                <div>上次运行时间</div>
+                                <div>11::43:54</div>
+                            </div>
+                        )
+                        : null
                 }
                 <div className="prevStateShow-children">
                     <div>上次运行成功</div>
-                   <div>1</div>
+                    <div>1</div>
                 </div>
                 <div className="prevStateShow-children">
                     <div>上次运行失败</div>
@@ -199,7 +193,7 @@ function AutomaticInvestment() {
                         <div>{record.description}</div>
                     ),
                     rowExpandable: record => record.name !== 'Not Expandable',
-                    onExpandedRowsChange:()=>{
+                    onExpandedRowsChange: () => {
                         setTimeDomShow(!timeDomShow)
                     }
                 }}
