@@ -15,13 +15,8 @@ import aabi from "./contractAPI/stableContract"
 
 function App({ dispatch }) {
 
-
-
-
   const addresses = store.getState().get("addresses")
   const owners = store.getState().get("owners")
-
-
 
   useEffect(() => {
     let web3 = new Web3(window.ethereum)
@@ -75,6 +70,10 @@ function App({ dispatch }) {
       console.log(1)
     })()
   }, [addresses, owners, dispatch]);
+
+
+
+
 
   return (
     <div className="App">

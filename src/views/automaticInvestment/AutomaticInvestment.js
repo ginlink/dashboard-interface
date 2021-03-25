@@ -2,6 +2,11 @@
 import { Table } from "antd"
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Select } from 'antd';
+import moment from "moment"
+import axios from "axios"
+
+
+import { getAutomaticInvestmentList} from "./../../api/automaticInvestment"
 
 import "./AutomaticInvestment.css"
 
@@ -134,37 +139,47 @@ function AutomaticInvestment() {
     const [dataSource, setDataSource] = useState([])
 
     useEffect(() => {
-        setDataSource([
-            {
-                key: '1',
-                scriptCode: '胡彦斌',
-                scriptName: 32,
-                runningState: '西湖区湖底公园1号',
-                theResults: "成功",
-                lastRunTime: "11-0-1",
-                tunButton: (<button onClick={(e) => {
-                    e.stopPropagation()
-                }}>运行</button>),
-                open: (<button>打开</button>),
-                description: '这是脚本的详情'
-            },
-            {
-                key: '2',
-                scriptCode: '胡彦祖',
-                scriptName: 42,
-                runningState: '西湖区湖底公园1号',
-                theResults: "成功",
-                lastRunTime: "11-0-1",
-                tunButton: (<button onClick={(e) => {
-                    e.stopPropagation()
-                }}>打开</button>),
-                open: (<button>运行</button>)
-            },
-        ]);
+        (function getList(){
+            getAutomaticInvestmentList().then(res=>{
+                console.log(999)
+                const dataSource = res.data.data.map((item,index)=>(
+                    {
+                        key: index,
+                        scriptCode: item.task_id,
+                        scriptName: item.script_name,
+                        runningState: 
+                            item.task_status === "INIT" ? "初始状态" :  
+                            item.task_status === "RUNNING" ? "运行中" :
+                            item.task_status === "WAITNEXT" ? "重复执行的间歇" :
+                            item.task_status === "FINSH" ? "结束" :
+                            "没有数据",
+                        theResults: 
+                            item.task_result === "SUCCESS" ? "成功" :
+                            item.task_result === "FAILED" ? "失败" :
+                            "没有数据",
+                        // lastRunTime: item.last_time,
+                        lastRunTime:moment(item.last_time).utcOffset(480).format('LTS'),
+                        tunButton: 
+                        (<Button onClick={(e) => {
+                            e.stopPropagation()
+                            axios.get(item.req_url).then(res=>{
+                                if(res.data.data !== "SUCCESS") return
+                                getList()
+                            })
+    
+                        }}>运行</Button>),
+                        description: '这是脚本的详情'
+                    }
+                ))
+                setDataSource(dataSource)
+            })
+        })()
     }, []);
+
+
     return (
         <div>
-            <div className="prevStateShow">
+            {/* <div className="prevStateShow">
                 {
                     timeDomShow
                         ? (
@@ -184,7 +199,7 @@ function AutomaticInvestment() {
                     <div>1</div>
                 </div>
             </div>
-            <IFrom />
+            <IFrom /> */}
 
             <Table
                 expandable={{
