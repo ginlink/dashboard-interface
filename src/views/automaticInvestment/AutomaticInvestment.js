@@ -1,14 +1,17 @@
-
 import { Table } from "antd"
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Select } from 'antd';
 import moment from "moment"
 import axios from "axios"
+// import { Terminal } from "xterm"
+
+import webssh from "./components/webssh"
 
 
 import { getAutomaticInvestmentList} from "./../../api/automaticInvestment"
 
 import "./AutomaticInvestment.css"
+import Webssh from "./components/webssh";
 
 const { Option } = Select
 
@@ -134,14 +137,13 @@ const columns = [
     }
 ];
 
-function AutomaticInvestment() {
+function AutomaticInvestment(props) {
     const [timeDomShow, setTimeDomShow] = useState(false)
     const [dataSource, setDataSource] = useState([])
 
     useEffect(() => {
         (function getList(){
             getAutomaticInvestmentList().then(res=>{
-                console.log(999)
                 const dataSource = res.data.data.map((item,index)=>(
                     {
                         key: index,
@@ -166,9 +168,13 @@ function AutomaticInvestment() {
                                 if(res.data.data !== "SUCCESS") return
                                 getList()
                             })
-    
                         }}>运行</Button>),
-                        description: '这是脚本的详情'
+                        // description: '这是脚本的详情'
+
+                        description: <div>
+                            <Webssh  index={index}/>
+                        </div>
+                        
                     }
                 ))
                 setDataSource(dataSource)
@@ -204,9 +210,12 @@ function AutomaticInvestment() {
             <Table
                 expandable={{
                     expandRowByClick: true,
-                    expandedRowRender: record => (
-                        <div>{record.description}</div>
-                    ),
+                    expandedRowRender: record => {
+                        // const term = new Terminal()
+                        // term.open(document.getElementById('terminal'+record.scriptName));
+                        // console.log(document.getElementById('terminal'+record.scriptName))
+                        return record.description
+                    } ,
                     rowExpandable: record => record.name !== 'Not Expandable',
                     onExpandedRowsChange: () => {
                         setTimeDomShow(!timeDomShow)
