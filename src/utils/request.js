@@ -3,7 +3,7 @@
 import axios from "axios"
 
 const request = axios.create({
-    baseURL:"https://localhost:3001"
+    baseURL:"http://192.168.3.80:9800"
 })
 
-export default axios
+export default request
