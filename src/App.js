@@ -26,7 +26,7 @@ function App({ dispatch }) {
         type: types.CHANGEACCOUNT,
         payload: accounts[0],
       });
-    });
+    }, []);
 
     async function getAddressesAndOwners(data) {
       for (let index in data) {
@@ -70,6 +70,10 @@ function App({ dispatch }) {
           poolFeeManager: await addresses[index].poolContract.methods
             .feeManager()
             .call(), //pool手续费账号
+
+          TotalSupply: await addresses[index].poolContract.methods
+            .totalSupply()
+            .call(),
         };
         dispatch({
           type: types.CHANGEADDRESSES,
@@ -79,6 +83,10 @@ function App({ dispatch }) {
           type: types.CHANGEOWNERS,
           payload: [...owners],
         });
+        if (Number(index) === data.length - 1) {
+          console.log("CHAGNEINVESTMENTLISTONLOAD");
+          dispatch({ type: types.CHAGNEINVESTMENTLISTONLOAD, payload: true });
+        }
       }
     }
     (async () => {
