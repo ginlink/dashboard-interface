@@ -49,6 +49,7 @@ function App({ dispatch }) {
             underlying_address
           ),
         };
+
         owners[index] = {
           poolOwner: await addresses[index].poolContract.methods.owner().call(),
           strategyOwner: await addresses[index].strategyContract.methods
@@ -71,9 +72,15 @@ function App({ dispatch }) {
             .feeManager()
             .call(), //pool手续费账号
 
-          TotalSupply: await addresses[index].poolContract.methods
-            .totalSupply()
+          poolTotalSupply: await addresses[index].vaultContract.methods
+            .balance()
             .call(),
+          //已投总资产
+
+          totalInvestedAssets: await addresses[index].stableCoinContract.methods
+            .balanceOf(vault_address)
+            .call(),
+          //已投总资产
         };
         dispatch({
           type: types.CHANGEADDRESSES,

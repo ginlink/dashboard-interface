@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, Fragment } from "react";
 import { Collapse, Button, Layout, Input, Spin } from "antd";
 import { useSelector } from "react-redux";
+import { BigNumber } from "bignumber.js";
 
 import "./investment.css";
 
@@ -19,14 +20,15 @@ const Investment = () => {
     return state.get("account");
   });
   const addresses = useSelector((state) => state.get("addresses"));
-  const owners = useSelector((state) => state.get("owners"));
+  const owners = useSelector((state) => {
+    return state.get("owners");
+  });
   const dataArray = useSelector((state) => state.get("dataArray"));
   const investmentListOnLoad = useSelector((state) =>
     state.get("investmentListOnLoad")
   );
 
   useEffect(() => {
-    console.log(owners);
     async function transferAuthorityHandler(name, index) {
       const value = inputRef.current.input.value;
       addresses[index][name].methods.setOperator(value).send({ from: account });
@@ -53,16 +55,20 @@ const Investment = () => {
             </tr>
             <tr>
               <td>金库owner</td>
-              <td>{owners[index] ? owners[index].poolOwner : "-"}</td>
+              <td>{owners && owners[index] ? owners[index].poolOwner : "-"}</td>
             </tr>
             <tr>
               <td>策略owner</td>
-              <td>{owners[index] ? owners[index].strategyOwner : "-"}</td>
+              <td>
+                {owners && owners[index] ? owners[index].strategyOwner : "-"}
+              </td>
             </tr>
 
             <tr>
               <td>策略operator</td>
-              <td>{owners[index] ? owners[index].stragyOperator : "-"}</td>
+              <td>
+                {owners && owners[index] ? owners[index].stragyOperator : "-"}
+              </td>
               <td>
                 <Button
                   type="primary"
@@ -77,7 +83,9 @@ const Investment = () => {
             </tr>
             <tr>
               <td>金库operator</td>
-              <td>{owners[index] ? owners[index].vaultOperator : "-"}</td>
+              <td>
+                {owners && owners[index] ? owners[index].vaultOperator : "-"}
+              </td>
               <td>
                 <Button
                   type="primary"
@@ -92,7 +100,9 @@ const Investment = () => {
             </tr>
             <tr>
               <td>pool operator</td>
-              <td>{owners[index] ? owners[index].poolOperator : "-"}</td>
+              <td>
+                {owners && owners[index] ? owners[index].poolOperator : "-"}
+              </td>
               <td>
                 <Button
                   type="primary"
@@ -107,7 +117,9 @@ const Investment = () => {
             </tr>
             <tr>
               <td>pool feeManager</td>
-              <td>{owners[index] ? owners[index].poolFeeManager : "-"}</td>
+              <td>
+                {owners && owners[index] ? owners[index].poolFeeManager : "-"}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -191,25 +203,73 @@ const Investment = () => {
           </div>
         </div>
       </Header>
-      <div className="investment-header">
-        <div className="investment-header-wrap">
-          <span className="investment-header-left">名称</span>
-          <span className="investment-header-right">收益代币</span>
-          <span className="investment-header-left">pool总资产</span>
-          <span className="investment-header-right">已投总资产</span>
-        </div>
-      </div>
+      <Panel
+        style={{
+          paddingLeft: "20px",
+          paddingTop: "10px",
+          height: "40px",
+          textAlign: "40px",
+          fontWeight: 600,
+        }}
+        header={
+          <div className="investment-table-header">
+            <div className="investment-content-wrap">
+              <span className="tokenName">名称</span>
+              <span className="tokenName">收益代币</span>
+              <span className="tokenName">pool总资产</span>
+              <span className="tokenName">已投总资产</span>
+            </div>
+            <div></div>
+          </div>
+        }
+        key="1"
+      ></Panel>
       {investmentList.map((item, index) => {
         return (
           <Collapse key={index} onChange={callback}>
             <Panel
               header={
                 <div className="investment-table-header">
-                  <div>
+                  <div className="investment-content-wrap">
                     <span className="tokenName">
                       {dataArray[index]["underlying_name"]}
                     </span>
-                    <span>{dataArray[index]["strategy_index"]}</span>
+                    <span className="tokenName">
+                      {dataArray[index]["strategy_index"]}
+                    </span>
+                    <span className="tokenName">
+                      {owners &&
+                      owners[index] &&
+                      owners[index]["poolTotalSupply"]
+                        ? new BigNumber(owners[index]["poolTotalSupply"])
+                            .div(new BigNumber(10).pow(18))
+                            .toFixed(4)
+                        : "-"}
+                    </span>
+                    <span className="tokenName">
+                      {/* {owners &&
+                      owners[index] &&
+                      owners[index]["totalInvestedAssets"] &&
+                      owners[index]["poolTotalSupply"]
+                        ? new BigNumber(owners[index]["totalInvestedAssets"])
+                            .div(new BigNumber(10).pow(18))
+                            .toFixed(4) -
+                          new BigNumber(owners[index]["poolTotalSupply"])
+                            .div(new BigNumber(10).pow(18))
+                            .toFixed(4)
+                        : "-"} */}
+                      {owners &&
+                      owners[index] &&
+                      owners[index]["totalInvestedAssets"] &&
+                      owners[index]["poolTotalSupply"]
+                        ? new BigNumber(
+                            owners[index]["poolTotalSupply"] -
+                              owners[index]["totalInvestedAssets"]
+                          )
+                            .div(new BigNumber(10).pow(18))
+                            .toFixed(4)
+                        : "-"}
+                    </span>
                   </div>
                   <div className="investment-table-header-right">
                     <Button
