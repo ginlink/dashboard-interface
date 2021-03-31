@@ -63,7 +63,7 @@ const Investment = () => {
                   type="primary"
                   shape="round"
                   onClick={() => {
-                    transferAuthorityHandler("strategyContract", index,"transferOwnership");
+                    transferAuthorityHandler("vaultContract", index,"transferOwnership");
                   }}
                 >
                   权限转移
