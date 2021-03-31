@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, Fragment } from "react";
 import { Collapse, Button, Layout, Input, Spin } from "antd";
 import { useSelector } from "react-redux";
 import { BigNumber } from "bignumber.js";
+import moment from "moment"
 
 import "./investment.css";
 
@@ -29,9 +30,11 @@ const Investment = () => {
   );
 
   useEffect(() => {
-    async function transferAuthorityHandler(name, index) {
+    async function transferAuthorityHandler(name, index,functionName) {
       const value = inputRef.current.input.value;
-      addresses[index][name].methods.setOperator(value).send({ from: account });
+      if(!investmentListOnLoad)return alert("请等待数据加载完成，稍后重试") 
+      // addresses[index][name].methods.setOperator(value).send({ from: account });
+      addresses[index][name].methods[functionName](value).send({ from: account });
     }
     let newData = dataArray.map((item, index) => {
       return (
@@ -56,12 +59,30 @@ const Investment = () => {
             <tr>
               <td>金库owner</td>
               <td>{owners && owners[index] ? owners[index].poolOwner : "-"}</td>
+              <Button
+                  type="primary"
+                  shape="round"
+                  onClick={() => {
+                    transferAuthorityHandler("strategyContract", index,"transferOwnership");
+                  }}
+                >
+                  权限转移
+                </Button>
             </tr>
             <tr>
               <td>策略owner</td>
               <td>
                 {owners && owners[index] ? owners[index].strategyOwner : "-"}
               </td>
+              <Button
+                  type="primary"
+                  shape="round"
+                  onClick={() => {
+                    transferAuthorityHandler("strategyContract", index,"transferOwnership");
+                  }}
+                >
+                  权限转移
+                </Button>
             </tr>
 
             <tr>
@@ -74,7 +95,7 @@ const Investment = () => {
                   type="primary"
                   shape="round"
                   onClick={() => {
-                    transferAuthorityHandler("strategyContract", index);
+                    transferAuthorityHandler("strategyContract", index,"setOperator");
                   }}
                 >
                   权限转移
@@ -91,7 +112,7 @@ const Investment = () => {
                   type="primary"
                   shape="round"
                   onClick={() => {
-                    transferAuthorityHandler("vaultContract", index);
+                    transferAuthorityHandler("vaultContract", index,"setOperator");
                   }}
                 >
                   权限转移
@@ -108,7 +129,7 @@ const Investment = () => {
                   type="primary"
                   shape="round"
                   onClick={() => {
-                    transferAuthorityHandler("poolContract", index);
+                    transferAuthorityHandler("poolContract", index,"setOperator");
                   }}
                 >
                   权限转移
@@ -126,7 +147,7 @@ const Investment = () => {
       );
     });
     setInvestmentList(newData);
-  }, [owners, dataArray, account, addresses]);
+  }, [owners, dataArray, account, addresses,investmentListOnLoad]);
 
   async function earns() {
     addresses.forEach((item, index) => {
@@ -152,6 +173,21 @@ const Investment = () => {
     if (!addresses[index]) return alert("数据加载中，请稍后重试");
     addresses[index].strategyContract.methods.harvest().send({ from: account });
   }
+
+  function calculateDiffTime(start_time) {
+		if(!parseInt(start_time)) return "-";
+		var endTime = Math.round(new Date() / 1000);
+
+		var timeDiff = endTime - start_time
+		var day = parseInt(timeDiff / 86400);
+		var hour = parseInt((timeDiff % 86400) / 3600);
+		var minute = parseInt((timeDiff % 3600) / 60);
+
+		day = day?(day+'天'):'';
+		hour = hour?(hour+"时"):'';
+		minute = minute?(minute+"分"):'';
+		return day + hour + minute;
+	}
 
   return (
     <div>
@@ -193,7 +229,7 @@ const Investment = () => {
                 <Spin size="middle" />
               </div>
             )}
-            {account == "" || account == undefined ? null : (
+            {account === "" || account === undefined ? null : (
               <div className="account-name">
                 <span className="">{String(account).substr(0, 4)}</span>
                 <span>...</span>
@@ -218,6 +254,7 @@ const Investment = () => {
               <span className="tokenName">收益代币</span>
               <span className="tokenName">pool总资产</span>
               <span className="tokenName">已投总资产</span>
+              <span className="tokenName">最后一次复投时间</span>
             </div>
             <div></div>
           </div>
@@ -247,17 +284,6 @@ const Investment = () => {
                         : "-"}
                     </span>
                     <span className="tokenName">
-                      {/* {owners &&
-                      owners[index] &&
-                      owners[index]["totalInvestedAssets"] &&
-                      owners[index]["poolTotalSupply"]
-                        ? new BigNumber(owners[index]["totalInvestedAssets"])
-                            .div(new BigNumber(10).pow(18))
-                            .toFixed(4) -
-                          new BigNumber(owners[index]["poolTotalSupply"])
-                            .div(new BigNumber(10).pow(18))
-                            .toFixed(4)
-                        : "-"} */}
                       {owners &&
                       owners[index] &&
                       owners[index]["totalInvestedAssets"] &&
@@ -268,6 +294,14 @@ const Investment = () => {
                           )
                             .div(new BigNumber(10).pow(18))
                             .toFixed(4)
+                        : "-"}
+                    </span>
+                    <span className="tokenName">
+                      {owners &&
+                      owners[index] &&
+                      owners[index]["recentlyAfterVotingTime"]
+                        // ? moment((new Date().getTime() - owners[index]["recentlyAfterVotingTime"]) * 1000).utcOffset(480).format('LTS')
+                        ? calculateDiffTime(owners[index]["recentlyAfterVotingTime"])+"钟前"
                         : "-"}
                     </span>
                   </div>

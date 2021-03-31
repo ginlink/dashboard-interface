@@ -28,7 +28,19 @@ function App({ dispatch }) {
       });
     }, []);
 
+    function getRecentlyAfterVotingTime (arg,blockInfo){
+      let timeStamp = "20分钟内没有复投"
+      if(!arg || !arg["_jsonInterface"])return timeStamp
+      arg["_jsonInterface"].forEach(item=>{
+        if(item.signature === blockInfo.data.result[0].input){
+          timeStamp = blockInfo.data.result[0].timeStamp
+        }
+      })
+      return timeStamp
+    }
+
     async function getAddressesAndOwners(data) {
+      const blockInfo = await axios.get(`https://api.hecoinfo.com/api?module=account&action=txlist&address=0x2f8570c0a21fdf2774e1a63bb9f568dcf323f38d&startblock=${web3.eth.getBlockNumber()-600}&endblock=${web3.eth.getBlockNumber()}&sort=desc&apikey=25MQ3HCDZ6J12KFH4W83JYIWVQBNCBYBSF`)
       for (let index in data) {
         let item = data[index];
         let {
@@ -49,7 +61,7 @@ function App({ dispatch }) {
             underlying_address
           ),
         };
-
+        // debugger
         owners[index] = {
           poolOwner: await addresses[index].poolContract.methods.owner().call(),
           strategyOwner: await addresses[index].strategyContract.methods
@@ -81,6 +93,8 @@ function App({ dispatch }) {
             .balanceOf(vault_address)
             .call(),
           //已投总资产
+
+          recentlyAfterVotingTime:getRecentlyAfterVotingTime(addresses[index].strategyContract,blockInfo) //最后一次复投时间
         };
         dispatch({
           type: types.CHANGEADDRESSES,
