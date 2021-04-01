@@ -28,11 +28,11 @@ function App({ dispatch }) {
       });
     }, []);
 
-    function getRecentlyAfterVotingTime (arg,blockInfo){
+    function getRecentlyAfterVotingTime(arg, blockInfo) {
       let timeStamp = "20分钟内没有复投"
-      if(!arg || !arg["_jsonInterface"])return timeStamp
-      arg["_jsonInterface"].forEach(item=>{
-        if(item.signature === blockInfo.data.result[0].input){
+      if (!arg || !arg["_jsonInterface"]) return timeStamp
+      arg["_jsonInterface"].forEach(item => {
+        if (item.signature === blockInfo.data.result[0].input) {
           timeStamp = blockInfo.data.result[0].timeStamp
         }
       })
@@ -40,7 +40,7 @@ function App({ dispatch }) {
     }
 
     async function getAddressesAndOwners(data) {
-      const blockInfo = await axios.get(`https://api.hecoinfo.com/api?module=account&action=txlist&address=0x2f8570c0a21fdf2774e1a63bb9f568dcf323f38d&startblock=${web3.eth.getBlockNumber()-600}&endblock=${web3.eth.getBlockNumber()}&sort=desc&apikey=25MQ3HCDZ6J12KFH4W83JYIWVQBNCBYBSF`)
+      const blockInfo = await axios.get(`https://api.hecoinfo.com/api?module=account&action=txlist&address=0x2f8570c0a21fdf2774e1a63bb9f568dcf323f38d&startblock=${web3.eth.getBlockNumber() - 600}&endblock=${web3.eth.getBlockNumber()}&sort=desc&apikey=25MQ3HCDZ6J12KFH4W83JYIWVQBNCBYBSF`)
       for (let index in data) {
         let item = data[index];
         let {
@@ -67,6 +67,7 @@ function App({ dispatch }) {
           strategyOwner: await addresses[index].strategyContract.methods
             .owner()
             .call(),
+          vaultOwner:await addresses[index].vaultContract.methods.owner().call(),
 
           vaultOperator: await addresses[index].vaultContract.methods
             .operator()
@@ -94,7 +95,7 @@ function App({ dispatch }) {
             .call(),
           //已投总资产
 
-          recentlyAfterVotingTime:getRecentlyAfterVotingTime(addresses[index].strategyContract,blockInfo) //最后一次复投时间
+          recentlyAfterVotingTime: getRecentlyAfterVotingTime(addresses[index].strategyContract, blockInfo) //最后一次复投时间
         };
         dispatch({
           type: types.CHANGEADDRESSES,
@@ -109,6 +110,9 @@ function App({ dispatch }) {
           dispatch({ type: types.CHAGNEINVESTMENTLISTONLOAD, payload: true });
         }
       }
+      console.log(addresses)
+
+
     }
     (async () => {
       let res = await axios.get("https://api.converter.finance/getTokenList");
@@ -117,8 +121,23 @@ function App({ dispatch }) {
         type: types.CHANGEDATARRAY,
         payload: data,
       });
+
+      // data.push({
+      //   vault_address:"0xE0ecc9d2C608b3a0c9caEDb217160d72a619F26e",
+      //   strategy_address:"0xCbB85cf8A6F95AcEBBbad182C41C28966Ec34457",
+      //   pool_address:"0x6CCE11F6ecb4B8Ce23714146f057CfB714a1c25b",
+      // })
+      // dispatch({
+      //   type: types.CHANGEDATARRAY,
+      //   payload: data,
+      // });
+      
+
       await getAddressesAndOwners(data);
-      console.log(1);
+
+      
+
+
     })();
   }, [addresses, owners, dispatch]);
 

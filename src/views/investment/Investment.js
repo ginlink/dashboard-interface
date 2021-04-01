@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, Fragment } from "react";
 import { Collapse, Button, Layout, Input, Spin } from "antd";
 import { useSelector } from "react-redux";
 import { BigNumber } from "bignumber.js";
-import moment from "moment"
 
 import "./investment.css";
 
@@ -14,7 +13,6 @@ function callback(key) {
 }
 const Investment = () => {
   const inputRef = useRef();
-
   const [investmentList, setInvestmentList] = useState([]);
 
   const account = useSelector((state) => {
@@ -30,11 +28,13 @@ const Investment = () => {
   );
 
   useEffect(() => {
-    async function transferAuthorityHandler(name, index,functionName) {
-      const value = inputRef.current.input.value;
+    console.log(dataArray)
+    async function transferAuthorityHandler(name, index,functionName,address) {
       if(!investmentListOnLoad)return alert("请等待数据加载完成，稍后重试") 
-      // addresses[index][name].methods.setOperator(value).send({ from: account });
+      const value = inputRef.current.input.value;
       addresses[index][name].methods[functionName](value).send({ from: account });
+      console.log(dataArray[index][address])
+
     }
     let newData = dataArray.map((item, index) => {
       return (
@@ -57,13 +57,26 @@ const Investment = () => {
               <td>{item.vault_address}</td>
             </tr>
             <tr>
-              <td>金库owner</td>
+              <td>pool owner</td>
               <td>{owners && owners[index] ? owners[index].poolOwner : "-"}</td>
               <Button
                   type="primary"
                   shape="round"
                   onClick={() => {
-                    transferAuthorityHandler("strategyContract", index,"transferOwnership");
+                    transferAuthorityHandler("poolContract", index,"transferOwnership","pool_address");
+                  }}
+                >
+                  权限转移
+                </Button>
+            </tr>
+            <tr>
+              <td>金库owner</td>
+              <td>{owners && owners[index] ? owners[index].vaultOwner : "-"}</td>
+              <Button
+                  type="primary"
+                  shape="round"
+                  onClick={() => {
+                    transferAuthorityHandler("vaultContract", index,"transferOwnership","vault_address");
                   }}
                 >
                   权限转移
@@ -78,7 +91,7 @@ const Investment = () => {
                   type="primary"
                   shape="round"
                   onClick={() => {
-                    transferAuthorityHandler("strategyContract", index,"transferOwnership");
+                    transferAuthorityHandler("strategyContract", index,"transferOwnership","strategy_address");
                   }}
                 >
                   权限转移
@@ -95,7 +108,7 @@ const Investment = () => {
                   type="primary"
                   shape="round"
                   onClick={() => {
-                    transferAuthorityHandler("strategyContract", index,"setOperator");
+                    transferAuthorityHandler("strategyContract", index,"setOperator","strategy_address");
                   }}
                 >
                   权限转移
@@ -112,7 +125,7 @@ const Investment = () => {
                   type="primary"
                   shape="round"
                   onClick={() => {
-                    transferAuthorityHandler("vaultContract", index,"setOperator");
+                    transferAuthorityHandler("vaultContract", index,"setOperator","vault_address");
                   }}
                 >
                   权限转移
@@ -129,7 +142,7 @@ const Investment = () => {
                   type="primary"
                   shape="round"
                   onClick={() => {
-                    transferAuthorityHandler("poolContract", index,"setOperator");
+                    transferAuthorityHandler("poolContract", index,"setOperator","pool_address");
                   }}
                 >
                   权限转移
@@ -280,7 +293,7 @@ const Investment = () => {
                       owners[index]["poolTotalSupply"]
                         ? new BigNumber(owners[index]["poolTotalSupply"])
                             .div(new BigNumber(10).pow(18))
-                            .toFixed(4)
+                            .toFixed(6)
                         : "-"}
                     </span>
                     <span className="tokenName">
@@ -293,7 +306,7 @@ const Investment = () => {
                               owners[index]["totalInvestedAssets"]
                           )
                             .div(new BigNumber(10).pow(18))
-                            .toFixed(4)
+                            .toFixed(6)
                         : "-"}
                     </span>
                     <span className="tokenName">
