@@ -49,6 +49,10 @@ function App({ dispatch }) {
           pool_address,
           underlying_address,
         } = item;
+        console.log(vault_address,
+          strategy_address,
+          pool_address,
+          underlying_address,)
         addresses[index] = {
           vaultContract: await new web3.eth.Contract(vaultApi, vault_address),
           strategyContract: await new web3.eth.Contract(

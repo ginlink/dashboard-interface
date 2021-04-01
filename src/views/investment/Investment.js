@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, Fragment } from "react";
 import { Collapse, Button, Layout, Input, Spin } from "antd";
 import { useSelector } from "react-redux";
 import { BigNumber } from "bignumber.js";
-import moment from "moment"
 
 import "./investment.css";
 
@@ -14,7 +13,6 @@ function callback(key) {
 }
 const Investment = () => {
   const inputRef = useRef();
-
   const [investmentList, setInvestmentList] = useState([]);
 
   const account = useSelector((state) => {
@@ -30,9 +28,10 @@ const Investment = () => {
   );
 
   useEffect(() => {
+    // console.log(addresses)
     async function transferAuthorityHandler(name, index,functionName) {
-      const value = inputRef.current.input.value;
       if(!investmentListOnLoad)return alert("请等待数据加载完成，稍后重试") 
+      const value = inputRef.current.input.value;
       // addresses[index][name].methods.setOperator(value).send({ from: account });
       addresses[index][name].methods[functionName](value).send({ from: account });
     }
@@ -280,7 +279,7 @@ const Investment = () => {
                       owners[index]["poolTotalSupply"]
                         ? new BigNumber(owners[index]["poolTotalSupply"])
                             .div(new BigNumber(10).pow(18))
-                            .toFixed(4)
+                            .toFixed(6)
                         : "-"}
                     </span>
                     <span className="tokenName">
@@ -293,7 +292,7 @@ const Investment = () => {
                               owners[index]["totalInvestedAssets"]
                           )
                             .div(new BigNumber(10).pow(18))
-                            .toFixed(4)
+                            .toFixed(6)
                         : "-"}
                     </span>
                     <span className="tokenName">
