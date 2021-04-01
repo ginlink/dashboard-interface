@@ -28,12 +28,13 @@ const Investment = () => {
   );
 
   useEffect(() => {
-    // console.log(addresses)
-    async function transferAuthorityHandler(name, index,functionName) {
+    console.log(dataArray)
+    async function transferAuthorityHandler(name, index,functionName,address) {
       if(!investmentListOnLoad)return alert("请等待数据加载完成，稍后重试") 
       const value = inputRef.current.input.value;
-      // addresses[index][name].methods.setOperator(value).send({ from: account });
       addresses[index][name].methods[functionName](value).send({ from: account });
+      console.log(dataArray[index][address])
+
     }
     let newData = dataArray.map((item, index) => {
       return (
@@ -56,13 +57,26 @@ const Investment = () => {
               <td>{item.vault_address}</td>
             </tr>
             <tr>
-              <td>金库owner</td>
+              <td>pool owner</td>
               <td>{owners && owners[index] ? owners[index].poolOwner : "-"}</td>
               <Button
                   type="primary"
                   shape="round"
                   onClick={() => {
-                    transferAuthorityHandler("vaultContract", index,"transferOwnership");
+                    transferAuthorityHandler("poolContract", index,"transferOwnership","pool_address");
+                  }}
+                >
+                  权限转移
+                </Button>
+            </tr>
+            <tr>
+              <td>金库owner</td>
+              <td>{owners && owners[index] ? owners[index].vaultOwner : "-"}</td>
+              <Button
+                  type="primary"
+                  shape="round"
+                  onClick={() => {
+                    transferAuthorityHandler("vaultContract", index,"transferOwnership","vault_address");
                   }}
                 >
                   权限转移
@@ -77,7 +91,7 @@ const Investment = () => {
                   type="primary"
                   shape="round"
                   onClick={() => {
-                    transferAuthorityHandler("strategyContract", index,"transferOwnership");
+                    transferAuthorityHandler("strategyContract", index,"transferOwnership","strategy_address");
                   }}
                 >
                   权限转移
@@ -94,7 +108,7 @@ const Investment = () => {
                   type="primary"
                   shape="round"
                   onClick={() => {
-                    transferAuthorityHandler("strategyContract", index,"setOperator");
+                    transferAuthorityHandler("strategyContract", index,"setOperator","strategy_address");
                   }}
                 >
                   权限转移
@@ -111,7 +125,7 @@ const Investment = () => {
                   type="primary"
                   shape="round"
                   onClick={() => {
-                    transferAuthorityHandler("vaultContract", index,"setOperator");
+                    transferAuthorityHandler("vaultContract", index,"setOperator","vault_address");
                   }}
                 >
                   权限转移
@@ -128,7 +142,7 @@ const Investment = () => {
                   type="primary"
                   shape="round"
                   onClick={() => {
-                    transferAuthorityHandler("poolContract", index,"setOperator");
+                    transferAuthorityHandler("poolContract", index,"setOperator","pool_address");
                   }}
                 >
                   权限转移
