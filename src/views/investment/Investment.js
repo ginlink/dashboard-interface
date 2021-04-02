@@ -198,7 +198,7 @@ const Investment = () => {
 
 		day = day?(day+'天'):'';
 		hour = hour?(hour+"时"):'';
-		minute = minute?(minute+"分"):'';
+		minute = minute?(minute+"分钟前"):'';
 		return day + hour + minute;
 	}
 
@@ -314,7 +314,7 @@ const Investment = () => {
                       owners[index] &&
                       owners[index]["recentlyAfterVotingTime"]
                         // ? moment((new Date().getTime() - owners[index]["recentlyAfterVotingTime"]) * 1000).utcOffset(480).format('LTS')
-                        ? calculateDiffTime(owners[index]["recentlyAfterVotingTime"])+"钟前"
+                        ? calculateDiffTime(owners[index]["recentlyAfterVotingTime"])
                         : "-"}
                     </span>
                   </div>
