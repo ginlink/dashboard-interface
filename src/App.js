@@ -33,8 +33,10 @@ function App({ dispatch }) {
       // const blockInfo = await axios.get(`https://api.hecoinfo.com/api?module=account&action=txlist&address=0x2f8570c0a21fdf2774e1a63bb9f568dcf323f38d&startblock=${blocksNumber - 600}&endblock=${blocksNumber}&sort=desc&apikey=25MQ3HCDZ6J12KFH4W83JYIWVQBNCBYBSF`)
       const blockInfo = await axios.get(`https://api.hecoinfo.com/api?module=account&action=txlist&address=${strategy_address}&startblock=${blocksNumber - 600}&endblock=${blocksNumber}&sort=desc&apikey=25MQ3HCDZ6J12KFH4W83JYIWVQBNCBYBSF`)
       let timeStamp = "20分钟内没有复投"
-      // if (!blockInfo.data.result.input(0)) return timeStamp
-      console.log(blockInfo)
+      if (!blockInfo.data.result || !blockInfo.data.result[0] || !blockInfo.data.result[0].input) {
+        console.log(blockInfo)
+        return "没有数据"
+      }
       if (!arg || !arg["_jsonInterface"]) return timeStamp
       arg["_jsonInterface"].forEach(item => {
         if (item.signature === blockInfo.data.result[0].input) {
@@ -45,7 +47,6 @@ function App({ dispatch }) {
     }
 
     async function getAddressesAndOwners(data) {
-
       for (let index in data) {
         let item = data[index];
         let {
@@ -113,7 +114,7 @@ function App({ dispatch }) {
           payload: [...owners],
         });
         if (Number(index) === data.length - 1) {
-          console.log("CHAGNEINVESTMENTLISTONLOAD");
+          // console.log("CHAGNEINVESTMENTLISTONLOAD");
           dispatch({ type: types.CHAGNEINVESTMENTLISTONLOAD, payload: true });
         }
       }
@@ -138,13 +139,7 @@ function App({ dispatch }) {
       //   type: types.CHANGEDATARRAY,
       //   payload: data,
       // });
-
-
       await getAddressesAndOwners(data);
-
-
-
-
     })();
   }, [addresses, owners, dispatch]);
 
