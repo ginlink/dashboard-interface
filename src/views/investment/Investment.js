@@ -28,7 +28,6 @@ const Investment = () => {
   );
 
   useEffect(() => {
-    console.log(dataArray)
     async function transferAuthorityHandler(name, index,functionName,address) {
       if(!investmentListOnLoad)return alert("请等待数据加载完成，稍后重试") 
       const value = inputRef.current.input.value;
@@ -188,6 +187,7 @@ const Investment = () => {
   }
 
   function calculateDiffTime(start_time) {
+    if ( start_time === "20分钟内没有复投" ) return start_time
 		if(!parseInt(start_time)) return "-";
 		var endTime = Math.round(new Date() / 1000);
 
