@@ -1,0 +1,4 @@
+{
+  "msg":"msg",
+  "balance": "is: {{ test }}"
+}

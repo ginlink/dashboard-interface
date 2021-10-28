@@ -1,0 +1,28 @@
+@import './antd-global.css';
+
+p {
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-inline-start: 0;
+  margin-inline-end: 0;
+}
+
+/* 去掉input type=number时输入框内的上下箭头 */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* 去掉input type=number时输入框内的上下箭头 END */
+
+/* TODO 记得压缩字体 */
+@font-face {
+  font-family: Inter;
+  src: url('../font/Inter.ttf');
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400px" height="110px" viewBox="0 0 400 110" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>bg</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="400" height="110" rx="20"></rect>
+        <radialGradient cx="40.2451707%" cy="44.3758178%" fx="40.2451707%" fy="44.3758178%" r="72.6144191%" gradientTransform="translate(0.402452,0.443758),scale(0.844473,1.000000),rotate(-119.739444),scale(1.000000,1.000218),translate(-0.402452,-0.443758)" id="radialGradient-3">
+            <stop stop-color="#0E233E" offset="0%"></stop>
+            <stop stop-color="#566C8D" offset="100%"></stop>
+        </radialGradient>
+        <radialGradient cx="50%" cy="68.9546176%" fx="50%" fy="68.9546176%" r="147.157059%" gradientTransform="translate(0.500000,0.689546),scale(0.841520,1.000000),rotate(174.092998),scale(1.000000,0.999703),translate(-0.500000,-0.689546)" id="radialGradient-4">
+            <stop stop-color="#88AEE3" offset="0%"></stop>
+            <stop stop-color="#284269" offset="100%"></stop>
+        </radialGradient>
+        <radialGradient cx="38.5313827%" cy="44.0896071%" fx="38.5313827%" fy="44.0896071%" r="185.823786%" gradientTransform="translate(0.385314,0.440896),scale(0.585154,1.000000),rotate(4.165950),scale(1.000000,0.999700),translate(-0.385314,-0.440896)" id="radialGradient-5">
+            <stop stop-color="#5878A5" offset="0%"></stop>
+            <stop stop-color="#1E3251" offset="100%"></stop>
+        </radialGradient>
+    </defs>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="聚合流动性挖矿" transform="translate(-530.000000, -225.000000)">
+            <g id="bg" transform="translate(530.000000, 225.000000)">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <use id="蒙版" fill="#162133" xlink:href="#path-1"></use>
+                <path d="M364.149368,457 C292.28222,235.770161 145.694813,180.581663 26,128.5 C-129.338908,60.9088623 -257.331882,18.0614271 -303,-174.507905 L429.836124,-200 L475,453.143538 L364.149368,457 Z" id="Fill-48" fill="url(#radialGradient-3)" mask="url(#mask-2)"></path>
+                <path d="M51.0331791,-149.801803 C197.970246,-45.4189367 213.557194,110.411058 449.836657,185.696324 L449.749881,-149.904729 L51.0331791,-149.801803 Z" id="Fill-13" fill="url(#radialGradient-4)" opacity="0.048726" mask="url(#mask-2)"></path>
+                <path d="M38.1319421,-149.798173 C116.955884,-124.485083 166.905777,-83.1259064 210.021066,-41.7628975 C278.138116,23.5855724 329.158017,88.9344682 449.811876,90.9910583 L449.749736,-149.905048 L38.1319421,-149.798173 Z" id="Fill-21" fill="url(#radialGradient-5)" opacity="0.161877587" mask="url(#mask-2)"></path>
+            </g>
+        </g>
+    </g>
+</svg>

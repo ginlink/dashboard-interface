@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="486px" height="308px" viewBox="0 0 486 308" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>img2</title>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#0C1626" offset="0%"></stop>
+            <stop stop-color="#0C1626" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="40.921953%" x2="50%" y2="100%" id="linearGradient-2">
+            <stop stop-color="#267BEA" offset="0%"></stop>
+            <stop stop-color="#0C1626" stop-opacity="0.308737161" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="94.6091683%" y1="47.9539122%" x2="0%" y2="62.515359%" id="linearGradient-3">
+            <stop stop-color="#5AE7DE" offset="0%"></stop>
+            <stop stop-color="#1C3CAD" offset="56.6764778%"></stop>
+            <stop stop-color="#0C1626" offset="100%"></stop>
+        </linearGradient>
+        <circle id="path-4" cx="425" cy="63" r="11"></circle>
+        <filter x="-68.2%" y="-68.2%" width="236.4%" height="236.4%" filterUnits="objectBoundingBox" id="filter-5">
+            <feOffset dx="0" dy="0" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0.352941176   0 0 0 0 0.905882353   0 0 0 0 0.870588235  0 0 0 1 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="首页" transform="translate(-530.000000, -885.000000)">
+            <g id="组2" transform="translate(530.000000, 885.000000)">
+                <g id="img2" transform="translate(0.000000, 0.000000)">
+                    <g id="编组-20" opacity="0.149999991" transform="translate(242.500000, 175.500000) rotate(-270.000000) translate(-242.500000, -175.500000) translate(110.000000, -66.000000)" fill="#D8D8D8">
+                        <rect id="矩形" x="0" y="4.00746103e-12" width="1" height="483"></rect>
+                        <rect id="矩形" x="44" y="4.03588274e-12" width="1" height="483"></rect>
+                        <rect id="矩形" x="88" y="4.03588274e-12" width="1" height="483"></rect>
+                        <rect id="矩形" x="132" y="4.00746103e-12" width="1" height="483"></rect>
+                        <rect id="矩形" x="176" y="4.00746103e-12" width="1" height="483"></rect>
+                        <rect id="矩形" x="220" y="4.00746103e-12" width="1" height="483"></rect>
+                        <rect id="矩形" x="264" y="3.97903932e-12" width="1" height="483"></rect>
+                    </g>
+                    <g id="编组-20" transform="translate(242.500000, 154.000000) rotate(-360.000000) translate(-242.500000, -154.000000) ">
+                        <rect id="矩形" fill="#D8D8D8" opacity="0.149999991" x="-2.27373675e-13" y="0" width="1" height="308"></rect>
+                        <rect id="矩形" fill="#D8D8D8" opacity="0.149999991" x="44" y="0" width="1" height="308"></rect>
+                        <rect id="矩形" fill="#D8D8D8" opacity="0.149999991" x="88" y="0" width="1" height="308"></rect>
+                        <rect id="矩形" fill="#D8D8D8" opacity="0.149999991" x="132" y="0" width="1" height="308"></rect>
+                        <rect id="矩形" fill="#D8D8D8" opacity="0.149999991" x="176" y="0" width="1" height="308"></rect>
+                        <rect id="矩形" fill="#D8D8D8" opacity="0.149999991" x="220" y="0" width="1" height="308"></rect>
+                        <rect id="矩形" fill="#D8D8D8" opacity="0.149999991" x="264" y="0" width="1" height="308"></rect>
+                        <rect id="矩形" fill="#D8D8D8" opacity="0.149999991" x="308" y="0" width="1" height="308"></rect>
+                        <rect id="矩形" fill="#D8D8D8" opacity="0.149999991" x="352" y="0" width="1" height="308"></rect>
+                        <rect id="矩形" fill="#D8D8D8" opacity="0.149999991" x="396" y="0" width="1" height="308"></rect>
+                        <rect id="矩形" fill="#D8D8D8" opacity="0.149999991" x="440" y="0" width="1" height="308"></rect>
+                        <rect id="矩形" fill="#D8D8D8" opacity="0.149999991" x="484" y="0" width="1" height="308"></rect>
+                        <rect id="矩形" fill="url(#linearGradient-1)" x="-2.27373675e-13" y="0" width="485" height="308"></rect>
+                    </g>
+                    <g id="编组-21" transform="translate(1.000000, 49.000000)">
+                        <path d="M0,212.983394 C9.39215527,211.525878 37.2067465,186.726471 88,182.93116 C160.863417,176.070929 186.157611,145.626796 200.291636,136 C214.425661,126.373204 238.122101,102.355913 293.44159,102.355913 C333.684784,105.031475 368.786309,100.223036 396,85.5320053 C423.213691,70.8409743 474.434143,14.4909202 483,0 C483.156304,9.92591069 483.489637,95.9259107 484,258 L0,259 C0,237.665468 0,222.3266 0,212.983394 Z" id="路径-4" fill="url(#linearGradient-2)" opacity="0.298294"></path>
+                        <path d="M1.55112258,212.279878 C2.67225695,212.734628 46.7563655,185.224143 88,182.93116 C160.863417,176.070929 186.157611,145.626796 200.291636,136 C214.425661,126.373204 238.122101,102.355913 293.44159,102.355913 C333.684784,105.031475 368.786309,100.223036 396,85.5320053 C423.213691,70.8409743 474.434143,14.4909202 483,0" id="路径-4" stroke="url(#linearGradient-3)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <g id="椭圆形">
+                            <use fill="black" fill-opacity="1" filter="url(#filter-5)" xlink:href="#path-4"></use>
+                            <use fill="#5AE7DE" fill-rule="evenodd" xlink:href="#path-4"></use>
+                        </g>
+                    </g>
+                    <g id="上升" transform="translate(370.315000, 232.000000)" fill="#5AE7DE" fill-rule="nonzero">
+                        <path d="M12.8206525,22 L6.75463036,22 C6.22002841,22 5.68542646,21.7873333 5.68542646,21.1511667 L5.68542646,12.6646667 C5.68542646,12.0285 5.50542582,11.8176667 4.97262387,11.8176667 L1.40321086,11.8176667 C0.54820775,11.8176667 0.476207474,10.5013333 1.0828097,9.78083332 L9.03883869,0.318999995 C9.39523998,-0.106333332 10.0018422,-0.106333332 10.3942436,0.318999995 L18.3502726,9.779 C18.9568748,10.5013333 18.7084739,11.8176667 17.8516708,11.8176667 L14.5684588,11.6893333 C14.0338569,11.6893333 13.5694552,12.0285 13.5694552,12.6646667 L13.5694552,21.153 C13.5334551,21.7451667 13.3552544,22 12.8206525,22 Z" id="路径"></path>
+                    </g>
+                    <g id="上升" transform="translate(104.315000, 147.000000)" fill="#5AE7DE" fill-rule="nonzero">
+                        <path d="M12.8206525,22 L6.75463036,22 C6.22002841,22 5.68542646,21.7873333 5.68542646,21.1511667 L5.68542646,12.6646667 C5.68542646,12.0285 5.50542582,11.8176667 4.97262387,11.8176667 L1.40321086,11.8176667 C0.54820775,11.8176667 0.476207474,10.5013333 1.0828097,9.78083332 L9.03883869,0.318999995 C9.39523998,-0.106333332 10.0018422,-0.106333332 10.3942436,0.318999995 L18.3502726,9.779 C18.9568748,10.5013333 18.7084739,11.8176667 17.8516708,11.8176667 L14.5684588,11.6893333 C14.0338569,11.6893333 13.5694552,12.0285 13.5694552,12.6646667 L13.5694552,21.153 C13.5334551,21.7451667 13.3552544,22 12.8206525,22 Z" id="路径"></path>
+                    </g>
+                    <g id="编组-22" transform="translate(330.000000, 65.000000)">
+                        <path d="M0,17 C0,7.61127778 7.857525,0 17.55,0 L60.45,0 C70.142475,0 78,7.61127778 78,17 C78,26.3887222 70.142475,34 60.45,34 L17.55,34 C7.857525,34 0,26.3887222 0,17 Z" id="路径" fill="#277BE9" fill-rule="nonzero"></path>
+                        <text id="+280%" font-family="Inter-Regular_SemiBold, Inter" font-size="16" font-weight="500" fill="#FFFFFF">
+                            <tspan x="11" y="23">+280%</tspan>
+                        </text>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
