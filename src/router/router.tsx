@@ -1,8 +1,3 @@
-import Farm from '@/pages/Farm'
-import Home from '@/pages/Home'
-import Set from '@/pages/Set'
-import Profile from '@/pages/Profile'
-import SingleFarm from '@/pages/SingleFarm'
 import React from 'react'
 import { DefaultRootState } from 'react-redux'
 import { Switch, HashRouter as Router, Route, Redirect, Link } from 'react-router-dom'
@@ -40,11 +35,11 @@ const Routes = (props: any) => (
     <Link to="/new/content">new-content</Link>】 */}
 
     <Switch>
-      <Route exact path="/home" render={() => <Home />} />
+      {/* <Route exact path="/home" render={() => <Home />} />
       <Route exact path="/set" render={() => <Set />} />
       <Route exact path="/single-farm" render={() => <SingleFarm />} />
       <Route exact path="/farm" render={() => <Farm />} />
-      <Route exact path="/profile" render={() => <Profile />} />
+      <Route exact path="/profile" render={() => <Profile />} /> */}
 
       <Redirect from="/" to="/home" />
       {/* {mapRoutes(routes, props.store)} */}

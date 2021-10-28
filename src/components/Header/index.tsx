@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 14:15:56
- * @LastEditTime: 2021-09-17 16:28:06
+ * @LastEditTime: 2021-10-28 15:41:48
  * @LastEditors: jiangjin
  * @Description: In User Settings Edit
  * @FilePath: /converter-bsc-web/src/components/Header/index.tsx
@@ -11,8 +11,6 @@ import React, { memo } from 'react'
 import styled from 'styled-components/macro'
 
 import HeaderPC from './HeaderPC'
-import HeaderH5 from './HeaderH5'
-import Popups from '../Popups'
 import { MEDIUM } from '@/utils/adapteH5'
 const HeaderWrapper = styled.div<{ isPc: boolean }>`
   margin: 13px 24px;
@@ -35,17 +33,7 @@ function Header() {
   const isPc = useIsPcByScreenWidth()
   return (
     <HeaderWrapper isPc={isPc}>
-      {isPc ? (
-        <HeaderInnerWrapper isPc={isPc}>
-          <HeaderPC />
-        </HeaderInnerWrapper>
-      ) : (
-        <HeaderInnerWrapper isPc={isPc}>
-          <HeaderH5 />
-        </HeaderInnerWrapper>
-      )}
-
-      <Popups />
+      <HeaderPC />
     </HeaderWrapper>
   )
 }

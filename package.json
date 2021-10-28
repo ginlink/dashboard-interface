@@ -5,7 +5,7 @@
   "author": ".",
   "private": true,
   "scripts": {
-    "start": "yarn compile-contract-types && react-app-rewired start",
+    "start": "yarn compile-external-abi-types && react-app-rewired start",
     "start:origin": "yarn compile-contract-types && react-scripts start",
     "build": "npm run build:prod",
     "build:prod": "cross-env NODE_ENV_CUSTOM=production react-app-rewired  build --mode production",

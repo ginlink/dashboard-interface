@@ -1,7 +1,7 @@
 /*
  * @Author: jiangjin
  * @Date: 2021-09-02 22:01:32
- * @LastEditTime: 2021-09-19 16:36:41
+ * @LastEditTime: 2021-10-28 15:29:43
  * @LastEditors: jiangjin
  * @Description:
  *
@@ -9,7 +9,6 @@
 
 import React from 'react'
 import styled from 'styled-components/macro'
-import { Token } from '@uniswap/sdk-core'
 
 const InputBaseWrapper = styled.div`
   .input-base {

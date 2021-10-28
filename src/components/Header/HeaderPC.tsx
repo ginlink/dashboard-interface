@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 18:06:40
- * @LastEditTime: 2021-09-24 12:21:28
+ * @LastEditTime: 2021-10-28 15:41:41
  * @LastEditors: jiangjin
  * @Description: In User Settings Edit
  * @FilePath: /converter-bsc-web/src/components/Header/header1.tsx
@@ -10,7 +10,6 @@ import { NETWORK_LABELS } from '@/constants/chains'
 import { useActiveWeb3React } from '@/hooks/web3'
 import React, { memo } from 'react'
 import styled from 'styled-components/macro'
-import LinksStatus from '../LinksStatus'
 import Web3Status from '../Web3Status'
 
 const Wrapper = styled.div`
@@ -30,7 +29,6 @@ function HeaderPC() {
   return (
     <Wrapper>
       {NETWORK_LABELS[chainId ?? -1] ?? 'ErrorNetWork'}
-      <LinksStatus />
       <Empty />
       <Web3Status />
     </Wrapper>

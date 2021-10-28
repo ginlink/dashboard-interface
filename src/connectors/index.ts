@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 19:01:46
- * @LastEditTime: 2021-09-12 22:03:36
+ * @LastEditTime: 2021-10-28 15:31:28
  * @LastEditors: jiangjin
  * @Description: In User Settings Edit
  * @FilePath: /converter-bsc-web/src/connectors/index.ts
@@ -55,7 +55,7 @@ export const walletconnect = new WalletConnectConnector({
   rpc: NETWORK_URLS,
   bridge: WALLETCONNECT_BRIDGE_URL,
   qrcode: true,
-  pollingInterval: 15000,
+  // pollingInterval: 15000,
 })
 
 // mainnet only

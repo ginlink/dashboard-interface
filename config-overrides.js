@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-08-30 19:39:13
- * @LastEditTime: 2021-09-02 14:42:59
+ * @LastEditTime: 2021-10-28 15:23:48
  * @LastEditors: jiangjin
  * @Description: In User Settings Edit
  * @FilePath: /converter-bsc-web/config-overrides.js
@@ -40,15 +40,6 @@ module.exports = override(
     addWebpackAlias({
         //路径别名
         '@': path.resolve(__dirname, 'src'),
-    }),
-    addLessLoader({
-        lessOptions: {
-            javascriptEnabled: true,
-            modifyVars: {
-                '@primary-color': '#FFAB36',
-                '@link-color': '#fff',
-            },
-        },
     }),
     (config) => {
         //暴露webpack的配置 config ,evn

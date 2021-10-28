@@ -1,5 +1,3 @@
-@import './antd-global.css';
-
 p {
   margin-top: 0;
   margin-bottom: 0;
@@ -21,7 +19,6 @@ input[type="number"] {
 
 /* 去掉input type=number时输入框内的上下箭头 END */
 
-/* TODO 记得压缩字体 */
 @font-face {
   font-family: Inter;
   src: url('../font/Inter.ttf');
