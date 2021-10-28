@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
 import { darken } from 'polished'
 import { ArrowLeft, X, ExternalLink as LinkIconFeather, Trash } from 'react-feather'
-import { MEDIUM, px2vwm } from '@/utils/adapteH5'
 
 export const ButtonText = styled.button`
   outline: none;
@@ -334,11 +333,4 @@ export const AbsBase = styled.div<{
   left: ${({ ispc, left }) => (ispc && left + 'px') || 'auto'};
   bottom: ${({ ispc, bottom }) => (ispc && bottom + 'px') || 'auto'};
   right: ${({ ispc, right }) => (ispc && right + 'px') || 'auto'};
-
-  @media (max-width: ${MEDIUM}) {
-    top: ${({ ispc, top }) => (!ispc && px2vwm(top)) || 'auto'};
-    left: ${({ ispc, left }) => (!ispc && px2vwm(left)) || 'auto'};
-    bottom: ${({ ispc, bottom }) => (!ispc && px2vwm(bottom)) || 'auto'};
-    right: ${({ ispc, right }) => (!ispc && px2vwm(right)) || 'auto'};
-  }
 `

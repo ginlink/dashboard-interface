@@ -1,9 +1,8 @@
 import { useScreenWidth } from '@/store/application/hooks'
-import { MEDIUM } from 'utils/adapteH5'
 
 export function useIsPcByScreenWidth() {
   const currentScreenWidth = useScreenWidth()
 
-  return currentScreenWidth ? currentScreenWidth > parseInt(MEDIUM) : true
+  return currentScreenWidth ? currentScreenWidth > parseInt('960px') : true
   // 默认情况下是PC端
 }

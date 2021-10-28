@@ -1,13 +1,30 @@
 /*
  * @Author: jiangjin
  * @Date: 2021-09-12 20:56:09
- * @LastEditTime: 2021-10-28 15:44:57
+ * @LastEditTime: 2021-10-28 16:09:49
  * @LastEditors: jiangjin
  * @Description:
  *  用于useSelector的第二个参数，节流用，依赖不变化，则不通知我更新
  */
 
-import { EqualityFn } from '@/store/multicall/hooks'
+export type CallResultsProps = {
+  [chainId: number]: {
+    [callKey: string]: {
+      data?: string | null
+      blockNumber?: number
+      fetchingBlockNumber?: number
+    }
+  }
+}
+export type CallLitenersProps = {
+  [chainId: number]: {
+    [callKey: string]: {
+      [blocksPerFetch: number]: number
+    }
+  }
+}
+export type EqualityFn = (left: CallResultsProps, right: CallResultsProps) => boolean
+
 import { useCallback } from 'react'
 import { useActiveWeb3React } from './web3'
 

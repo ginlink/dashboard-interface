@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-09-01 14:15:56
- * @LastEditTime: 2021-10-28 15:41:48
+ * @LastEditTime: 2021-10-28 16:17:48
  * @LastEditors: jiangjin
  * @Description: In User Settings Edit
  * @FilePath: /converter-bsc-web/src/components/Header/index.tsx
@@ -11,16 +11,11 @@ import React, { memo } from 'react'
 import styled from 'styled-components/macro'
 
 import HeaderPC from './HeaderPC'
-import { MEDIUM } from '@/utils/adapteH5'
 const HeaderWrapper = styled.div<{ isPc: boolean }>`
   margin: 13px 24px;
 
   position: ${({ isPc }) => (isPc ? 'absolute' : '')};
   right: ${({ isPc }) => (isPc ? '0' : '')};
-
-  @media (max-width: ${MEDIUM}) {
-    margin: unset;
-  }
 `
 
 const HeaderInnerWrapper = styled.div<{ isPc: boolean }>`

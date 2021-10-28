@@ -1,4 +1,3 @@
-import { MEDIUM, px2vwm } from '@/utils/adapteH5'
 import React, { useMemo } from 'react'
 import { TextProps as TextPropsOriginal, Text } from 'rebass'
 import styled, {
@@ -166,10 +165,6 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 
 const TextWrapper = styled(Text)<{ color: keyof Colors; fontSize: string }>`
   color: ${({ color, theme }) => (theme as any)[color]};
-
-  @media (max-width: ${MEDIUM}) {
-    font-size: ${({ fontSize }) => px2vwm(fontSize)} !important;
-  }
 `
 
 export const TYPE = {

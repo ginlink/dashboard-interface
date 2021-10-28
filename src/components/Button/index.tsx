@@ -5,8 +5,6 @@ import { darken, important, lighten, opacify, transparentize } from 'polished'
 import { RowBetween } from '../Row'
 import { ChevronDown, Check } from 'react-feather'
 import { Button as RebassButton, ButtonProps as ButtonPropsOriginal } from 'rebass/styled-components'
-// import useTheme from 'hooks/useTheme'
-import { MEDIUM, px2vwm } from 'utils/adapteH5'
 
 type ButtonProps = Omit<ButtonPropsOriginal, 'css'>
 
@@ -88,13 +86,6 @@ const ButtonFirstBase = styled(ButtonPrimary)`
   min-height: 36px;
   font-size: 16px;
   border-radius: 20px;
-
-  @media (max-width: ${MEDIUM}) {
-    min-width: ${px2vwm(100)};
-    min-height: ${px2vwm(34)};
-    font-size: ${px2vwm(14)};
-    border-radius: ${px2vwm(17)};
-  }
 `
 
 export const ButtonFirst = styled(ButtonFirstBase)<{
@@ -119,13 +110,6 @@ export const ButtonFirst = styled(ButtonFirstBase)<{
   &:active,
   &:disabled {
     color: ${({ theme }) => theme.black};
-  }
-
-  @media (max-width: ${MEDIUM}) {
-    min-width: ${(props) => (props.widthh5 ? px2vwm(props.widthh5) : px2vwm(100))};
-    min-height: ${(props) => (props.heighth5 ? px2vwm(props.heighth5) : px2vwm(34))};
-    font-size: ${px2vwm(12)};
-    border-radius: ${(props) => (props.radiush5 ? px2vwm(props.radiush5) : px2vwm(17))};
   }
 `
 

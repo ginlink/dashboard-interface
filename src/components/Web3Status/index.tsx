@@ -1,7 +1,7 @@
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core'
 import { darken, lighten } from 'polished'
-import React, { useEffect, useMemo } from 'react'
+import React from 'react'
 import { Activity } from 'react-feather'
 import styled, { css } from 'styled-components'
 import CoinbaseWalletIcon from '../../assets/images/coinbaseWalletIcon.svg'
@@ -10,24 +10,14 @@ import PortisIcon from '../../assets/images/portisIcon.png'
 import WalletConnectIcon from '../../assets/images/walletConnectIcon.svg'
 import { fortmatic, injected, portis, walletconnect, walletlink } from '../../connectors'
 import { NetworkContextName } from '../../constants/misc'
-// import useENSName from '../../hooks/useENSName'
-// import { useHasSocks } from '../../hooks/useSocksBalance'
-// import { useWalletModalToggle } from '../../state/application/hooks'
-// import { isTransactionRecent, useAllTransactions } from '../../state/transactions/hooks'
-// import { TransactionDetails } from '../../state/transactions/reducer'
 import { shortenAddress } from '../../utils'
 import { ButtonSecondary } from '../Button'
 
-import * as Icon from '@/components/Icon'
 import Identicon from '../Identicon'
 // import Loader from '../Loader'
 
 // import { RowBetween } from '../Row'
-import { MEDIUM, px2vwm } from 'utils/adapteH5'
-import Row, { RowBetween } from '../Row'
-import { isTransactionRecent, useAllTransactions } from '@/store/transaction/hooks'
-import { TransactionDetail } from '@/store/transaction/reducer'
-import Loader from '../Loader'
+import Row from '../Row'
 import { useIsPcByScreenWidth } from '@/hooks/useIsPc'
 
 const IconWrapper = styled.div<{ size?: number }>`
@@ -99,16 +89,6 @@ const Web3StatusConnect = styled(Web3StatusGeneric)<{ faded?: boolean }>`
         /* color: ${({ theme }) => theme.primaryText1}; */
       }
     `};
-
-  @media (max-width: ${MEDIUM}) {
-    padding: ${px2vwm`5px`};
-    & > p {
-      font-size: ${px2vwm`13px`};
-      font-weight: 500;
-      color: ${({ theme }) => theme.primary1};
-      line-height: ${px2vwm`19px`};
-    }
-  }
 `
 
 const Web3StatusConnected = styled(Web3StatusGeneric)<{ pending?: boolean }>`
@@ -133,13 +113,6 @@ const Web3StatusConnected = styled(Web3StatusGeneric)<{ pending?: boolean }>`
   :active {
     border: 1px solid ${({ theme }) => darken(0.6, theme.white)};
   }
-
-  @media (max-width: ${MEDIUM}) {
-    /* padding: ${px2vwm`5px`}; */
-    /* padding: 5px; */
-    border: 1px solid transparent;
-    padding: 3px 10px;
-  }
 `
 
 const Text = styled.p`
@@ -150,10 +123,6 @@ const Text = styled.p`
   font-size: 12px;
   width: fit-content;
   font-weight: 500;
-
-  /* @media (max-width: ${MEDIUM}) {
-    font-size: ${px2vwm`16px`};
-  } */
 `
 
 const NetworkIcon = styled(Activity)`
@@ -161,26 +130,7 @@ const NetworkIcon = styled(Activity)`
   margin-right: 0.5rem;
   width: 16px;
   height: 16px;
-
-  @media (max-width: ${MEDIUM}) {
-    font-size: ${px2vwm`16px`};
-    width: ${px2vwm`16px`};
-    height: ${px2vwm`16px`};
-  }
 `
-
-// we want the latest one to come first, so return negative if a is after b
-function newTransactionsFirst(a: TransactionDetail, b: TransactionDetail) {
-  return b.addedTime - a.addedTime
-}
-
-// function Sock() {
-//   return (
-//     <span role="img" aria-label={t`has socks emoji`} style={{ marginTop: -4, marginBottom: -4 }}>
-//       🧦
-//     </span>
-//   )
-// }
 
 // eslint-disable-next-line react/prop-types
 function StatusIcon({ connector }: { connector: AbstractConnector }) {
@@ -233,52 +183,16 @@ const WalletIcon = styled(Row)`
 function Web3StatusInner() {
   const { account, connector, error } = useWeb3React()
 
-  // const { ENSName } = useENSName(account ?? undefined)
-
-  const allTransactions = useAllTransactions()
-
-  const sortedRecentTransactions = useMemo(() => {
-    const txs = Object.values(allTransactions)
-    return txs.filter(isTransactionRecent).sort(newTransactionsFirst)
-  }, [allTransactions])
-
-  const pending = useMemo(
-    () => sortedRecentTransactions.filter((tx) => !tx.receipt).map((tx) => tx.hash),
-    [sortedRecentTransactions]
-  )
-
-  const hasPendingTransactions = !!pending.length
-
-  useEffect(() => {
-    console.debug('[](allTransactions):', allTransactions)
-  }, [allTransactions])
-  // const hasSocks = useHasSocks()
-  // const toggleWalletModal = useWalletModalToggle()
-
   const isPc = useIsPcByScreenWidth()
 
   if (account) {
     return (
-      <Web3StatusConnected id="web3-status-connected" pending={hasPendingTransactions}>
+      <Web3StatusConnected id="web3-status-connected">
         {/* <Web3StatusConnected id="web3-status-connected" pending={true}> */}
         <InnerWrapper>
-          {hasPendingTransactions ? (
-            // {true ? (
-            <RowBetween>
-              <Text>{pending?.length} Pending</Text>
-              <Loader stroke="white" />
-            </RowBetween>
-          ) : (
-            <>
-              <WalletIcon>
-                <Icon.Wallet />
-              </WalletIcon>
-              <Text>{shortenAddress(account ?? '', isPc ? 4 : 2)}</Text>
-            </>
-          )}
+          <WalletIcon>钱包图片</WalletIcon>
+          <Text>{shortenAddress(account ?? '', isPc ? 4 : 2)}</Text>
         </InnerWrapper>
-        {/* 图标，钱包头像 */}
-        {/* {connector && <StatusIcon connector={connector} />} */}
       </Web3StatusConnected>
     )
   } else if (error) {
