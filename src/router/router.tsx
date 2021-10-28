@@ -31,19 +31,10 @@ function mapRoutes(routes: any[], store: DefaultRootState): any {
 // 例子
 const Routes = (props: any) => (
   <Router>
-    {/* <Link to="/home">home</Link> | <Link to="/new">new</Link> 【<Link to="/new/list">new-list</Link> |{' '}
-    <Link to="/new/content">new-content</Link>】 */}
-
     <Switch>
-      {/* <Route exact path="/home" render={() => <Home />} />
-      <Route exact path="/set" render={() => <Set />} />
-      <Route exact path="/single-farm" render={() => <SingleFarm />} />
-      <Route exact path="/farm" render={() => <Farm />} />
-      <Route exact path="/profile" render={() => <Profile />} /> */}
-
-      <Redirect from="/" to="/home" />
-      {/* {mapRoutes(routes, props.store)} */}
-      {/* <Route component={() => <div>Page not Found!</div>} /> */}
+      <Route exact path="/" render={() => <Redirect to="/home" />} />
+      {mapRoutes(routes, props.store)}
+      <Route component={() => <div>Page not Found!</div>} />
     </Switch>
   </Router>
 )

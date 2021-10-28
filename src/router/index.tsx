@@ -28,7 +28,7 @@ const Loading = (props: any) => {
 // 路由懒加载
 const loadable = (path: any) => {
   return Loadable({
-    loader: () => import(`@/${path}`),
+    loader: () => import(`../${path}`),
     loading: Loading,
     delay: 200,
     timeout: 10000,
