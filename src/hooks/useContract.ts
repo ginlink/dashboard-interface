@@ -1,11 +1,3 @@
-/*
- * @Author: jiangjin
- * @Date: 2021-09-10 18:17:13
- * @LastEditTime: 2021-09-25 10:04:30
- * @LastEditors: jiangjin
- * @Description:
- *  合约库
- */
 import { Contract } from '@ethersproject/contracts'
 import { useMemo } from 'react'
 import { useActiveWeb3React } from './web3'
@@ -22,7 +14,7 @@ import REWARD_POOL_ABI from '@/abis/reward-pool.json'
 import { Erc20, Multicall2, RewardPool } from '@/abis/types'
 import { SupportedChainId } from '@/constants/chains'
 import { Vault } from '@/abis/types/Vault'
-
+import abiDatas from '../abis/ISpePool.json'
 export function getSigner(library: Web3Provider, account: string) {
   return library.getSigner(account).connectUnchecked()
 }
@@ -131,3 +123,6 @@ export function useRewardPoolContract(poolAddress: string | undefined, withSigne
   return useContract<RewardPool>(poolAddress, REWARD_POOL_ABI, withSigner)
 }
 /********************** Contract End ************************ */
+export function usePositionContract(address: any) {
+  return useContract(address, abiDatas, true)
+}

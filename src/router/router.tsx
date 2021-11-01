@@ -5,7 +5,6 @@ import routes from './index'
 function mapRoutes(routes: any[], store: DefaultRootState): any {
   return routes.map((item: any, index: number) => {
     console.log(item, 'item')
-
     return (
       <Route
         exact={item.exact || false}

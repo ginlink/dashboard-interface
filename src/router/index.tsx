@@ -42,6 +42,10 @@ const routes = [
     exact: true,
   },
   {
+    path: '/tables',
+    component: loadable('pages/Tables'),
+  },
+  {
     path: '/new',
     component: loadable('components/New'),
     redirect: '/new/list',
