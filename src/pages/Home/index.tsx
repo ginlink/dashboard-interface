@@ -1,13 +1,7 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
-const FontHome = styled.div`
-  color: #000;
-`
+const Warpper = styled.div``
 export default function Home() {
-  return (
-    <>
-      <FontHome>2132132132132</FontHome>
-    </>
-  )
+  return <Warpper></Warpper>
 }
