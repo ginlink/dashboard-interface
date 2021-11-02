@@ -27,11 +27,11 @@ function apiAxios<P, R>(method: Methods, url: string, params: P) {
       timeout: 60000,
     })
 
-    instance[method](url, {
-      data: method === Methods.POST || method === Methods.PUT ? params : null,
-      params: method === Methods.GET || method === Methods.DELETE || method === Methods.PATCH ? params : null,
-      withCredentials: false,
-    })
+    const call = instance[method]
+
+    const isWrite = method == Methods.POST || method == Methods.PUT || method == Methods.PATCH
+
+    call(url, isWrite ? params : { params })
       .then((res: any) => {
         if (res?.status === 200 || res?.status === 201) {
           resolve(res.data)
