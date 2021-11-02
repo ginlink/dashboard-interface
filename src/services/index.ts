@@ -1,34 +1,34 @@
-/*
- * @Author: jiangjin
- * @Date: 2021-09-23 15:58:01
- * @LastEditTime: 2021-09-23 16:27:21
- * @LastEditors: jiangjin
- * @Description:
- *
- */
-import axios from 'axios'
+import axios, { AxiosInstance } from 'axios'
 import { BASE_URL } from './config'
+
+enum Methods {
+  GET = 'get',
+  POST = 'post',
+  PUT = 'put',
+  DELETE = 'delete',
+  PATCH = 'patch',
+}
 
 /**
  * 二次封装axios
- * @param {String} method Ajax请求类型 'POST'|'PUT'|'GET'|'DELETE'
+ * @param {String} method Ajax请求类型 'POST'|'PUT'|'GET'|'DELETE'|'PATCH'
  * @param {String} url 请求地址
  * @param {Object} params  参数
  * @returns Promise<T>
  */
-function apiAxios<P, R>(method: string, url: string, params: P) {
+function apiAxios<P, R>(method: Methods, url: string, params: P) {
   return new Promise<R>((resolve, reject) => {
     // axios.defaults.headers.common.Authorization = localStorage.getItem('accessToken')
     // 设置默认头部
 
-    const instance: any = axios.create({
+    const instance: AxiosInstance = axios.create({
       baseURL: BASE_URL,
       timeout: 60000,
     })
 
-    instance[method.toLowerCase()](url, {
-      data: method === 'POST' || method === 'PUT' ? params : null,
-      params: method === 'GET' || method === 'DELETE' || method === 'PATCH' ? params : null,
+    instance[method](url, {
+      data: method === Methods.POST || method === Methods.PUT ? params : null,
+      params: method === Methods.GET || method === Methods.DELETE || method === Methods.PATCH ? params : null,
       withCredentials: false,
     })
       .then((res: any) => {
@@ -82,18 +82,18 @@ function apiAxios<P, R>(method: string, url: string, params: P) {
 }
 export default {
   get: (url: string, params: any = {}) => {
-    return apiAxios('GET', url, params)
+    return apiAxios(Methods.GET, url, params)
   },
-  post: (url: string, params: any) => {
-    return apiAxios('POST', url, params)
+  post: (url: string, data: any) => {
+    return apiAxios(Methods.POST, url, data)
   },
-  put: (url: string, params: any) => {
-    return apiAxios('PUT', url, params)
+  put: (url: string, data: any) => {
+    return apiAxios(Methods.PUT, url, data)
   },
   delete: (url: string, params: any) => {
-    return apiAxios('DELETE', url, params)
+    return apiAxios(Methods.DELETE, url, params)
   },
   patch: (url: string, params: any) => {
-    return apiAxios('PATCH', url, params)
+    return apiAxios(Methods.PATCH, url, params)
   },
 }
