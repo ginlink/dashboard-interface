@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios'
-import { BASE_URL } from './config'
+// import { BASE_URL } from './config'
+const BASE_URL = 'http://192.168.3.42:3099/api'
 
 enum Methods {
   GET = 'get',
@@ -32,7 +33,7 @@ function apiAxios<P, R>(method: Methods, url: string, params: P) {
       withCredentials: false,
     })
       .then((res: any) => {
-        if (res?.status === 200) {
+        if (res?.status === 200 || res?.status === 201) {
           resolve(res.data)
         } else {
           reject('Axios返回状态不对，查看请求处理过程．．．．')
