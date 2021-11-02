@@ -3,7 +3,7 @@ import styled from 'styled-components/macro'
 import { DatePicker, Input, Button, Table, Pagination } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import { getTableLists } from '@/services/api'
-
+import bignumber from 'bignumber.js'
 const { RangePicker } = DatePicker
 const Warpper = styled.div`
   color: black;
@@ -66,21 +66,25 @@ export default function TestComponent() {
       title: 'apt开始余额',
       dataIndex: 'apt_start_amount',
       key: 'apt_start_amount',
+      render: (text: any) => <span>{processingFee(text)}</span>,
     },
     {
       title: 'apt结束余额',
       dataIndex: 'apt_end_amount',
       key: 'apt_end_amount',
+      render: (text: any) => <span>{processingFee(text)}</span>,
     },
     {
       title: '手续费开始余额',
       dataIndex: 'fee_start_amount',
       key: 'fee_start_amount',
+      render: (text: any) => <span>{processingFee(text)}</span>,
     },
     {
       title: '手续费结束余额',
       dataIndex: 'fee_end_amount',
       key: 'fee_end_amount',
+      render: (text: any) => <span>{processingFee(text)}</span>,
     },
     {
       title: '成功次数',
@@ -125,7 +129,6 @@ export default function TestComponent() {
   const queryData = useCallback((searchParams) => {
     console.log('searchParams:', searchParams)
     getTableLists(searchParams).then((res) => {
-      console.log('res:', res)
       setData((res.data as any).list)
       setTotal((res as any).data.count)
     })
@@ -135,6 +138,14 @@ export default function TestComponent() {
     if (hash) {
       const hideStr = hash.substring(4, hash.length - 4)
       return hash.replace(hideStr, '...')
+    } else {
+      return ''
+    }
+  }, [])
+  //余额处理
+  const processingFee = useCallback((fee) => {
+    if (fee) {
+      return new bignumber(fee).toFixed(4)
     } else {
       return ''
     }
@@ -155,9 +166,9 @@ export default function TestComponent() {
     setStartTime('')
     setEndTime('')
     setTimeValue([])
-    queryData({ page: current, limit: pageSize, name: searchValue, start_time: startTime, end_time: endTime })
+    queryData({ page: 1, limit: pageSize, name: '', start_time: '', end_time: '' })
     setCurrent(1)
-  }, [current, endTime, pageSize, queryData, searchValue, startTime])
+  }, [pageSize, queryData])
   const changeSearchValue = useCallback((event: any) => {
     setSearchValue(event.target.value)
   }, [])
@@ -169,7 +180,7 @@ export default function TestComponent() {
   // 切换下上一页
   function changePage(c: any) {
     setCurrent(c)
-    queryData({ page: c, limit: pageSize })
+    queryData({ page: c, limit: pageSize, name: searchValue, start_time: startTime, end_time: endTime })
   }
   useEffect(() => {
     queryData({ page: current, limit: pageSize, name: searchValue, start_time: startTime, end_time: endTime })
