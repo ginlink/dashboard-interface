@@ -48,12 +48,12 @@ export default function TestComponent() {
       key: 'id',
     },
     {
-      title: 'strategy_name',
+      title: '策略名称',
       dataIndex: 'strategy_name',
       key: 'strategy_name',
     },
     {
-      title: 'apt_address',
+      title: 'apt地址',
       dataIndex: 'apt_address',
       key: 'apt_address',
       render: (text: any) => (
@@ -63,32 +63,32 @@ export default function TestComponent() {
       ),
     },
     {
-      title: 'apt_start_amount',
+      title: 'apt开始余额',
       dataIndex: 'apt_start_amount',
       key: 'apt_start_amount',
     },
     {
-      title: 'apt_end_amount',
+      title: 'apt结束余额',
       dataIndex: 'apt_end_amount',
       key: 'apt_end_amount',
     },
     {
-      title: 'fee_start_amount',
+      title: '手续费开始余额',
       dataIndex: 'fee_start_amount',
       key: 'fee_start_amount',
     },
     {
-      title: 'fee_end_amount',
+      title: '手续费结束余额',
       dataIndex: 'fee_end_amount',
       key: 'fee_end_amount',
     },
     {
-      title: 'success_times',
+      title: '成功次数',
       dataIndex: 'success_times',
       key: 'success_times',
     },
     {
-      title: 'date',
+      title: '时间',
       dataIndex: 'date',
       key: 'date',
     },
