@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios'
-// import { BASE_URL } from './config'
-const BASE_URL = 'http://192.168.3.42:3099/api'
+import { BASE_URL } from './config'
+// const BASE_URL = 'http://16.162.188.15:9010/api/user'
 
 enum Methods {
   GET = 'get',
