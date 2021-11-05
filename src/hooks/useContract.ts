@@ -11,7 +11,7 @@ import MULTICALL_ABI from '@/abis/multicall2.json'
 import ERC20_ABI from '@/abis/erc20.json'
 import REWARD_POOL_ABI from '@/abis/reward-pool.json'
 
-import { Erc20, Multicall2, RewardPool } from '@/abis/types'
+import { Erc20, ISpePool, Multicall2, RewardPool } from '@/abis/types'
 import { SupportedChainId } from '@/constants/chains'
 import { Vault } from '@/abis/types/Vault'
 import abiDatas from '../abis/ISpePool.json'
@@ -124,5 +124,5 @@ export function useRewardPoolContract(poolAddress: string | undefined, withSigne
 }
 /********************** Contract End ************************ */
 export function usePositionContract(address: any) {
-  return useContract(address, abiDatas, true)
+  return useContract<ISpePool>(address, abiDatas)
 }
