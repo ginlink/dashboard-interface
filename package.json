@@ -7,7 +7,7 @@
   "scripts": {
     "start": "yarn compile-external-abi-types && react-app-rewired start",
     "start:origin": "yarn compile-contract-types && react-scripts start",
-    "build": "npm run build:prod",
+    "build": "yarn compile-external-abi-types && yarn build:prod",
     "build:prod": "cross-env NODE_ENV_CUSTOM=production react-app-rewired  build --mode production",
     "build:test": "cross-env NODE_ENV_CUSTOM=testing react-app-rewired build --mode testing",
     "build:pre": "cross-env NODE_ENV_CUSTOM=preview react-app-rewired build --mode preview",
