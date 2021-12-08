@@ -17,6 +17,12 @@ interface SearchParams {
   start_time?: string
   end_time?: string
 }
+
 export const getTableLists = (searchParams: SearchParams): Promise<HttpResponse> => {
   return http.post('/record/search', searchParams) as Promise<HttpResponse>
+}
+
+//事务列表
+export const getTransctionList = (): Promise<HttpResponse> => {
+  return http.post('/getTxList', '') as Promise<HttpResponse>
 }
