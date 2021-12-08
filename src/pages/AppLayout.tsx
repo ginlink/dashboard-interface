@@ -5,7 +5,6 @@ import styled from 'styled-components'
 
 import PCHeader from '../components/Header'
 import Sider from '../components/Sider'
-import Router from '@/router/router'
 const { Header, Content } = Layout
 const { SubMenu } = Menu
 const SiderLogo = styled.div`
