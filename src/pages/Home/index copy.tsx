@@ -321,22 +321,6 @@ const poolAddressArr = [
     name: 'Cake / WBNB',
     addr: '0xbbd4871c23eb06f0113b397c5e54d1b755903b87',
   },
-  // {
-  //   name: 'BUSD-BNB',
-  //   addr: '0x6A8A94e07bDf789eF069e256C6a499999014Ba54',
-  // },
-  // {
-  //   name: 'BUSD-USDC',
-  //   addr: '0xC3436f443A74c0D4246E37d4d98B8b5a5D9dA5A0',
-  // },
-  // {
-  //   name: 'spc-wbnb',
-  //   addr: '0x4574568C69A5A3497c624E84b28DbE8E1b937C70',
-  // },
-  // {
-  //   name: 'busd-usdc',
-  //   addr: '0xFa977A0D777Df70784eA170368A08c881A5FBB5d',
-  // },
 ]
 const PoolItem = styled.div`
   margin-bottom: 20px;
