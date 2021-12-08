@@ -1,10 +1,10 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 
 import { Layout, Menu, Breadcrumb } from 'antd'
 import { DesktopOutlined, PieChartOutlined, FileOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons'
 import styled from 'styled-components/macro'
 import { TYPE } from '@/theme'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 
 const { Sider } = Layout
 const { SubMenu } = Menu
@@ -17,19 +17,40 @@ const SiderLogo = styled.div`
 
 const StyledNavLike = styled(NavLink)``
 
+enum Route {
+  Home = 1,
+  Contract = 2,
+}
+
+const routes: {
+  [route: string]: string
+} = {
+  '/home': Route.Home + '', //to string
+  '/contract': Route.Contract + '',
+}
+
 export default function Siders() {
   const [collapsed, setCollapsed] = useState(false)
+
+  // 导航菜单跟随路由变化
+  const location = useLocation()
+  const selectKeys = useMemo(() => {
+    const route = location?.pathname
+    if (!route) return []
+
+    return [routes[route]]
+  }, [location])
 
   return (
     <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
       <SiderLogo />
-      <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-        <Menu.Item key="1" icon={<PieChartOutlined />}>
+      <Menu theme="dark" defaultSelectedKeys={selectKeys} selectedKeys={selectKeys} mode="inline">
+        <Menu.Item key={Route.Home} icon={<PieChartOutlined />}>
           <StyledNavLike to="/home">
             <TYPE.main color="white">首页</TYPE.main>
           </StyledNavLike>
         </Menu.Item>
-        <Menu.Item key="2" icon={<DesktopOutlined />}>
+        <Menu.Item key={Route.Contract} icon={<DesktopOutlined />}>
           <StyledNavLike to="/contract">
             <TYPE.main color="white">合约助手</TYPE.main>
           </StyledNavLike>
