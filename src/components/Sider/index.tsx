@@ -19,8 +19,10 @@ const StyledNavLike = styled(NavLink)``
 
 enum Route {
   Home = 1,
-  Strategy = 2,
-  Contract = 3,
+  Strategy,
+  Contract,
+  FastCall,
+  CallAdmin,
 }
 
 const routes: {
@@ -29,6 +31,8 @@ const routes: {
   '/home': Route.Home + '', //to string
   '/strategy': Route.Strategy + '',
   '/contract': Route.Contract + '',
+  '/fast_call': Route.FastCall + '',
+  '/call_admin': Route.CallAdmin + '',
 }
 
 export default function Siders() {
@@ -57,11 +61,19 @@ export default function Siders() {
             <TYPE.main color="white">策略列表</TYPE.main>
           </StyledNavLike>
         </Menu.Item>
-        <Menu.Item key={Route.Contract} icon={<DesktopOutlined />}>
-          <StyledNavLike to="/contract">
-            <TYPE.main color="white">合约助手</TYPE.main>
-          </StyledNavLike>
-        </Menu.Item>
+
+        <SubMenu key={'100'} icon={<DesktopOutlined />} title="合约助手">
+          <Menu.Item key={Route.FastCall}>
+            <StyledNavLike to="/fast_call">
+              <TYPE.main color="white">快速调用</TYPE.main>
+            </StyledNavLike>
+          </Menu.Item>
+          <Menu.Item key={Route.CallAdmin}>
+            <StyledNavLike to="/call_admin">
+              <TYPE.main color="white">管理调用</TYPE.main>
+            </StyledNavLike>
+          </Menu.Item>
+        </SubMenu>
       </Menu>
     </Sider>
   )
