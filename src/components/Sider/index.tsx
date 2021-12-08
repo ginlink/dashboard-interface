@@ -19,13 +19,15 @@ const StyledNavLike = styled(NavLink)``
 
 enum Route {
   Home = 1,
-  Contract = 2,
+  Strategy = 2,
+  Contract = 3,
 }
 
 const routes: {
   [route: string]: string
 } = {
   '/home': Route.Home + '', //to string
+  '/strategy': Route.Strategy + '',
   '/contract': Route.Contract + '',
 }
 
@@ -48,6 +50,11 @@ export default function Siders() {
         <Menu.Item key={Route.Home} icon={<PieChartOutlined />}>
           <StyledNavLike to="/home">
             <TYPE.main color="white">首页</TYPE.main>
+          </StyledNavLike>
+        </Menu.Item>
+        <Menu.Item key={Route.Strategy} icon={<PieChartOutlined />}>
+          <StyledNavLike to="/strategy">
+            <TYPE.main color="white">策略列表</TYPE.main>
           </StyledNavLike>
         </Menu.Item>
         <Menu.Item key={Route.Contract} icon={<DesktopOutlined />}>
