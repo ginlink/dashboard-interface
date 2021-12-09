@@ -146,12 +146,14 @@ const CreateButtonPrimary = styled(ButtonPrimary)`
 `
 const BtnBox = styled.div`
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: 16px;
+  margin-bottom: 26px;
+  justify-content: space-between;
+  align-items: center;
   button {
     margin-left: 14px;
   }
 `
+const AddressBox = styled.div``
 export default function TransactionList() {
   const { chainId } = useActiveWeb3React()
 
@@ -397,6 +399,7 @@ export default function TransactionList() {
   return (
     <Wrapper>
       <BtnBox>
+        <AddressBox>代理地址：{TRANSACTION_PROXY_ADDRESS[chainId || 56]}</AddressBox>
         <CreateButtonPrimary
           onClick={() => {
             setCreateType(1)
