@@ -19,6 +19,7 @@ import Identicon from '../Identicon'
 // import { RowBetween } from '../Row'
 import Row from '../Row'
 import { useIsPcByScreenWidth } from '@/hooks/useIsPc'
+import { TYPE } from '@/theme'
 
 const IconWrapper = styled.div<{ size?: number }>`
   ${({ theme }) => theme.flexColumnNoWrap};
@@ -97,11 +98,10 @@ const Web3StatusConnected = styled(Web3StatusGeneric)<{ pending?: boolean }>`
   color: ${({ pending, theme }) => (pending ? theme.white : theme.white)};
   font-weight: 500;
 
-  font-size: 12px;
   line-height: 17px;
   padding: 5px 15px;
 
-  border-radius: 16px;
+  border-radius: 10px;
 
   /* background-color: red; */
   :hover,
@@ -190,8 +190,9 @@ function Web3StatusInner() {
       <Web3StatusConnected id="web3-status-connected">
         {/* <Web3StatusConnected id="web3-status-connected" pending={true}> */}
         <InnerWrapper>
-          <WalletIcon>钱包图片</WalletIcon>
-          <Text>{shortenAddress(account ?? '', isPc ? 4 : 2)}</Text>
+          <TYPE.main fontSize={14} color="white">
+            {shortenAddress(account ?? '', isPc ? 4 : 2)}
+          </TYPE.main>
         </InnerWrapper>
       </Web3StatusConnected>
     )
@@ -204,46 +205,20 @@ function Web3StatusInner() {
     )
   } else {
     return null
-    // <Web3StatusConnect id="connect-wallet" faded={!account}>
-    //   <WalletIcon>
-    //     <Icon.Wallet />
-    //   </WalletIcon>
-    //   <Text>Connect to a wallet</Text>
-    // </Web3StatusConnect>
   }
 }
 
 export default function Web3Status() {
   const { active, account } = useWeb3React()
-  const context = useWeb3React()
   const contextNetwork = useWeb3React(NetworkContextName)
-
-  // const { ENSName } = useENSName(account ?? undefined)
-
-  // const allTransactions = useAllTransactions()
-
-  // const sortedRecentTransactions = useMemo(() => {
-  //   const txs = Object.values(allTransactions)
-  //   return txs.filter(isTransactionRecent).sort(newTransactionsFirst)
-  // }, [allTransactions])
-
-  // const pending = sortedRecentTransactions.filter((tx) => !tx.receipt).map((tx) => tx.hash)
-  // const confirmed = sortedRecentTransactions.filter((tx) => tx.receipt).map((tx) => tx.hash)
-
-  // TODO H5端滑动屏幕，此log一直会打印，待查找原因
-  console.debug('[contextNetwork, context]:', contextNetwork, context)
 
   if (!contextNetwork.active && !active) {
     return null
   }
 
-  // TODO 钱包弹窗暂时阉割掉，后续要添加则添加
-
   return (
     <>
       <Web3StatusInner />
-      {/* <WalletModal ENSName={undefined} pendingTransactions={['pending']} confirmedTransactions={['confirmed']} /> */}
-      {/* <WalletModal ENSName={ENSName ?? undefined} pendingTransactions={pending} confirmedTransactions={confirmed} /> */}
     </>
   )
 }
