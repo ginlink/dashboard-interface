@@ -71,6 +71,8 @@ instance.interceptors.response.use(
       default:
         console.log('未知错误', errCode, err)
     }
+
+    throw err
   }
 )
 

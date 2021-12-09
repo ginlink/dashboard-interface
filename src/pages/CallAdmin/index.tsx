@@ -5,6 +5,7 @@ import { TYPE } from '@/theme'
 import { Card, Form, Input, message, Pagination, Space, Table } from 'antd'
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components/macro'
+import { parseFunc } from './util'
 
 const Wrapper = styled.div``
 
@@ -64,9 +65,19 @@ export default function CallAdmin() {
           key: 'id',
         },
         {
+          title: '函数名',
+          dataIndex: 'name',
+          key: 'name',
+        },
+        {
+          title: '参数',
+          dataIndex: 'param',
+          key: 'param',
+        },
+        {
           title: 'function',
-          dataIndex: 'function',
-          key: 'function',
+          dataIndex: 'origin',
+          key: 'origin',
         },
         {
           title: '描述',
@@ -77,12 +88,14 @@ export default function CallAdmin() {
       const dataSource: any[] = []
 
       list?.forEach((item) => {
-        const { id, function: func, desc } = item
+        const { id, name, param, origin, desc } = item
 
         dataSource.push({
           key: item?.id,
           id,
-          function: func,
+          name,
+          param,
+          origin,
           desc,
         })
       })
@@ -102,10 +115,24 @@ export default function CallAdmin() {
     async (values: any) => {
       console.log('[](values):', values)
 
-      const ctFunc: CtFunction = {
-        function: values.function,
-        desc: values.desc,
+      const { origin, desc } = values
+
+      const { name, param, type } = parseFunc(origin)
+
+      if (!name || !param) {
+        // TODO参数解析出错
+        return message.error('解析出错')
       }
+
+      const ctFunc: CtFunction = {
+        name,
+        type,
+        param,
+        origin,
+        desc,
+      }
+
+      // debugger
 
       try {
         await addFunctionApi(ctFunc)

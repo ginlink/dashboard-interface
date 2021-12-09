@@ -12,6 +12,8 @@ export type AddFuncProps = {
   onFinish?: (values: any) => void
 }
 
+const defaultFunc = 'function balanceOf (address account) external view returns(uint256)'
+
 export default function AddFuncModal({ open, form, onDismiss, onSuccess, onFinish }: AddFuncProps) {
   // const [form] = Form.useForm()
 
@@ -27,12 +29,12 @@ export default function AddFuncModal({ open, form, onDismiss, onSuccess, onFinis
           onFinish={onFinish}
           autoComplete="off"
         >
-          <Form.Item label="函数" name="function" rules={[{ required: true, message: 'required!' }]}>
-            <Input />
+          <Form.Item label="函数" name="origin" rules={[{ required: true, message: 'required!' }]}>
+            <Input placeholder={defaultFunc} />
           </Form.Item>
 
           <Form.Item label="描述" name="desc">
-            <Input.Password />
+            <Input />
           </Form.Item>
         </Form>
       </Modal>

@@ -1,3 +1,4 @@
+import { FuncType } from '@/pages/CallAdmin/util'
 import http from './index'
 
 interface SearchParams {
@@ -12,9 +13,12 @@ export type CtFunctionRecord = {
 
 export type CtFunction = {
   id?: number
-  function: string
+  name?: string
+  param?: string
+  origin?: string
   record?: CtFunctionRecord
   desc?: string
+  type?: FuncType
 }
 
 export const getTableLists = (searchParams: SearchParams) => {
@@ -27,4 +31,10 @@ export const addFunctionApi = (data: CtFunction) => {
 
 export const getFunctionApi = () => {
   return http.get('/ct-function') as Promise<any>
+}
+
+export const searchFuncApi = (key: string) => {
+  return http.get('/ct-function/search', {
+    key,
+  }) as Promise<any>
 }
