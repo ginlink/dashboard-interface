@@ -5,7 +5,7 @@
   "author": ".",
   "private": true,
   "scripts": {
-    "start": "yarn compile-external-abi-types && react-app-rewired start",
+    "start": "yarn compile-contract-types && react-app-rewired start",
     "start:origin": "yarn compile-contract-types && react-scripts start",
     "build": "yarn compile-external-abi-types && yarn build:prod",
     "build:prod": "cross-env NODE_ENV_CUSTOM=production react-app-rewired  build --mode production",
@@ -16,7 +16,7 @@
     "eject": "react-scripts eject",
     "compile-contract-types": "yarn compile-external-abi-types && yarn compile-v3-contract-types",
     "compile-external-abi-types": "typechain --target ethers-v5 --out-dir src/abis/types './src/abis/**/*.json'",
-    "compile-v3-contract-types": "typechain --target ethers-v5 --out-dir src/types/v3 './src/plugins/@uniswap/?(v3-core|v3-periphery)/artifacts/contracts/**/*.json'"
+    "compile-v3-contract-types": "typechain --target ethers-v5 --out-dir src/types/v3 './node_modules/@uniswap/?(v3-core|v3-periphery)/artifacts/contracts/**/*.json'"
   },
   "dependencies": {
     "@babel/core": "^7.4.5",
@@ -53,9 +53,13 @@
     "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
-    "uglifyjs-webpack-plugin": "^2.2.0"
+    "uglifyjs-webpack-plugin": "^2.2.0",
+    "redux-localstorage-simple": "^2.4.1",
+    "cids": "^1.0.0",
+    "multicodec": "^3.0.1"
   },
   "devDependencies": {
+    "@reduxjs/toolkit": "^1.6.1",
     "@testing-library/react-hooks": "^7.0.2",
     "@typechain/ethers-v5": "^7.0.0",
     "@types/jest": "^24.0.0",

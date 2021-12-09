@@ -6,7 +6,8 @@ import 'antd/dist/antd.css'
 import '@/assets/css/reset.css'
 
 import App from './pages/App'
-import store from '@/store'
+
+import store from '@/state'
 
 import 'moment/locale/zh-cn'
 
