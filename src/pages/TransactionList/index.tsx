@@ -67,7 +67,8 @@ export default function TransactionList() {
     // },
   ]
   const showModal = useCallback(() => {
-    setVisible(true)
+    // setVisible(true)
+    console.log('222')
   }, [])
   const handleOk = useCallback(() => {
     setVisible(false)
@@ -86,7 +87,7 @@ export default function TransactionList() {
   return (
     <Wrapper>
       <Table pagination={false} columns={columns} dataSource={dataList} />
-      {/* <Button onClick={showModal}>Open Draggable Modal</Button> */}
+      <Button onClick={showModal}>Open Draggable Modal</Button>
       {/* <Modal footer={null} title={modalTitle} visible={visible} onOk={handleOk} onCancel={handleCancel}>
         <Button type="primary" onClick={createFn}>
           创建

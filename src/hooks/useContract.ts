@@ -11,10 +11,25 @@ import MULTICALL_ABI from '@/abis/multicall2.json'
 import ERC20_ABI from '@/abis/erc20.json'
 import REWARD_POOL_ABI from '@/abis/reward-pool.json'
 
-import { Erc20, ISpePool, Multicall2, RewardPool } from '@/abis/types'
+import { Erc20, ISpePool, Multicall2, RewardPool, SwapMining } from '@/abis/types'
 import { SupportedChainId } from '@/constants/chains'
 import { Vault } from '@/abis/types/Vault'
 import abiDatas from '../abis/ISpePool.json'
+import {
+  TRANSACTION_PROXY_ADDRESS,
+  TRANSACTION_POSITION_REWARD_ADDRESS,
+  TRANSACTION_SWAPMING_ADDRESSES,
+  TRANSACTION_OPERATABLE_ADDRESS,
+  TRANSACTION_MULTISEND_ADDRESS,
+} from 'constants/address'
+import { abi as gnosisSafe } from '@/abis/GnosisSafe.json'
+import { abi as Ownable } from 'abis/Ownable.json'
+import { abi as multiSend } from 'abis/MultiSend.json'
+import positionReward from 'abis/position-reward.json'
+import { GnosisSafe } from 'abis/types/GnosisSafe'
+import { PositionReward } from 'abis/types/PositionReward'
+import { MultiSend } from 'abis/types/MultiSend'
+
 export function getSigner(library: Web3Provider, account: string) {
   return library.getSigner(account).connectUnchecked()
 }
@@ -125,4 +140,24 @@ export function useRewardPoolContract(poolAddress: string | undefined, withSigne
 /********************** Contract End ************************ */
 export function usePositionContract(address: any) {
   return useContract<ISpePool>(address, abiDatas)
+}
+
+export function useOwnable() {
+  return useContract(TRANSACTION_OPERATABLE_ADDRESS, Ownable)
+}
+
+// TODO  transaction contract start
+
+export function useTransactionProxy() {
+  return useContract<GnosisSafe>(TRANSACTION_PROXY_ADDRESS, gnosisSafe)
+}
+export function useTransactionSwapMing() {
+  return useContract<SwapMining>(TRANSACTION_SWAPMING_ADDRESSES, swapMining)
+}
+
+export function useTransactionReward() {
+  return useContract<PositionReward>(TRANSACTION_POSITION_REWARD_ADDRESS, positionReward)
+}
+export function useTransactionMultiSend() {
+  return useContract<MultiSend>(TRANSACTION_MULTISEND_ADDRESS, multiSend)
 }
