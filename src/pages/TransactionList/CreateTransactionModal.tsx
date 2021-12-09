@@ -13,6 +13,7 @@ import { parseFunc } from './util'
 import { Contract } from '@ethersproject/contracts'
 import { getSignerOrProvider, SWAP_MINING_ADDRESSES } from '@/hooks/useContract'
 import { useActiveWeb3React } from '@/hooks/web3'
+import { TRANSACTION_OPERATABLE_ADDRESS, TRANSACTION_POSITION_REWARD_ADDRESS } from '@/constants/address'
 
 const CloseWrapper = styled.div`
   position: absolute;
@@ -157,8 +158,6 @@ export default function CreateTransactionModal({
 
       const address = obj.name
 
-      changeAddress(address)
-
       let contract: Contract | undefined = undefined
       switch (e) {
         case 1:
@@ -167,27 +166,29 @@ export default function CreateTransactionModal({
             swapMiningAbi.abi,
             getSignerOrProvider(library, account)
           )
-          break
-
-        default:
-          break
-      }
-
-      changeContract && changeContract(contract)
-
-      switch (e) {
-        case 1:
           setMethodOptionArr(swapMiningMethods[1])
           break
         case 2:
+          contract = new Contract(
+            TRANSACTION_OPERATABLE_ADDRESS[chainId],
+            ownableAbi.abi,
+            getSignerOrProvider(library, account)
+          )
           setMethodOptionArr(ownableMethods[1])
           break
         case 3:
+          contract = new Contract(
+            TRANSACTION_POSITION_REWARD_ADDRESS[chainId],
+            positionRewardAbi,
+            getSignerOrProvider(library, account)
+          )
           setMethodOptionArr(positionRewardMethods[1])
           break
         default:
           break
       }
+      changeAddress(address)
+      changeContract && changeContract(contract)
     },
     [
       account,
