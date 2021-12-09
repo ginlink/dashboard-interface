@@ -81,6 +81,8 @@ export default function CreateTransactionModal({
   const [positionRewardMethods, setPositionRewardMethods] = useState<Array<any>>([])
   const [methodOptionArr, setMethodOptionArr] = useState<Array<string>>([])
 
+  const [currentOption, setCurrentOption] = useState<number | undefined>()
+
   const [optionArr, setOptionArr] = useState<Array<any>>([
     {
       name: 'swap-mining',
@@ -146,9 +148,13 @@ export default function CreateTransactionModal({
   const changeMethodName = useCallback(
     (e) => {
       changeMethod(e)
+
+      // const arg =
+      // setArgPlaceHolder()
     },
     [changeMethod]
   )
+
   const changeOption = useCallback(
     (e) => {
       if (!library || !account || !chainId) return
@@ -156,6 +162,8 @@ export default function CreateTransactionModal({
       const obj = optionArr.find((v) => v.key === e)
 
       const address = obj.name
+
+      setCurrentOption(e)
 
       changeAddress(address)
 
