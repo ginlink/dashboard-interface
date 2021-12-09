@@ -1,10 +1,14 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import styled from 'styled-components/macro'
 import Modal from '@/components/Modal'
 import CloseOutlined from '@ant-design/icons/lib/icons/CloseOutlined'
-import { Space, Radio, Input } from 'antd'
+import { Space, Radio, Input, Select } from 'antd'
 import { ButtonPrimary } from '@/components/Button'
+import swapMiningAbi from '@/abis/swap-mining.json'
+import ownableAbi from '@/abis/Ownable.json'
+import positionRewardAbi from '@/abis/position-reward.json'
 
+const { Option } = Select
 type CreateTransactionType = {
   isOpen: boolean
   onClose: () => void
@@ -60,6 +64,94 @@ export default function CreateTransactionModal({
   arg,
   changeArg,
 }: CreateTransactionType) {
+  const [swapMiningMethods, setSwapMiningMethods] = useState<Array<any>>([])
+  const [ownableMethods, setOwnableMethods] = useState<Array<any>>([])
+  const [positionRewardMethods, setPositionRewardMethods] = useState<Array<any>>([])
+  const [methodOptionArr, setMethodOptionArr] = useState<Array<string>>([])
+  const [optionArr, setOptionArr] = useState<Array<any>>([
+    {
+      name: 'swap-mining',
+      key: 1,
+    },
+    {
+      name: 'Ownable',
+      key: 2,
+    },
+    {
+      name: 'position-reward',
+      key: 3,
+    },
+  ])
+  useEffect(() => {
+    //swap-mining abi
+    const swapMiningFilterAbi = swapMiningAbi.abi.filter((v) => v.type === 'function')
+    const swapMiningReadData = [] as any
+    const swapMiningWriteData = [] as any
+    swapMiningFilterAbi.map((v: any) => {
+      if (v.stateMutability === 'view') {
+        swapMiningReadData.push(v.name)
+      } else {
+        swapMiningWriteData.push(v.name)
+      }
+    })
+    console.log('[swapMiningReadData, swapMiningWriteData]', [swapMiningReadData, swapMiningWriteData])
+    setSwapMiningMethods([swapMiningReadData, swapMiningWriteData])
+
+    //Ownable abi
+    const ownableFilterAbi = ownableAbi.abi.filter((v) => v.type === 'function')
+    const ownableReadData = [] as any
+    const ownableWriteData = [] as any
+    ownableFilterAbi.map((v: any) => {
+      if (v.stateMutability === 'view') {
+        ownableReadData.push(v.name)
+      } else {
+        ownableWriteData.push(v.name)
+      }
+    })
+    console.log('[ownableReadData, ownableWriteData]', [ownableReadData, ownableWriteData])
+    setOwnableMethods([ownableReadData, ownableWriteData])
+
+    //position-reward abi
+    const positionRewardFilterAbi = positionRewardAbi.filter((v) => v.type === 'function')
+    const positionRewardReadData = [] as any
+    const positionRewardWriteData = [] as any
+    positionRewardFilterAbi.map((v: any) => {
+      if (v.stateMutability === 'view') {
+        positionRewardReadData.push(v.name)
+      } else {
+        positionRewardWriteData.push(v.name)
+      }
+    })
+    console.log('[positionRewardReadData, positionRewardWriteData]', [positionRewardReadData, positionRewardWriteData])
+    setPositionRewardMethods([positionRewardReadData, positionRewardWriteData])
+  }, [])
+
+  const changeMethodName = useCallback(
+    (e) => {
+      changeMethod(e)
+    },
+    [changeMethod]
+  )
+  const changeOption = useCallback(
+    (e) => {
+      const obj = optionArr.find((v) => v.key === e)
+      changeAddress(obj.name)
+      switch (e) {
+        case 1:
+          setMethodOptionArr(swapMiningMethods[1])
+          break
+        case 2:
+          setMethodOptionArr(ownableMethods[1])
+          break
+        case 3:
+          setMethodOptionArr(positionRewardMethods[1])
+          break
+        default:
+          break
+      }
+    },
+    [changeAddress, optionArr, ownableMethods, positionRewardMethods, swapMiningMethods]
+  )
   return (
     <Modal isOpen={isOpen}>
       <CloseWrapper onClick={() => onClose && onClose()}>
@@ -89,12 +181,30 @@ export default function CreateTransactionModal({
       ) : (
         <InputBox>
           <InputItem>
-            <label>address</label>
-            <Input allowClear={true} value={address} onChange={changeAddress} placeholder="address" />
+            <label></label>
+            {/* <Input allowClear={true} value={address} onChange={changeAddress} placeholder="address" /> */}
+            <Select defaultValue="" style={{ width: 200 }} allowClear onChange={changeOption}>
+              {optionArr.map((v: any, index: number) => {
+                return (
+                  <Option value={v.key} key={index}>
+                    {v.name}
+                  </Option>
+                )
+              })}
+            </Select>
           </InputItem>
           <InputItem>
             <label>method</label>
-            <Input allowClear={true} value={method} onChange={changeMethod} placeholder="method" />
+            {/* <Input allowClear={true} value={method} onChange={changeMethod} placeholder="method" /> */}
+            <Select onChange={changeMethodName} style={{ width: 200 }} allowClear>
+              {methodOptionArr.map((v: any, index: number) => {
+                return (
+                  <Option value={v} key={index}>
+                    {v}
+                  </Option>
+                )
+              })}
+            </Select>
           </InputItem>
           <InputItem>
             <label>arg</label>

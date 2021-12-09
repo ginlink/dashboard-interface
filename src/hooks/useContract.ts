@@ -113,11 +113,6 @@ export function useBytes32TokenContract(tokenAddress?: string, withSignerIfPossi
   return useContract(tokenAddress, ERC20_BYTES32_ABI, withSignerIfPossible)
 }
 
-// TODO [测试用]查询奖励的合约（sheepDEX）
-export function useSwapMiningContract() {
-  return useContract(SWAP_MINING_ADDRESSES, swapMining)
-}
-
 // 辅助合约，用于静态查询（轮询）数据
 export function useMulticall2Contract() {
   return useContract<Multicall2>(MULTICALL2_ADDRESSES, MULTICALL_ABI, false) as Multicall2
@@ -150,9 +145,6 @@ export function useOwnable() {
 
 export function useTransactionProxy() {
   return useContract<GnosisSafe>(TRANSACTION_PROXY_ADDRESS, gnosisSafe)
-}
-export function useTransactionSwapMing() {
-  return useContract<SwapMining>(TRANSACTION_SWAPMING_ADDRESSES, swapMining)
 }
 
 export function useTransactionReward() {
