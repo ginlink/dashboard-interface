@@ -82,7 +82,8 @@ export default function TransactionList() {
     ['0xf0a734400c8BD2e80Ba166940B904C59Dd08b6F0', '10000000000000000000'],
     2,
     '97',
-    '0xa417D727268ADb2A4FE137F47bf6AA493D2fAAd5'
+    '0xa417D727268ADb2A4FE137F47bf6AA493D2fAAd5',
+    createType
   )
   useEffect(() => {
     getTransctionList().then((res) => {
