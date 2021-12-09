@@ -9,6 +9,7 @@ import { TYPESTATE } from './hooks'
 import swapMiningAbi from '@/abis/swap-mining.json'
 import ownableAbi from '@/abis/Ownable.json'
 import positionRewardAbi from '@/abis/position-reward.json'
+import { parseFunc } from './util'
 
 const CloseWrapper = styled.div`
   position: absolute;
@@ -89,6 +90,10 @@ export default function CreateTransactionModal({
   useEffect(() => {
     //swap-mining abi
     const swapMiningFilterAbi = swapMiningAbi.abi.filter((v) => v.type === 'function')
+
+    const parsedFunc = parseFunc(swapMiningFilterAbi)
+    console.log('[](parsedFunc):', parsedFunc)
+
     const swapMiningReadData = [] as any
     const swapMiningWriteData = [] as any
     swapMiningFilterAbi.map((v: any) => {
