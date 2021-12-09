@@ -80,7 +80,7 @@ export function colors(darkMode: boolean): Colors {
     bs0: 'rgba(224,230,242,1)',
 
     //primary colors
-    primary1: '#FFAB36',
+    primary1: '#1890ff',
     primary2: '#8391a8',
     primary3: 'rgba(0, 118, 255, 0.4)',
     primary4: 'rgba(0, 118, 255, 0.5)',
@@ -226,7 +226,7 @@ export const Divide = styled.div<{ lang?: string | undefined }>`
 export const ThemedGlobalStyle = createGlobalStyle`
   html,
   body {
-    color: #ffffff;
+    color: ${({ theme }) => theme.text0};
     line-height: 1;
 
     box-sizing: border-box;

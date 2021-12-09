@@ -12,7 +12,11 @@ interface HttpResponse {
   code: number
   data: Array<any>
 }
-
-export const getLiquidityList = (): Promise<HttpResponse> => {
-  return http.get('/getLiquidity') as Promise<HttpResponse>
+interface SearchParams {
+  name?: string
+  start_time?: string
+  end_time?: string
+}
+export const getTableLists = (searchParams: SearchParams): Promise<HttpResponse> => {
+  return http.post('/record/search', searchParams) as Promise<HttpResponse>
 }

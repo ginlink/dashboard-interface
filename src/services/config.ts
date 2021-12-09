@@ -15,4 +15,4 @@ export const isDev = process.env.NODE_ENV === 'development'
 export const BSC_URL = isDev ? 'testnet.bscscan.com' : 'bscscan.com'
 
 // TODO 后端Api接口地址
-export const BASE_URL = isDev ? 'http://18.163.124.224:9701' : 'http://18.163.124.224:9701'
+export const BASE_URL = isDev ? 'http://16.162.188.15:9010/api' : 'http://16.162.188.15:9010/api'
