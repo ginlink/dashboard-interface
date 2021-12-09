@@ -17,7 +17,15 @@ interface SearchParams {
   start_time?: string
   end_time?: string
 }
-type addTxType = ''
+type addTxType = {
+  txType?: number
+  txFrom?: string
+  txTo?: string
+  txAmount?: any
+  txHash?: string
+  txFun?: string
+  txFunArg?: string
+}
 
 export const getTableLists = (searchParams: SearchParams): Promise<HttpResponse> => {
   return http.post('/record/search', searchParams) as Promise<HttpResponse>
