@@ -73,13 +73,13 @@ export default function FastCall() {
   const statusRef = useRef<HTMLDivElement | null>(null)
 
   const [funcInput, setFuncInput] = useState<string | undefined>(
-    // undefined
-    'function balanceOf (address account) external view returns(uint256)'
+    undefined
+    // 'function balanceOf (address account) external view returns(uint256)'
     // 'function approve (address spender, uint256 num) external'
     // // 'function balanceOf ()'
   )
-  // const [addressInput, setAddressInput] = useState<string | undefined>(undefined)
-  const [addressInput, setAddressInput] = useState<string | undefined>('0x5B8698f10555F5Fb4fE58BFfc2169790e526D8AD')
+  const [addressInput, setAddressInput] = useState<string | undefined>(undefined)
+  // const [addressInput, setAddressInput] = useState<string | undefined>('0x5B8698f10555F5Fb4fE58BFfc2169790e526D8AD')
 
   const [statusList, setStatusList] = useState<StatusItem[] | undefined>(undefined)
 
@@ -156,8 +156,14 @@ export default function FastCall() {
 
     try {
       const resFuc: CtFunction = await addFunctionApi(parsed)
+
+      setFuncInput('')
+
       setSelectedFuncs((prev) => {
-        if (!prev) return [{ ...parsed, ...resFuc }]
+        if (!prev) {
+          message.success('添加成功')
+          return [{ ...parsed, ...resFuc }]
+        }
 
         if (prev.find((item) => item.id == resFuc.id)) {
           message.warning('已存在')
@@ -259,17 +265,18 @@ export default function FastCall() {
                 return (
                   <SelectedFuncItem
                     key={index}
-                    id={index + 1}
+                    id={item?.id}
                     {...item}
-                    onDelete={(index) => {
-                      if (!index) return
+                    onDelete={(id) => {
+                      if (!id) return
 
                       setSelectedFuncs((prev) => {
                         if (!prev) return prev
 
                         // delete prev[index]
-                        prev.splice(index - 1, 1)
-                        return [...prev]
+
+                        // return [...prev]
+                        return prev.filter((item) => item.id !== id)
                       })
                     }}
                   />
