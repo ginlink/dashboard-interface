@@ -2,10 +2,11 @@ import React, { useState, useEffect, createRef, useCallback, useRef } from 'reac
 import styled from 'styled-components/macro'
 import { Table, Tag, Space } from 'antd'
 import { getTransctionList, addTx } from '@/services/api'
-import { Modal, Button } from 'antd'
+import { Modal, Button, message } from 'antd'
 import CreateTransactionModal from './CreateTransactionModal'
 import { ButtonPrimary } from '@/components/Button'
-
+import TableRowModal from './TableRowModal'
+import { useTransactionProxy } from '@/hooks/useContract'
 const columns = [
   {
     title: '事务ID',
@@ -49,7 +50,11 @@ const columns = [
   },
 ]
 
-const Wrapper = styled.div``
+const Wrapper = styled.div`
+  .ant-table-row {
+    cursor: pointer;
+  }
+`
 const CreateButtonPrimary = styled(ButtonPrimary)`
   width: fit-content;
 `
@@ -63,6 +68,8 @@ const BtnBox = styled.div`
 `
 export default function TransactionList() {
   const [dataList, setDataList] = useState<any>([])
+  const [rowData, setRowData] = useState<any>({})
+  const [openRow, setOpenRow] = useState<boolean>(false)
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [fromAddress, setFromAddress] = useState<any>()
   const [toAddress, setToAddress] = useState<any>()
@@ -71,7 +78,7 @@ export default function TransactionList() {
   const [method, setMethod] = useState<any>()
   const [arg, setArg] = useState<any>()
   const [createType, setCreateType] = useState<number>(1)
-
+  const transactionProxy = useTransactionProxy()
   useEffect(() => {
     getTransctionList().then((res) => {
       setDataList(res.data)
@@ -135,10 +142,53 @@ export default function TransactionList() {
   const onChangeCreateType = useCallback((e) => {
     setCreateType(e.target.value)
   }, [])
+  const viewRow = useCallback((row) => {
+    setRowData(row)
+    if (!!row.tx_hash) {
+      setOpenRow(true)
+    } else {
+      message.warning('已失效')
+    }
+  }, [])
+  const closeRowModal = useCallback(() => {
+    setOpenRow(false)
+  }, [])
+  const approveFn = useCallback(
+    (item) => {
+      console.log('item', item)
+      transactionProxy?.approveHash(item.tx_hash).then((res) => {
+        console.log('res', res)
+      })
+    },
+    [transactionProxy]
+  )
+  const confrimFn = useCallback(
+    async (item) => {
+      console.log('item', item)
+      console.log(await transactionProxy?.nonce())
+      transactionProxy
+        ?.execTransaction(
+          '0xdEF572641Fac47F770596357bfb7432F78407ab3',
+          0,
+          item.tx_data,
+          1,
+          0,
+          0,
+          0,
+          '0x0000000000000000000000000000000000000000',
+          '0x0000000000000000000000000000000000000000',
+          '0x0000000000000000000000000F70D0661bA51a0383f59E76dC0f2d44703A868000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000013F0b2a9691bB72cae72616b39E798a824F182710000000000000000000000000000000000000000000000000000000000000000010000000000000000000000002D0D56a2490B942F59704481a4Eedf894CdCCec8000000000000000000000000000000000000000000000000000000000000000001'
+        )
+        .then((res) => {
+          console.log('res', res)
+        })
+    },
+    [transactionProxy]
+  )
+
   return (
     <Wrapper>
       <BtnBox>
-        {/* <ButtonPrimary>11</ButtonPrimary> */}
         <CreateButtonPrimary
           onClick={() => {
             setCreateType(1)
@@ -148,7 +198,19 @@ export default function TransactionList() {
           创建事务
         </CreateButtonPrimary>
       </BtnBox>
-      <Table pagination={false} columns={columns} dataSource={dataList} />
+      <Table
+        onRow={(record) => {
+          return {
+            onClick: () => {
+              viewRow(record)
+            }, // 点击行
+          }
+        }}
+        scroll={{ x: 2000, y: 700 }}
+        pagination={false}
+        columns={columns}
+        dataSource={dataList}
+      />
       <CreateTransactionModal
         onClose={onClose}
         isOpen={isOpen}
@@ -168,6 +230,13 @@ export default function TransactionList() {
         createType={createType}
         onChangeCreateType={onChangeCreateType}
       ></CreateTransactionModal>
+      <TableRowModal
+        approveFn={approveFn}
+        confrimFn={confrimFn}
+        closeRowModal={closeRowModal}
+        openRow={openRow}
+        item={rowData}
+      ></TableRowModal>
     </Wrapper>
   )
 }
