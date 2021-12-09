@@ -24,7 +24,7 @@ export const TRANSACTION_OPERATABLE_ADDRESS: AddressMap = {
 }
 
 export const TRANSACTION_MULTISEND_ADDRESS: AddressMap = {
-  [SupportedChainId.BSCTEST]: '0x316D5a4728E53e657136f2c0bCE71a8fA56Bd419',
+  [SupportedChainId.BSCTEST]: '0xdEF572641Fac47F770596357bfb7432F78407ab3',
   [SupportedChainId.BSC]: '',
 }
 
