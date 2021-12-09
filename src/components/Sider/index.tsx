@@ -21,6 +21,8 @@ enum Route {
   Home = 1,
   Strategy = 2,
   Contract = 3,
+  // MultiSign = 4,
+  TransactionList = 4,
 }
 
 const routes: {
@@ -29,6 +31,8 @@ const routes: {
   '/home': Route.Home + '', //to string
   '/strategy': Route.Strategy + '',
   '/contract': Route.Contract + '',
+  // '/multiSign': Route.MultiSign + '',
+  '/transactionList': Route.TransactionList + '',
 }
 
 export default function Siders() {
@@ -60,6 +64,16 @@ export default function Siders() {
         <Menu.Item key={Route.Contract} icon={<DesktopOutlined />}>
           <StyledNavLike to="/contract">
             <TYPE.main color="white">合约助手</TYPE.main>
+          </StyledNavLike>
+        </Menu.Item>
+        {/* <Menu.Item key={Route.MultiSign} icon={<PieChartOutlined />}>
+          <StyledNavLike to="/multiSign">
+            <TYPE.main color="white">多签</TYPE.main>
+          </StyledNavLike>
+        </Menu.Item> */}
+        <Menu.Item key={Route.TransactionList} icon={<PieChartOutlined />}>
+          <StyledNavLike to="/transactionList">
+            <TYPE.main color="white">事务列表</TYPE.main>
           </StyledNavLike>
         </Menu.Item>
       </Menu>
