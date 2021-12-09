@@ -1,17 +1,6 @@
-/*
- * @Author: jiangjin
- * @Date: 2021-09-23 16:02:00
- * @LastEditTime: 2021-09-23 16:11:23
- * @LastEditors: jiangjin
- * @Description:
- *  统一管理接口
- */
-
+import { FuncType } from '@/pages/CallAdmin/util'
 import http from './index'
-interface HttpResponse {
-  code: number
-  data: Array<any>
-}
+
 interface SearchParams {
   name?: string
   start_time?: string
@@ -30,15 +19,43 @@ type addTxType = {
   txProaddr?: string
 }
 
-export const getTableLists = (searchParams: SearchParams): Promise<HttpResponse> => {
-  return http.post('/record/search', searchParams) as Promise<HttpResponse>
+export type CtFunctionRecord = {
+  id?: number
+}
+
+export type CtFunction = {
+  id?: number
+  name?: string
+  param?: string
+  origin?: string
+  record?: CtFunctionRecord
+  desc?: string
+  type?: FuncType
+}
+
+export const getTableLists = (searchParams: SearchParams) => {
+  return http.post('/record/search', searchParams) as Promise<any>
+}
+
+export const addFunctionApi = (data: CtFunction) => {
+  return http.post('/ct-function', data) as Promise<any>
+}
+
+export const getFunctionApi = () => {
+  return http.get('/ct-function') as Promise<any>
+}
+
+export const searchFuncApi = (key: string) => {
+  return http.get('/ct-function/search', {
+    key,
+  }) as Promise<any>
 }
 
 //事务列表
-export const getTransctionList = (): Promise<HttpResponse> => {
-  return http.post('/getTxList', '') as Promise<HttpResponse>
+export const getTransctionList = () => {
+  return http.post('/getTxList', '') as Promise<any>
 }
 
-export const addTx = (param: addTxType): Promise<HttpResponse> => {
-  return http.post('/addTx', param) as Promise<HttpResponse>
+export const addTx = (param: addTxType) => {
+  return http.post('/addTx', param) as Promise<any>
 }

@@ -30,3 +30,5 @@ export const NetworkContextName = 'NETWORK'
 // 详见src/store/multicall/updater.tsx:176
 // TODO 暂未发现数据落后的情况，如果数据要求准确，则需要修改为0
 export const MAX_ACCESS_SPACING = 2
+
+export const DEFAULT_FORMAT_DATE = 'yyyy-MM-DD HH:ss:mm'

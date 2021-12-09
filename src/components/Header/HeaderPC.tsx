@@ -1,35 +1,31 @@
-/*
- * @Author: your name
- * @Date: 2021-09-01 18:06:40
- * @LastEditTime: 2021-10-28 15:41:41
- * @LastEditors: jiangjin
- * @Description: In User Settings Edit
- * @FilePath: /converter-bsc-web/src/components/Header/header1.tsx
- */
 import { NETWORK_LABELS } from '@/constants/chains'
 import { useActiveWeb3React } from '@/hooks/web3'
+import { TYPE } from '@/theme'
+import { borderRadius } from 'polished'
 import React, { memo } from 'react'
-import styled from 'styled-components/macro'
+import styled, { useTheme } from 'styled-components/macro'
+import Row from '../Row'
 import Web3Status from '../Web3Status'
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  position: relative;
-
-  z-index: 1;
+const Wrapper = styled(Row)`
+  gap: 8px;
 `
-const Empty = styled.div`
-  width: 23px;
+
+const EnsWrapper = styled.div`
+  padding: 4px 8px;
+  background-color: ${({ theme }) => theme.yellow1};
+  border-radius: 4px;
 `
 
 function HeaderPC() {
   const { chainId } = useActiveWeb3React()
+
   return (
     <Wrapper>
-      {NETWORK_LABELS[chainId ?? -1] ?? 'ErrorNetWork'}
-      <Empty />
+      <EnsWrapper>
+        <TYPE.main>{NETWORK_LABELS[chainId ?? -1] ?? 'ErrorNetWork'}</TYPE.main>
+      </EnsWrapper>
+
       <Web3Status />
     </Wrapper>
   )
