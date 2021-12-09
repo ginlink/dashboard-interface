@@ -56,8 +56,8 @@ const Base = styled(RebassButton)<
 export const ButtonPrimary = styled(Base)`
   background-color: ${({ theme }) => theme.primary1};
   color: ${({ theme }) => theme.white};
-  /* 不能统一高度，否则样式错乱 */
-  /* height: 48px; */
+
+  padding: 4px 16px;
 
   &:focus {
     box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.01, theme.primary1)};
