@@ -56,12 +56,12 @@ export function colors(darkMode: boolean): Colors {
     text11: '#00b594',
 
     // backgrounds / greys
-    bg0: darkMode ? black : '#FFF',
-    bg1: darkMode ? black : '#f5f6fa',
-    bg2: darkMode ? black : '#F7F8FA',
-    bg3: darkMode ? black : '#e0e6f1',
+    bg0: '#FFF',
+    bg1: '#f5f6fa',
+    bg2: '#f0f0f0',
+    bg3: '#e0e6f1',
     bg4: 'rgba(255, 255, 255, 0.1)',
-    bg5: darkMode ? black : 'rgba(136, 141, 155, 1)',
+    bg5: 'rgba(136, 141, 155, 1)',
     bg6: '#EDEEF2',
 
     bg7: '#E5F1FF',
@@ -169,19 +169,19 @@ const TextWrapper = styled(Text)<{ color: keyof Colors; fontSize: string }>`
 
 export const TYPE = {
   main(props: TextProps) {
-    return <TextWrapper fontWeight={500} color={'white'} {...props} />
+    return <TextWrapper fontWeight={500} color={'text0'} {...props} />
   },
   link(props: TextProps) {
-    return <TextWrapper fontWeight={500} color={'white'} {...props} />
+    return <TextWrapper fontWeight={500} color={'text0'} {...props} />
   },
   label(props: TextProps) {
-    return <TextWrapper fontWeight={600} color={'white'} {...props} />
+    return <TextWrapper fontWeight={600} color={'text0'} {...props} />
   },
   black(props: TextProps) {
     return <TextWrapper fontWeight={500} color={'text1'} {...props} />
   },
   white(props: TextProps) {
-    return <TextWrapper fontWeight={500} color={'white'} {...props} />
+    return <TextWrapper fontWeight={500} color={'text0'} {...props} />
   },
   body(props: TextProps) {
     return <TextWrapper fontWeight={400} fontSize={16} color={'text1'} {...props} />
@@ -275,4 +275,6 @@ export const ThemedGlobalStyle = createGlobalStyle`
   input:-ms-input-placeholder {  
     color:rgba(255,255,255,0.7);
   }
+
+  textarea{ resize:none; }
 `
