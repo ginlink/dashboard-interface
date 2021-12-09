@@ -6,7 +6,9 @@ import { Modal, Button, message } from 'antd'
 import CreateTransactionModal from './CreateTransactionModal'
 import { ButtonPrimary } from '@/components/Button'
 import TableRowModal from './TableRowModal'
-import { useTransactionProxy } from '@/hooks/useContract'
+import { useTransacitonSubmitData } from './hooks'
+import { useTokenContract, useTransactionProxy } from '@/hooks/useContract'
+import { useActiveWeb3React } from '@/hooks/web3'
 const columns = [
   {
     title: '事务ID',
@@ -79,6 +81,17 @@ export default function TransactionList() {
   const [arg, setArg] = useState<any>()
   const [createType, setCreateType] = useState<number>(1)
   const transactionProxy = useTransactionProxy()
+  const { account, chainId } = useActiveWeb3React()
+  const tokenrc20 = useTokenContract('0x5b8698f10555f5fb4fe58bffc2169790e526d8ad')
+  const Proxysinger = useTransactionProxy()
+  const { safeTx, safeApproveHash } = useTransacitonSubmitData(
+    tokenrc20,
+    'transfer',
+    ['0xf0a734400c8BD2e80Ba166940B904C59Dd08b6F0', '10000000000000000000'],
+    2,
+    '97',
+    '0xa417D727268ADb2A4FE137F47bf6AA493D2fAAd5'
+  )
   useEffect(() => {
     getTransctionList().then((res) => {
       setDataList(res.data)
@@ -108,39 +121,52 @@ export default function TransactionList() {
   const createFn = useCallback(async () => {
     const addParam = {
       txType: createType,
+      txId: '2',
       txFrom: '',
       txTo: '',
       txAmount: '',
       txHash: '1111111',
       txFun: '',
       txFunArg: '',
+      txData: '',
+      txProaddr: '0xa417D727268ADb2A4FE137F47bf6AA493D2fAAd5',
     }
+    if (!safeApproveHash || !safeTx || !Proxysinger) return
     if (createType === 1) {
-      console.log(fromAddress, toAddress, amount)
-      addParam.txFrom = fromAddress
-      addParam.txTo = toAddress
-      addParam.txAmount = amount
+      addParam.txFrom = '0x5b8698f10555f5fb4fe58bffc2169790e526d8ad'
+      addParam.txTo = '0x0F70D0661bA51a0383f59E76dC0f2d44703A8680'
+      addParam.txAmount = '100000000000000000'
+      addParam.txFun = 'transfer'
+      addParam.txFunArg = '0x0F70D0661bA51a0383f59E76dC0f2d44703A8680,100000000000000000'
+      addParam.txHash = safeApproveHash
+      addParam.txData = safeTx.data
     } else {
-      console.log(address, method, arg)
       addParam.txFun = method
-      addParam.txFunArg = arg
+      addParam.txFunArg = ''
     }
-    const res = await addTx(addParam)
-    if (res.code === 200) {
-      getTransctionList().then((res) => {
-        setDataList(res.data)
-      })
-    }
-    setFromAddress('')
-    setToAddress('')
-    setAmount('')
-    setAddress('')
-    setMethod('')
-    setArg('')
-    setIsOpen(false)
-  }, [address, amount, arg, createType, fromAddress, method, toAddress])
+    debugger
+    try {
+      await Proxysinger.approveHash(safeApproveHash)
+      const res = await addTx(addParam)
+      if (res.code === 200) {
+        getTransctionList().then((res) => {
+          setDataList(res.data)
+        })
+      }
+      setFromAddress('')
+      setToAddress('')
+      setAmount('')
+      setAddress('')
+      setMethod('')
+      setArg('')
+      setIsOpen(false)
+    } catch (error) {}
+  }, [Proxysinger, createType, method, safeApproveHash, safeTx])
   const onChangeCreateType = useCallback((e) => {
     setCreateType(e.target.value)
+    if (e.target.value == 1) {
+      setMethod('transfer')
+    }
   }, [])
   const viewRow = useCallback((row) => {
     setRowData(row)

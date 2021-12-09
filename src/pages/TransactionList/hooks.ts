@@ -1,6 +1,12 @@
 import { Contract, BigNumberish } from 'ethers'
 
-import { buildContractCall, buildSignatureBytes, calculateSafeTransactionHash, signer } from '@/utils/execution'
+import {
+  buildContractCall,
+  buildSafeTransaction,
+  buildSignatureBytes,
+  calculateSafeTransactionHash,
+  signer,
+} from '@/utils/execution'
 import { buildMultiSendSafeTx } from '@/utils/multisend'
 import { useTransactionMultiSend } from '@/hooks/useContract'
 import { useMemo } from 'react'
@@ -14,10 +20,17 @@ export function useTransacitonSubmitData(
   safe: string
 ) {
   const multiSend = useTransactionMultiSend()
+  // const txs = useMemo(() => {
+  //   if (!contract || !method || !params) return null
+  //   return [buildContractCall(contract, method, params, 0)]
+  // }, [contract, method, params])
   const txs = useMemo(() => {
     if (!contract || !method || !params) return null
-    return [buildContractCall(contract, method, params, 0)]
-  }, [contract, method, params])
+    const data = contract.interface.encodeFunctionData('transfer', params)
+    console.log(data)
+    console.log('contract.address', contract.address)
+    return [buildSafeTransaction({ to: contract.address, data, safeTxGas: 1000000, nonce: nonce })]
+  }, [contract, method, nonce, params])
   const safeTx = useMemo(() => {
     if (!multiSend || !txs) return null
     return buildMultiSendSafeTx(multiSend, txs, nonce)
