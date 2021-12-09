@@ -12,17 +12,17 @@ const { Option } = Select
 type CreateTransactionType = {
   isOpen: boolean
   onClose: () => void
-  fromAddress: string
+  fromAddress?: string
   changeFromAddress: (e: any) => void
-  toAddress: string
+  toAddress?: string
   changeToAddress: (e: any) => void
-  amount: string
+  amount?: string
   changeAmount: (e: any) => void
-  address: string
+  address?: string
   changeAddress: (e: any) => void
-  method: string
+  method?: string
   changeMethod: (e: any) => void
-  arg: string
+  arg?: string
   changeArg: (e: any) => void
   createFn: () => void
   createType: number

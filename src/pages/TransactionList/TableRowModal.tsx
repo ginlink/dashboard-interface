@@ -20,6 +20,7 @@ export type RowItemType = {
   tx_data: any
   tx_proaddr: any
 }
+
 type TableRowModalType = {
   openRow: boolean
   item: RowItemType

@@ -124,7 +124,7 @@ export function useVaultContract(vaultAddress: string | undefined, withSigner?: 
 }
 
 // 币合约，用于查询余额
-export function useTokenContract(tokenAddress: string) {
+export function useTokenContract(tokenAddress?: string) {
   return useContract<Erc20>(tokenAddress, ERC20_ABI)
 }
 
@@ -132,7 +132,7 @@ export function useTokenContract(tokenAddress: string) {
 export function useRewardPoolContract(poolAddress: string | undefined, withSigner?: boolean) {
   return useContract<RewardPool>(poolAddress, REWARD_POOL_ABI, withSigner)
 }
-/********************** Contract End ************************ */
+
 export function usePositionContract(address: any) {
   return useContract<ISpePool>(address, abiDatas)
 }

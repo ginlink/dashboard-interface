@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createRef, useCallback, useRef } from 'react'
+import React, { useState, useEffect, createRef, useCallback, useRef, useMemo } from 'react'
 import styled from 'styled-components/macro'
 import { Table, Tag, Space } from 'antd'
 import { getTransctionList, addTx } from '@/services/api'
@@ -6,7 +6,7 @@ import { Modal, Button, message } from 'antd'
 import CreateTransactionModal from './CreateTransactionModal'
 import { ButtonPrimary } from '@/components/Button'
 import TableRowModal from './TableRowModal'
-import { useTransacitonSubmitData } from './hooks'
+import { TransactionSubmitProps, useTransacitonSubmitData } from './hooks'
 import { useTokenContract, useTransactionProxy } from '@/hooks/useContract'
 import { useActiveWeb3React } from '@/hooks/web3'
 import fu from '@/assets/images/fu.png'
@@ -28,6 +28,8 @@ const conversionType = function (type: string) {
     return '转账'
   }
 }
+
+import BigFloatNumber from 'bignumber.js'
 const columns = [
   {
     title: 'id',
@@ -149,29 +151,78 @@ const BtnBox = styled.div`
   }
 `
 export default function TransactionList() {
+  const { account, chainId } = useActiveWeb3React()
+
   const [dataList, setDataList] = useState<any>([])
   const [rowData, setRowData] = useState<any>({})
   const [openRow, setOpenRow] = useState<boolean>(false)
   const [isOpen, setIsOpen] = useState<boolean>(false)
-  const [fromAddress, setFromAddress] = useState<any>()
-  const [toAddress, setToAddress] = useState<any>()
-  const [amount, setAmount] = useState<any>()
+  const [fromAddress, setFromAddress] = useState<string | undefined>()
+  const [toAddress, setToAddress] = useState<string | undefined>()
+  const [amount, setAmount] = useState<string | undefined>()
   const [address, setAddress] = useState<any>()
   const [method, setMethod] = useState<any>()
   const [arg, setArg] = useState<any>()
   const [createType, setCreateType] = useState<number>(1)
+
+  const [decimals, setDecimals] = useState<number | undefined>(undefined)
+
+  // const [tokenAddress, setTokenAddress] = useState<string | undefined>(undefined)
+
+  // useEffect(() => {
+  //   setTokenAddress('0x5b8698f10555f5fb4fe58bffc2169790e526d8ad')
+  // }, [])
+
   const transactionProxy = useTransactionProxy()
-  const { account, chainId } = useActiveWeb3React()
-  const tokenrc20 = useTokenContract('0x5b8698f10555f5fb4fe58bffc2169790e526d8ad')
+
+  const tokenContract = useTokenContract(fromAddress)
+
+  useEffect(() => {
+    if (!tokenContract) return
+
+    tokenContract.decimals().then((res) => {
+      setDecimals(res)
+    })
+  }, [tokenContract])
+
   const Proxysinger = useTransactionProxy()
-  const { safeTx, safeApproveHash } = useTransacitonSubmitData(
-    tokenrc20,
-    'transfer',
-    ['0xf0a734400c8BD2e80Ba166940B904C59Dd08b6F0', '10000000000000000000'],
-    2,
-    '97',
-    '0xa417D727268ADb2A4FE137F47bf6AA493D2fAAd5'
-  )
+
+  const [nonce, setNonce] = useState<number | undefined>(undefined)
+  useEffect(() => {
+    if (!Proxysinger) return
+
+    // nonce不会很大，用toNumber
+    Proxysinger.nonce().then((res) => setNonce(res.toNumber()))
+  }, [Proxysinger])
+
+  const params: TransactionSubmitProps = useMemo(() => {
+    if (!amount || !toAddress || !chainId || !nonce || !decimals) return {}
+
+    const bigAmount = new BigFloatNumber(amount)
+    const _amount = bigAmount.multipliedBy(new BigFloatNumber(10).pow(decimals)).toFixed()
+
+    return {
+      contract: tokenContract,
+      chainId,
+      method: 'transfer',
+      targetAmount: [toAddress, _amount],
+      nonce: nonce,
+      safe: '0xa417D727268ADb2A4FE137F47bf6AA493D2fAAd5',
+      fnType: createType,
+    }
+  }, [amount, chainId, createType, decimals, nonce, toAddress, tokenContract])
+
+  const { safeTx, safeApproveHash } = useTransacitonSubmitData(params)
+
+  // const { safeTx, safeApproveHash } = useTransacitonSubmitData(
+  //   tokenContract,
+  //   'transfer',
+  //   ['0xf0a734400c8BD2e80Ba166940B904C59Dd08b6F0', '10000000000000000000'],
+  //   2,
+  //   '97',
+  //   '0xa417D727268ADb2A4FE137F47bf6AA493D2fAAd5'
+  // )
+
   useEffect(() => {
     getTransctionList().then((res) => {
       setDataList(res)
@@ -248,6 +299,7 @@ export default function TransactionList() {
       setMethod('transfer')
     }
   }, [])
+
   const viewRow = useCallback((row) => {
     setRowData(row)
     if (!!row.tx_hash) {
@@ -256,12 +308,15 @@ export default function TransactionList() {
       message.warning('已失效')
     }
   }, [])
+
   const closeRowModal = useCallback(() => {
     setOpenRow(false)
   }, [])
+
   const approveFn = useCallback(
     (item) => {
       console.log('item', item)
+
       transactionProxy?.approveHash(item.tx_hash).then((res) => {
         console.log('res', res)
       })
@@ -336,6 +391,7 @@ export default function TransactionList() {
         createType={createType}
         onChangeCreateType={onChangeCreateType}
       ></CreateTransactionModal>
+
       <TableRowModal
         approveFn={approveFn}
         confrimFn={confrimFn}

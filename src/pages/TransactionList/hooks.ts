@@ -1,4 +1,4 @@
-import { Contract, BigNumberish } from 'ethers'
+import { BigNumberish } from 'ethers'
 
 import {
   buildContractCall,
@@ -11,34 +11,59 @@ import { buildMultiSendSafeTx } from '@/utils/multisend'
 import { useTransactionMultiSend } from '@/hooks/useContract'
 import { useMemo } from 'react'
 
-export function useTransacitonSubmitData(
-  contract: any | null,
-  method: string,
-  params: any[],
-  nonce: number,
-  chainId: string,
-  safe: string
-) {
+export enum TYPESTATE {
+  TRANSFER = 1,
+  METHOD = 2,
+}
+
+import { Erc20 } from '@/abis/types'
+
+export type TransactionSubmitProps = {
+  contract?: Erc20 | null
+  safe?: string
+  method?: string
+  params?: [string, BigNumberish] | undefined
+  nonce?: number
+  chainId?: number | undefined
+  fnType?: TYPESTATE
+}
+
+export function useTransacitonSubmitData({
+  contract,
+  safe,
+  method,
+  params,
+  nonce,
+  chainId,
+  fnType,
+}: TransactionSubmitProps) {
   const multiSend = useTransactionMultiSend()
+
   // const txs = useMemo(() => {
   //   if (!contract || !method || !params) return null
   //   return [buildContractCall(contract, method, params, 0)]
   // }, [contract, method, params])
+
   const txs = useMemo(() => {
-    if (!contract || !method || !params) return null
-    const data = contract.interface.encodeFunctionData('transfer', params)
-    console.log(data)
-    console.log('contract.address', contract.address)
-    return [buildSafeTransaction({ to: contract.address, data, safeTxGas: 1000000, nonce: nonce })]
-  }, [contract, method, nonce, params])
+    if (!contract || !method || !params || !nonce || !fnType) return null
+
+    if (fnType == TYPESTATE.TRANSFER) {
+      const data = contract.interface.encodeFunctionData('transfer', params)
+      return [buildSafeTransaction({ to: contract.address, data, safeTxGas: 1000000, nonce: nonce })]
+    } else if (fnType == TYPESTATE.METHOD) {
+      return [buildContractCall(contract, method, params, 0)]
+    }
+  }, [contract, fnType, method, nonce, params])
+
   const safeTx = useMemo(() => {
-    if (!multiSend || !txs) return null
+    if (!multiSend || !txs || !nonce) return null
     return buildMultiSendSafeTx(multiSend, txs, nonce)
   }, [multiSend, nonce, txs])
 
   const safeApproveHash = useMemo(() => {
-    if (!safeTx) return null
-    return calculateSafeTransactionHash(safe, safeTx, chainId)
+    if (!safeTx || !chainId || !safe) return null
+
+    return calculateSafeTransactionHash(safe, safeTx, chainId + '')
   }, [chainId, safe, safeTx])
 
   return {
