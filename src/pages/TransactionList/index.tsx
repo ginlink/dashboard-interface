@@ -9,55 +9,135 @@ import TableRowModal, { RowItemType } from './TableRowModal'
 import { TransactionSubmitProps, TYPESTATE, useSignatureBytes, useTransacitonSubmitData } from './hooks'
 import { useTokenContract, useTransactionProxy } from '@/hooks/useContract'
 import { useActiveWeb3React } from '@/hooks/web3'
+import fu from '@/assets/images/fu.png'
+import copy from 'copy-to-clipboard'
+import { txType } from '@/constants/txType'
+import TxStatus from './TxStatus'
+const processingData = function (hash: string) {
+  if (hash) {
+    const hideStr = hash.substring(4, hash.length - 4)
+    return hash.replace(hideStr, '....')
+  } else {
+    return ''
+  }
+}
+const conversionType = function (type: string) {
+  if (Number(type) == txType.METHOD) {
+    return '方法'
+  } else {
+    return '转账'
+  }
+}
 
 import BigFloatNumber from 'bignumber.js'
 import { TRANSACTION_MULTISEND_ADDRESS, TRANSACTION_PROXY_ADDRESS } from '@/constants/address'
 const columns = [
   {
-    title: '事务ID',
-    dataIndex: 'tx_id',
-    key: 'tx_id',
-  },
-  {
-    title: '授权hash',
-    dataIndex: 'tx_hash',
-    key: 'tx_hash',
-  },
-  {
-    title: '事务类型',
-    dataIndex: 'tx_type',
-    key: 'tx_type',
-  },
-  {
-    title: 'from',
-    dataIndex: 'tx_from',
-    key: 'tx_from',
-  },
-  {
-    title: 'to',
-    dataIndex: 'tx_to',
-    key: 'tx_to',
-  },
-  {
-    title: '数量',
-    dataIndex: 'tx_amount',
-    key: 'tx_amount',
+    title: 'id',
+    dataIndex: 'id',
+    key: 'id',
+    width: 120,
   },
   {
     title: '方法',
     dataIndex: 'tx_fun',
     key: 'tx_fun',
+    width: 200,
   },
   {
-    title: '方法参数',
-    dataIndex: 'tx_fun_arg',
-    key: 'tx_fun_arg',
+    title: '事务ID',
+    dataIndex: 'tx_id',
+    key: 'tx_id',
+    width: 120,
   },
+  // {
+  //   title: '授权hash',
+  //   dataIndex: 'tx_hash',
+  //   key: 'tx_hash',
+  //   render: (text: any) => processingData(text),
+  // },
+  {
+    title: '事务状态',
+    dataIndex: 'tx_id',
+    key: 'tx_id',
+    width: 120,
+    render: (text: any) => <TxStatus text={text}></TxStatus>,
+  },
+  {
+    title: '事务类型',
+    dataIndex: 'tx_type',
+    key: 'tx_type',
+    width: 120,
+    render: (text: any) => conversionType(text),
+  },
+  {
+    title: 'from',
+    dataIndex: 'tx_from',
+    key: 'tx_from',
+    width: 150,
+    render: (text: any) => (
+      <div>
+        {processingData(text)}
+        {text && (
+          <img
+            className="copy-icon"
+            onClick={(e) => {
+              e.stopPropagation()
+              copy(text)
+              message.success('Copy Success!')
+            }}
+            src={fu}
+            alt=""
+          />
+        )}
+      </div>
+    ),
+  },
+  {
+    title: 'to',
+    dataIndex: 'tx_to',
+    key: 'tx_to',
+    width: 150,
+    render: (text: any) => (
+      <div>
+        {processingData(text)}
+        {text && (
+          <img
+            className="copy-icon"
+            onClick={(e) => {
+              e.stopPropagation()
+              copy(text)
+              message.success('Copy Success!')
+            }}
+            src={fu}
+            alt=""
+          />
+        )}
+      </div>
+    ),
+  },
+  {
+    title: '数量',
+    dataIndex: 'tx_amount',
+    key: 'tx_amount',
+    width: 300,
+  },
+  // {
+  //   title: '方法参数',
+  //   dataIndex: 'tx_fun_arg',
+  //   key: 'tx_fun_arg',
+  // },
 ]
 
 const Wrapper = styled.div`
   .ant-table-row {
     cursor: pointer;
+  }
+  .copy-icon {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    margin-left: 8px;
   }
 `
 const CreateButtonPrimary = styled(ButtonPrimary)`
@@ -169,10 +249,10 @@ export default function TransactionList() {
     setAmount(e.target.value)
   }, [])
   const changeAddress = useCallback((e) => {
-    setAddress(e.target.value)
+    setAddress(e)
   }, [])
   const changeMethod = useCallback((e) => {
-    setMethod(e.target.value)
+    setMethod(e)
   }, [])
   const changeArg = useCallback((e) => {
     setArg(e.target.value)
@@ -243,7 +323,9 @@ export default function TransactionList() {
 
       resetInput()
       setIsOpen(false)
-    } catch (error) {}
+    } catch (err) {
+      console.log('[onCreateHandler](err):', err)
+    }
   }, [submitParams, fromAddress, safeApproveHash, safeTx, proxySinger, createType, method, resetInput])
 
   const onApproveHandler = useCallback(
@@ -325,7 +407,7 @@ export default function TransactionList() {
             }, // 点击行
           }
         }}
-        scroll={{ x: 2000, y: 700 }}
+        scroll={{ y: 700 }}
         pagination={false}
         columns={columns}
         dataSource={dataList}
