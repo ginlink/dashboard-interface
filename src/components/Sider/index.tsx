@@ -65,11 +65,6 @@ export default function Siders() {
             <TYPE.main color="white">策略列表</TYPE.main>
           </StyledNavLike>
         </Menu.Item>
-        <Menu.Item key={Route.Contract} icon={<DesktopOutlined />}>
-          <StyledNavLike to="/contract">
-            <TYPE.main color="white">合约助手</TYPE.main>
-          </StyledNavLike>
-        </Menu.Item>
         {/* <Menu.Item key={Route.MultiSign} icon={<PieChartOutlined />}>
           <StyledNavLike to="/multiSign">
             <TYPE.main color="white">多签</TYPE.main>

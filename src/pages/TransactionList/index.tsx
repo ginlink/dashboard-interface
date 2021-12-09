@@ -94,7 +94,7 @@ export default function TransactionList() {
   )
   useEffect(() => {
     getTransctionList().then((res) => {
-      setDataList(res.data)
+      setDataList(res)
     })
   }, [])
   const onClose = useCallback(() => {
