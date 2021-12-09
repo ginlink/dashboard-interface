@@ -128,8 +128,9 @@ export default function TransactionList() {
       targetAmount: [toAddress, _amount],
       nonce: nonce,
       safe: '0xa417D727268ADb2A4FE137F47bf6AA493D2fAAd5',
+      fnType: createType,
     }
-  }, [amount, chainId, decimals, nonce, toAddress, tokenContract])
+  }, [amount, chainId, createType, decimals, nonce, toAddress, tokenContract])
 
   const { safeTx, safeApproveHash } = useTransacitonSubmitData(params)
 
