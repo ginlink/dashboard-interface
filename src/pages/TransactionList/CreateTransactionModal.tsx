@@ -10,6 +10,9 @@ import swapMiningAbi from '@/abis/swap-mining.json'
 import ownableAbi from '@/abis/Ownable.json'
 import positionRewardAbi from '@/abis/position-reward.json'
 import { parseFunc } from './util'
+import { Contract } from '@ethersproject/contracts'
+import { getSignerOrProvider, SWAP_MINING_ADDRESSES } from '@/hooks/useContract'
+import { useActiveWeb3React } from '@/hooks/web3'
 
 const CloseWrapper = styled.div`
   position: absolute;
@@ -48,6 +51,7 @@ type CreateTransactionType = {
   createFn: () => void
   createType: number
   onChangeCreateType: (e: any) => void
+  changeContract?: (contract: Contract | undefined) => void
 }
 
 export default function CreateTransactionModal({
@@ -68,11 +72,15 @@ export default function CreateTransactionModal({
   changeMethod,
   arg,
   changeArg,
+  changeContract,
 }: CreateTransactionType) {
+  const { library, account, chainId } = useActiveWeb3React()
+
   const [swapMiningMethods, setSwapMiningMethods] = useState<Array<any>>([])
   const [ownableMethods, setOwnableMethods] = useState<Array<any>>([])
   const [positionRewardMethods, setPositionRewardMethods] = useState<Array<any>>([])
   const [methodOptionArr, setMethodOptionArr] = useState<Array<string>>([])
+
   const [optionArr, setOptionArr] = useState<Array<any>>([
     {
       name: 'swap-mining',
@@ -143,8 +151,30 @@ export default function CreateTransactionModal({
   )
   const changeOption = useCallback(
     (e) => {
+      if (!library || !account || !chainId) return
+
       const obj = optionArr.find((v) => v.key === e)
-      changeAddress(obj.name)
+
+      const address = obj.name
+
+      changeAddress(address)
+
+      let contract: Contract | undefined = undefined
+      switch (e) {
+        case 1:
+          contract = new Contract(
+            SWAP_MINING_ADDRESSES[chainId],
+            swapMiningAbi.abi,
+            getSignerOrProvider(library, account)
+          )
+          break
+
+        default:
+          break
+      }
+
+      changeContract && changeContract(contract)
+
       switch (e) {
         case 1:
           setMethodOptionArr(swapMiningMethods[1])
@@ -159,7 +189,17 @@ export default function CreateTransactionModal({
           break
       }
     },
-    [changeAddress, optionArr, ownableMethods, positionRewardMethods, swapMiningMethods]
+    [
+      account,
+      chainId,
+      changeAddress,
+      changeContract,
+      library,
+      optionArr,
+      ownableMethods,
+      positionRewardMethods,
+      swapMiningMethods,
+    ]
   )
   return (
     <Modal isOpen={isOpen}>

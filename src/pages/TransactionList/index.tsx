@@ -31,6 +31,7 @@ const conversionType = function (type: string) {
 
 import BigFloatNumber from 'bignumber.js'
 import { TRANSACTION_MULTISEND_ADDRESS, TRANSACTION_PROXY_ADDRESS } from '@/constants/address'
+import { Contract } from '@ethersproject/contracts'
 const columns = [
   {
     title: 'id',
@@ -174,6 +175,8 @@ export default function TransactionList() {
   const [createType, setCreateType] = useState<number>(1)
 
   const [decimals, setDecimals] = useState<number | undefined>(undefined)
+
+  const [contract, setContract] = useState<Contract | undefined>(undefined)
 
   const transactionProxy = useTransactionProxy()
 
@@ -387,6 +390,10 @@ export default function TransactionList() {
     console.log('[](submitParams):', submitParams)
   }, [submitParams])
 
+  useEffect(() => {
+    console.log('[](contract):', contract)
+  }, [contract])
+
   return (
     <Wrapper>
       <BtnBox>
@@ -430,6 +437,7 @@ export default function TransactionList() {
         createFn={onCreateHandler}
         createType={createType}
         onChangeCreateType={onChangeCreateType}
+        changeContract={(contract) => setContract(contract)}
       ></CreateTransactionModal>
 
       <TableRowModal

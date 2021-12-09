@@ -20,7 +20,8 @@ export const TRANSACTION_PROXY_ADDRESS: AddressMap = {
   [SupportedChainId.BSC]: '',
 }
 export const TRANSACTION_OPERATABLE_ADDRESS: AddressMap = {
-  [SupportedChainId.BSCTEST]: '0x15487E4f8f2064F29E559ec93b136a666f4CaB45',
+  // [SupportedChainId.BSCTEST]: '0x15487E4f8f2064F29E559ec93b136a666f4CaB45',
+  [SupportedChainId.BSCTEST]: '0x29D2bEd6E240e015E09E0d2eDEFA8A55A8799671',
   [SupportedChainId.BSC]: '',
 }
 
