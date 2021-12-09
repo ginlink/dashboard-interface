@@ -25,7 +25,7 @@ export type TransactionSubmitProps = {
   params?: [string, BigNumberish] | undefined
   nonce?: number
   chainId?: number | undefined
-  fnType: TYPESTATE
+  fnType?: TYPESTATE
 }
 
 export function useTransacitonSubmitData({
@@ -45,7 +45,7 @@ export function useTransacitonSubmitData({
   // }, [contract, method, params])
 
   const txs = useMemo(() => {
-    if (!contract || !method || !params || !nonce) return null
+    if (!contract || !method || !params || !nonce || !fnType) return null
 
     if (fnType == TYPESTATE.TRANSFER) {
       const data = contract.interface.encodeFunctionData('transfer', params)
