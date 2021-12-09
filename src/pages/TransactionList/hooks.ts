@@ -5,21 +5,14 @@ import { buildMultiSendSafeTx } from '@/utils/multisend'
 import { useTransactionMultiSend } from '@/hooks/useContract'
 import { useMemo } from 'react'
 
-export function useTransacitonSubmitData({
-  contract,
-  method,
-  params,
-  nonce,
-  chainId,
-  safe,
-}: {
-  contract: Contract
-  method: string
-  params: any[]
-  nonce: number
-  chainId: string
+export function useTransacitonSubmitData(
+  contract: any | null,
+  method: string,
+  params: any[],
+  nonce: number,
+  chainId: string,
   safe: string
-}) {
+) {
   const multiSend = useTransactionMultiSend()
   const txs = useMemo(() => {
     if (!contract || !method || !params) return null
@@ -32,7 +25,7 @@ export function useTransacitonSubmitData({
 
   const safeApproveHash = useMemo(() => {
     if (!safeTx) return null
-    calculateSafeTransactionHash(safe, safeTx, chainId)
+    return calculateSafeTransactionHash(safe, safeTx, chainId)
   }, [chainId, safe, safeTx])
 
   return {

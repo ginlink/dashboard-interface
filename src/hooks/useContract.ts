@@ -129,8 +129,8 @@ export function useVaultContract(vaultAddress: string | undefined, withSigner?: 
 }
 
 // 币合约，用于查询余额
-export function useTokenContract(tokenAddress?: string, withSigner?: boolean) {
-  return useContract<Erc20>(tokenAddress, ERC20_ABI, withSigner)
+export function useTokenContract(tokenAddress: string) {
+  return useContract<Erc20>(tokenAddress, ERC20_ABI)
 }
 
 // 奖励池合约，用于质押和查询奖励

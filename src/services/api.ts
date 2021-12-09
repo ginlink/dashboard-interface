@@ -19,12 +19,15 @@ interface SearchParams {
 }
 type addTxType = {
   txType?: number
+  txId?: string | number
   txFrom?: string
   txTo?: string
   txAmount?: any
   txHash?: string
   txFun?: string
   txFunArg?: string
+  txData?: string
+  txProaddr?: string
 }
 
 export const getTableLists = (searchParams: SearchParams): Promise<HttpResponse> => {
