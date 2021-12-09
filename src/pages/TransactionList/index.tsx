@@ -167,6 +167,7 @@ export default function TransactionList() {
   // const [toAddress, setToAddress] = useState<string | undefined>('0xBf992941F09310b53A9F3436b0F40B25bCcc2C33')
 
   const [fromAddress, setFromAddress] = useState<string | undefined>()
+  const [methodAddress, setMethodAddress] = useState<string | undefined>()
   const [toAddress, setToAddress] = useState<string | undefined>()
 
   const [amount, setAmount] = useState<string | undefined>()
@@ -201,24 +202,40 @@ export default function TransactionList() {
   const [nonce, setNonce] = useState<number | undefined>(undefined)
 
   const submitParams: TransactionSubmitProps = useMemo(() => {
-    debugger
-    if (!amount || !toAddress || !chainId || nonce === undefined || !decimals) return {}
+    if (!chainId) return {}
 
-    const bigAmount = new BigFloatNumber(amount)
-    const _amount = bigAmount.multipliedBy(new BigFloatNumber(10).pow(decimals)).toFixed()
+    switch (createType) {
+      case TYPESTATE.TRANSFER:
+        if (!amount || !toAddress || !chainId || nonce === undefined || !decimals) return {}
 
-    debugger
+        const bigAmount = new BigFloatNumber(amount)
+        const _amount = bigAmount.multipliedBy(new BigFloatNumber(10).pow(decimals)).toFixed()
 
-    return {
-      contract: tokenContract,
-      chainId,
-      method: 'transfer',
-      params: [toAddress, _amount],
-      nonce: nonce,
-      safe: TRANSACTION_PROXY_ADDRESS[chainId],
-      fnType: TYPESTATE.TRANSFER,
+        return {
+          contract: tokenContract,
+          chainId,
+          method: 'transfer',
+          params: [toAddress, _amount],
+          nonce: nonce,
+          safe: TRANSACTION_PROXY_ADDRESS[chainId],
+          fnType: TYPESTATE.TRANSFER,
+        }
+      case TYPESTATE.METHOD:
+        if (!contract || !method || !arg) return {}
+
+        return {
+          contract: contract,
+          chainId,
+          method: method,
+          params: arg.split(','),
+          nonce: nonce,
+          safe: TRANSACTION_PROXY_ADDRESS[chainId],
+          fnType: TYPESTATE.METHOD,
+        }
     }
-  }, [amount, chainId, decimals, nonce, toAddress, tokenContract])
+
+    return {}
+  }, [amount, arg, chainId, contract, createType, decimals, method, nonce, toAddress, tokenContract])
 
   // get data for transaction
   const { safeTx, safeApproveHash } = useTransacitonSubmitData(submitParams)
@@ -286,33 +303,55 @@ export default function TransactionList() {
 
   const onCreateHandler = useCallback(async () => {
     const { params, nonce, safe } = submitParams
+    debugger
 
     if (nonce === undefined) return
 
-    if (!params || !fromAddress) return
+    if (!params) return
 
     if (!safeApproveHash || !safeTx || !proxySinger) return
 
     const addParam = {
       txType: createType,
       txId: nonce,
-      txFrom: fromAddress,
-      txTo: params[0],
-      txAmount: params[1].toString(),
+      txFrom: '',
+      txTo: '',
+      txAmount: '',
       txHash: safeApproveHash,
       txFunArg: params.join(','),
       txData: safeTx.data,
       txProaddr: safe,
       txFun: '',
     }
-
-    debugger
+    // const addParam = {
+    //   txType: createType,
+    //   txId: nonce,
+    //   txFrom: fromAddress,
+    //   txTo: params[0],
+    //   txAmount: params[1]?.toString(),
+    //   txHash: safeApproveHash,
+    //   txFunArg: params.join(','),
+    //   txData: safeTx.data,
+    //   txProaddr: safe,
+    //   txFun: '',
+    // }
 
     // for api
-    if (createType === TYPESTATE.TRANSFER) {
-      addParam.txFun = 'transfer'
-    } else {
-      addParam.txFun = method
+    switch (createType) {
+      case TYPESTATE.TRANSFER:
+        if (!fromAddress) return
+
+        addParam.txAmount = params[1]?.toString()
+        addParam.txHash = safeApproveHash
+        addParam.txFun = 'transfer'
+        addParam.txFrom = fromAddress
+        break
+
+      case TYPESTATE.METHOD:
+        if (!methodAddress) return
+        addParam.txFun = method
+        addParam.txFrom = methodAddress
+        break
     }
 
     try {
@@ -440,7 +479,10 @@ export default function TransactionList() {
         createFn={onCreateHandler}
         createType={createType}
         onChangeCreateType={onChangeCreateType}
-        changeContract={(contract) => setContract(contract)}
+        changeContract={(contract) => {
+          setContract(contract)
+          setMethodAddress(contract?.address)
+        }}
       ></CreateTransactionModal>
 
       <TableRowModal

@@ -19,7 +19,7 @@ export enum TYPESTATE {
 import { Erc20 } from '@/abis/types'
 
 export type TransactionSubmitProps = {
-  contract?: Erc20 | null
+  contract?: any
   safe?: string
   method?: string
   params?: [string, BigNumberish] | undefined
@@ -45,7 +45,6 @@ export function useTransacitonSubmitData({
   // }, [contract, method, params])
 
   const txs = useMemo(() => {
-    debugger
     if (!contract || !method || !params || nonce === undefined || !fnType) return null
 
     if (fnType == TYPESTATE.TRANSFER) {

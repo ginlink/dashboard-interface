@@ -268,7 +268,7 @@ export default function CreateTransactionModal({
           </InputItem>
           <InputItem>
             <label>arg</label>
-            <Input type="number" value={arg} onChange={changeArg} allowClear={true} placeholder="arg" />
+            <Input value={arg} onChange={changeArg} allowClear={true} placeholder="arg" />
           </InputItem>
         </InputBox>
       )}
