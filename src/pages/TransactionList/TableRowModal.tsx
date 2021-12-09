@@ -6,29 +6,6 @@ import { Input } from 'antd'
 import { txType } from '@/constants/txType'
 import { ButtonPrimary } from '@/components/Button'
 
-export type RowItemType = {
-  id: any
-  tx_id: any
-  tx_hash: any
-  tx_type: any
-  tx_from: any
-  tx_to: any
-  tx_amount: any
-  tx_fun: any
-  tx_fun_arg: any
-  tx_agent: any
-  tx_data: any
-  tx_proaddr: any
-}
-
-type TableRowModalType = {
-  openRow: boolean
-  item: RowItemType
-  closeRowModal: () => void
-  approveFn: (item: RowItemType) => void
-  confrimFn: (item: RowItemType) => void
-}
-
 const CloseWrapper = styled.div`
   position: absolute;
   right: 20px;
@@ -54,13 +31,37 @@ const BtnBox = styled.div`
     width: 36%;
   }
 `
+
+export type RowItemType = {
+  id: number
+  tx_id: string
+  tx_hash: string
+  tx_type: string
+  tx_from: string
+  tx_to: string
+  tx_amount: string
+  tx_fun: string
+  tx_fun_arg: string
+  tx_agent?: any
+  tx_data: string
+  tx_proaddr: string
+}
+
+type TableRowModalType = {
+  openRow: boolean
+  item: RowItemType
+  closeRowModal: () => void
+  approveFn: (item: RowItemType) => void
+  confrimFn: (item: RowItemType) => void
+}
+
 export default function TableRowModal({ openRow, item, closeRowModal, approveFn, confrimFn }: TableRowModalType) {
   return (
     <Modal isOpen={openRow}>
       <CloseWrapper onClick={() => closeRowModal && closeRowModal()}>
         <CloseOutlined />
       </CloseWrapper>
-      {item.tx_type == txType.TRANSFER ? (
+      {parseInt(item.tx_type) == txType.TRANSFER ? (
         <InputBox>
           <InputItem>
             <label>from</label>

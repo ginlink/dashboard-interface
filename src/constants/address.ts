@@ -15,7 +15,8 @@ export const TRANSACTION_POSITION_REWARD_ADDRESS: AddressMap = {
 }
 
 export const TRANSACTION_PROXY_ADDRESS: AddressMap = {
-  [SupportedChainId.BSCTEST]: '0xa417D727268ADb2A4FE137F47bf6AA493D2fAAd5',
+  // [SupportedChainId.BSCTEST]: '0xa417D727268ADb2A4FE137F47bf6AA493D2fAAd5',
+  [SupportedChainId.BSCTEST]: '0x0aAAc50719653930246bFe2a19e15C0c21366265',
   [SupportedChainId.BSC]: '',
 }
 export const TRANSACTION_OPERATABLE_ADDRESS: AddressMap = {

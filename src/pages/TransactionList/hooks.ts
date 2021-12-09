@@ -45,7 +45,8 @@ export function useTransacitonSubmitData({
   // }, [contract, method, params])
 
   const txs = useMemo(() => {
-    if (!contract || !method || !params || !nonce || !fnType) return null
+    debugger
+    if (!contract || !method || !params || nonce === undefined || !fnType) return null
 
     if (fnType == TYPESTATE.TRANSFER) {
       const data = contract.interface.encodeFunctionData('transfer', params)
@@ -56,7 +57,7 @@ export function useTransacitonSubmitData({
   }, [contract, fnType, method, nonce, params])
 
   const safeTx = useMemo(() => {
-    if (!multiSend || !txs || !nonce) return null
+    if (!multiSend || !txs || nonce === undefined) return null
     return buildMultiSendSafeTx(multiSend, txs, nonce)
   }, [multiSend, nonce, txs])
 

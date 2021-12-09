@@ -5,12 +5,13 @@ import { getTransctionList, addTx } from '@/services/api'
 import { Modal, Button, message } from 'antd'
 import CreateTransactionModal from './CreateTransactionModal'
 import { ButtonPrimary } from '@/components/Button'
-import TableRowModal from './TableRowModal'
-import { TransactionSubmitProps, useTransacitonSubmitData } from './hooks'
+import TableRowModal, { RowItemType } from './TableRowModal'
+import { TransactionSubmitProps, TYPESTATE, useSignatureBytes, useTransacitonSubmitData } from './hooks'
 import { useTokenContract, useTransactionProxy } from '@/hooks/useContract'
 import { useActiveWeb3React } from '@/hooks/web3'
 
 import BigFloatNumber from 'bignumber.js'
+import { TRANSACTION_MULTISEND_ADDRESS, TRANSACTION_PROXY_ADDRESS } from '@/constants/address'
 const columns = [
   {
     title: '事务ID',
@@ -71,31 +72,71 @@ const BtnBox = styled.div`
   }
 `
 export default function TransactionList() {
-  const { account, chainId } = useActiveWeb3React()
+  const { chainId } = useActiveWeb3React()
 
   const [dataList, setDataList] = useState<any>([])
   const [rowData, setRowData] = useState<any>({})
+
   const [openRow, setOpenRow] = useState<boolean>(false)
   const [isOpen, setIsOpen] = useState<boolean>(false)
+
+  // const [fromAddress, setFromAddress] = useState<string | undefined>('0x5B8698f10555F5Fb4fE58BFfc2169790e526D8AD')
+  // const [toAddress, setToAddress] = useState<string | undefined>('0xBf992941F09310b53A9F3436b0F40B25bCcc2C33')
+
   const [fromAddress, setFromAddress] = useState<string | undefined>()
   const [toAddress, setToAddress] = useState<string | undefined>()
+
   const [amount, setAmount] = useState<string | undefined>()
   const [address, setAddress] = useState<any>()
   const [method, setMethod] = useState<any>()
+
   const [arg, setArg] = useState<any>()
   const [createType, setCreateType] = useState<number>(1)
 
   const [decimals, setDecimals] = useState<number | undefined>(undefined)
 
-  // const [tokenAddress, setTokenAddress] = useState<string | undefined>(undefined)
-
-  // useEffect(() => {
-  //   setTokenAddress('0x5b8698f10555f5fb4fe58bffc2169790e526d8ad')
-  // }, [])
-
   const transactionProxy = useTransactionProxy()
 
   const tokenContract = useTokenContract(fromAddress)
+
+  const OWNER = useMemo(
+    () => [
+      '0x0F70D0661bA51a0383f59E76dC0f2d44703A8680',
+      '0xD06803c7cE034098CB332Af4C647f293C8BcD76a',
+      '0xf0a734400c8BD2e80Ba166940B904C59Dd08b6F0',
+      '0xBf992941F09310b53A9F3436b0F40B25bCcc2C33',
+    ],
+    []
+  )
+
+  const singerByteData = useSignatureBytes(OWNER)
+
+  const proxySinger = useTransactionProxy()
+
+  const [nonce, setNonce] = useState<number | undefined>(undefined)
+
+  const submitParams: TransactionSubmitProps = useMemo(() => {
+    debugger
+    if (!amount || !toAddress || !chainId || nonce === undefined || !decimals) return {}
+
+    const bigAmount = new BigFloatNumber(amount)
+    const _amount = bigAmount.multipliedBy(new BigFloatNumber(10).pow(decimals)).toFixed()
+
+    debugger
+
+    return {
+      contract: tokenContract,
+      chainId,
+      method: 'transfer',
+      params: [toAddress, _amount],
+      nonce: nonce,
+      safe: TRANSACTION_PROXY_ADDRESS[chainId],
+      fnType: TYPESTATE.TRANSFER,
+    }
+  }, [amount, chainId, decimals, nonce, toAddress, tokenContract])
+
+  // get data for transaction
+  const { safeTx, safeApproveHash } = useTransacitonSubmitData(submitParams)
 
   useEffect(() => {
     if (!tokenContract) return
@@ -105,52 +146,19 @@ export default function TransactionList() {
     })
   }, [tokenContract])
 
-  const Proxysinger = useTransactionProxy()
-
-  const [nonce, setNonce] = useState<number | undefined>(undefined)
-  useEffect(() => {
-    if (!Proxysinger) return
-
-    // nonce不会很大，用toNumber
-    Proxysinger.nonce().then((res) => setNonce(res.toNumber()))
-  }, [Proxysinger])
-
-  const params: TransactionSubmitProps = useMemo(() => {
-    if (!amount || !toAddress || !chainId || !nonce || !decimals) return {}
-
-    const bigAmount = new BigFloatNumber(amount)
-    const _amount = bigAmount.multipliedBy(new BigFloatNumber(10).pow(decimals)).toFixed()
-
-    return {
-      contract: tokenContract,
-      chainId,
-      method: 'transfer',
-      targetAmount: [toAddress, _amount],
-      nonce: nonce,
-      safe: '0xa417D727268ADb2A4FE137F47bf6AA493D2fAAd5',
-      fnType: createType,
-    }
-  }, [amount, chainId, createType, decimals, nonce, toAddress, tokenContract])
-
-  const { safeTx, safeApproveHash } = useTransacitonSubmitData(params)
-
-  // const { safeTx, safeApproveHash } = useTransacitonSubmitData(
-  //   tokenContract,
-  //   'transfer',
-  //   ['0xf0a734400c8BD2e80Ba166940B904C59Dd08b6F0', '10000000000000000000'],
-  //   2,
-  //   '97',
-  //   '0xa417D727268ADb2A4FE137F47bf6AA493D2fAAd5'
-  // )
-
   useEffect(() => {
     getTransctionList().then((res) => {
       setDataList(res)
     })
   }, [])
-  const onClose = useCallback(() => {
-    setIsOpen(false)
-  }, [])
+
+  useEffect(() => {
+    if (!proxySinger) return
+
+    // nonce不会很大，用toNumber
+    proxySinger.nonce().then((res) => setNonce(res.toNumber()))
+  }, [proxySinger])
+
   const changeFromAddress = useCallback((e) => {
     setFromAddress(e.target.value)
   }, [])
@@ -169,71 +177,76 @@ export default function TransactionList() {
   const changeArg = useCallback((e) => {
     setArg(e.target.value)
   }, [])
-  const createFn = useCallback(async () => {
-    const addParam = {
-      txType: createType,
-      txId: '2',
-      txFrom: '',
-      txTo: '',
-      txAmount: '',
-      txHash: '1111111',
-      txFun: '',
-      txFunArg: '',
-      txData: '',
-      txProaddr: '0xa417D727268ADb2A4FE137F47bf6AA493D2fAAd5',
-    }
-    if (!safeApproveHash || !safeTx || !Proxysinger) return
-    if (createType === 1) {
-      addParam.txFrom = '0x5b8698f10555f5fb4fe58bffc2169790e526d8ad'
-      addParam.txTo = '0x0F70D0661bA51a0383f59E76dC0f2d44703A8680'
-      addParam.txAmount = '100000000000000000'
-      addParam.txFun = 'transfer'
-      addParam.txFunArg = '0x0F70D0661bA51a0383f59E76dC0f2d44703A8680,100000000000000000'
-      addParam.txHash = safeApproveHash
-      addParam.txData = safeTx.data
-    } else {
-      addParam.txFun = method
-      addParam.txFunArg = ''
-    }
-    debugger
-    try {
-      await Proxysinger.approveHash(safeApproveHash)
-      const res = await addTx(addParam)
-      if (res.code === 200) {
-        getTransctionList().then((res) => {
-          setDataList(res.data)
-        })
-      }
-      setFromAddress('')
-      setToAddress('')
-      setAmount('')
-      setAddress('')
-      setMethod('')
-      setArg('')
-      setIsOpen(false)
-    } catch (error) {}
-  }, [Proxysinger, createType, method, safeApproveHash, safeTx])
+
+  const resetInput = useCallback(() => {
+    setFromAddress('')
+    setToAddress('')
+    setAmount('')
+    setAddress('')
+    setMethod('')
+    setArg('')
+  }, [])
+
   const onChangeCreateType = useCallback((e) => {
-    setCreateType(e.target.value)
-    if (e.target.value == 1) {
+    const type = e.target.value
+
+    if (!type) return
+
+    setCreateType(type)
+
+    if (type == TYPESTATE.TRANSFER) {
       setMethod('transfer')
     }
   }, [])
 
-  const viewRow = useCallback((row) => {
-    setRowData(row)
-    if (!!row.tx_hash) {
-      setOpenRow(true)
-    } else {
-      message.warning('已失效')
+  const onCreateHandler = useCallback(async () => {
+    const { params, nonce, safe } = submitParams
+
+    if (nonce === undefined) return
+
+    if (!params || !fromAddress) return
+
+    if (!safeApproveHash || !safeTx || !proxySinger) return
+
+    const addParam = {
+      txType: createType,
+      txId: nonce,
+      txFrom: fromAddress,
+      txTo: params[0],
+      txAmount: params[1].toString(),
+      txHash: safeApproveHash,
+      txFunArg: params.join(','),
+      txData: safeTx.data,
+      txProaddr: safe,
+      txFun: '',
     }
-  }, [])
 
-  const closeRowModal = useCallback(() => {
-    setOpenRow(false)
-  }, [])
+    debugger
 
-  const approveFn = useCallback(
+    // for api
+    if (createType === TYPESTATE.TRANSFER) {
+      addParam.txFun = 'transfer'
+    } else {
+      addParam.txFun = method
+    }
+
+    try {
+      // transaction
+      await proxySinger.approveHash(safeApproveHash)
+
+      // api
+      await addTx(addParam)
+
+      const list = await getTransctionList()
+
+      setDataList(list)
+
+      resetInput()
+      setIsOpen(false)
+    } catch (error) {}
+  }, [submitParams, fromAddress, safeApproveHash, safeTx, proxySinger, createType, method, resetInput])
+
+  const onApproveHandler = useCallback(
     (item) => {
       console.log('item', item)
 
@@ -243,29 +256,54 @@ export default function TransactionList() {
     },
     [transactionProxy]
   )
-  const confrimFn = useCallback(
-    async (item) => {
-      console.log('item', item)
-      console.log(await transactionProxy?.nonce())
+
+  const onConfirmHandler = useCallback(
+    async (item: RowItemType) => {
+      if (!chainId || !transactionProxy) return
+      const { tx_data } = item
+
+      if (!tx_data) return
+
+      // console.log('item', item)
+      // console.log(await transactionProxy?.nonce())
+
       transactionProxy
-        ?.execTransaction(
-          '0xdEF572641Fac47F770596357bfb7432F78407ab3',
+        .execTransaction(
+          TRANSACTION_MULTISEND_ADDRESS[chainId],
           0,
-          item.tx_data,
+          tx_data,
           1,
           0,
           0,
           0,
           '0x0000000000000000000000000000000000000000',
           '0x0000000000000000000000000000000000000000',
-          '0x0000000000000000000000000F70D0661bA51a0383f59E76dC0f2d44703A868000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000013F0b2a9691bB72cae72616b39E798a824F182710000000000000000000000000000000000000000000000000000000000000000010000000000000000000000002D0D56a2490B942F59704481a4Eedf894CdCCec8000000000000000000000000000000000000000000000000000000000000000001'
+          singerByteData
         )
         .then((res) => {
           console.log('res', res)
         })
+        .catch((err) => {
+          console.log('[](err):', err)
+        })
     },
-    [transactionProxy]
+    [chainId, singerByteData, transactionProxy]
   )
+
+  const onViewRow = useCallback((row: RowItemType) => {
+    setRowData(row)
+
+    if (!!row.tx_hash) {
+      setOpenRow(true)
+    } else {
+      message.warning('已失效')
+    }
+  }, [])
+
+  // debug
+  useEffect(() => {
+    console.log('[](submitParams):', submitParams)
+  }, [submitParams])
 
   return (
     <Wrapper>
@@ -283,7 +321,7 @@ export default function TransactionList() {
         onRow={(record) => {
           return {
             onClick: () => {
-              viewRow(record)
+              onViewRow(record)
             }, // 点击行
           }
         }}
@@ -293,7 +331,7 @@ export default function TransactionList() {
         dataSource={dataList}
       />
       <CreateTransactionModal
-        onClose={onClose}
+        onClose={() => setIsOpen(false)}
         isOpen={isOpen}
         fromAddress={fromAddress}
         changeFromAddress={changeFromAddress}
@@ -307,15 +345,15 @@ export default function TransactionList() {
         changeAddress={changeAddress}
         arg={arg}
         changeArg={changeArg}
-        createFn={createFn}
+        createFn={onCreateHandler}
         createType={createType}
         onChangeCreateType={onChangeCreateType}
       ></CreateTransactionModal>
 
       <TableRowModal
-        approveFn={approveFn}
-        confrimFn={confrimFn}
-        closeRowModal={closeRowModal}
+        approveFn={onApproveHandler}
+        confrimFn={onConfirmHandler}
+        closeRowModal={() => setOpenRow(false)}
         openRow={openRow}
         item={rowData}
       ></TableRowModal>

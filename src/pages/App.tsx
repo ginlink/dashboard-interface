@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Redirect, Route, Switch } from 'react-router'
 import Home from './Home'
 import Contract from './Contract'
@@ -8,8 +8,20 @@ import TransactionList from './TransactionList'
 import CreationProcess from './MultiSign/CreationProcess'
 import FastCall from './FastCall'
 import CallAdmin from './CallAdmin'
+import { useSignatureBytes } from './TransactionList/hooks'
 
 export default function App() {
+  // const singer = useSignatureBytes([
+  //   '0x0F70D0661bA51a0383f59E76dC0f2d44703A8680',
+  //   '0xD06803c7cE034098CB332Af4C647f293C8BcD76a',
+  //   '0xf0a734400c8BD2e80Ba166940B904C59Dd08b6F0',
+  //   '0xBf992941F09310b53A9F3436b0F40B25bCcc2C33',
+  // ])
+
+  // useEffect(() => {
+  //   console.log('[](singer):', singer)
+  // }, [singer])
+
   return (
     <>
       <Switch>

@@ -158,6 +158,7 @@ export function useTransactionSwapMing() {
 export function useTransactionReward() {
   return useContract<PositionReward>(TRANSACTION_POSITION_REWARD_ADDRESS, positionReward)
 }
+
 export function useTransactionMultiSend() {
   return useContract<MultiSend>(TRANSACTION_MULTISEND_ADDRESS, multiSend)
 }

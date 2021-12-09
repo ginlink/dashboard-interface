@@ -4,6 +4,25 @@ import Modal from '@/components/Modal'
 import CloseOutlined from '@ant-design/icons/lib/icons/CloseOutlined'
 import { Space, Radio, Input } from 'antd'
 import { ButtonPrimary } from '@/components/Button'
+import { TYPESTATE } from './hooks'
+
+const CloseWrapper = styled.div`
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  cursor: pointer;
+`
+const InputBox = styled.div`
+  margin-top: 18px;
+`
+const InputItem = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+  label {
+    width: 20%;
+  }
+`
 
 type CreateTransactionType = {
   isOpen: boolean
@@ -24,23 +43,7 @@ type CreateTransactionType = {
   createType: number
   onChangeCreateType: (e: any) => void
 }
-const CloseWrapper = styled.div`
-  position: absolute;
-  right: 20px;
-  top: 20px;
-  cursor: pointer;
-`
-const InputBox = styled.div`
-  margin-top: 18px;
-`
-const InputItem = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 18px;
-  label {
-    width: 20%;
-  }
-`
+
 export default function CreateTransactionModal({
   isOpen,
   onClose,
@@ -67,11 +70,11 @@ export default function CreateTransactionModal({
       </CloseWrapper>
       <Space>
         <Radio.Group onChange={onChangeCreateType} value={createType}>
-          <Radio value={1}>转账</Radio>
-          <Radio value={2}>方法</Radio>
+          <Radio value={TYPESTATE.TRANSFER}>转账</Radio>
+          <Radio value={TYPESTATE.METHOD}>方法</Radio>
         </Radio.Group>
       </Space>
-      {createType === 1 ? (
+      {createType === TYPESTATE.TRANSFER ? (
         <InputBox>
           <InputItem>
             <label>from</label>
