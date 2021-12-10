@@ -1,4 +1,5 @@
 import { FuncType } from '@/pages/CallAdmin/util'
+import { BASE_URL_15 } from './config'
 import http from './index'
 
 interface SearchParams {
@@ -38,15 +39,15 @@ export const getTableLists = (searchParams: SearchParams) => {
 }
 
 export const addFunctionApi = (data: CtFunction) => {
-  return http.post('/ct-function', data) as Promise<any>
+  return http.post(BASE_URL_15 + '/ct-function', data) as Promise<any>
 }
 
 export const getFunctionApi = () => {
-  return http.get('/ct-function') as Promise<any>
+  return http.get(BASE_URL_15 + '/ct-function') as Promise<any>
 }
 
 export const searchFuncApi = (key: string) => {
-  return http.get('/ct-function/search', {
+  return http.get(BASE_URL_15 + '/ct-function/search', {
     key,
   }) as Promise<any>
 }

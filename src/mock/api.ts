@@ -1,12 +1,3 @@
-/*
- * @Author: jiangjin
- * @Date: 2021-09-26 10:51:46
- * @LastEditTime: 2021-09-27 15:48:08
- * @LastEditors: jiangjin
- * @Description:
- *
- */
-
 // 单币挖矿mock数据
 export const singleData = [
   // busd
