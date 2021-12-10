@@ -3,7 +3,7 @@ import JSBI from 'jsbi'
 import { useMemo } from 'react'
 import { useActiveWeb3React } from '../../hooks/web3'
 import { useAllTokens } from '../../hooks/Tokens'
-import { useMulticall2Contract } from '../../hooks/useContract'
+import { useMulticallContract } from '../../hooks/useContract'
 import { isAddress } from '../../utils'
 import { useMultipleContractSingleData, useSingleContractMultipleData } from '../multicall/hooks'
 import { Interface } from '@ethersproject/abi'
@@ -16,7 +16,7 @@ export function useETHBalances(uncheckedAddresses?: (string | undefined)[]): {
   [address: string]: CurrencyAmount<Currency> | undefined
 } {
   const { chainId } = useActiveWeb3React()
-  const multicallContract = useMulticall2Contract()
+  const multicallContract = useMulticallContract()
 
   const addresses: string[] = useMemo(
     () =>

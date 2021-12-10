@@ -10,7 +10,7 @@ import swapMining from '@/abis/swap-mining.json'
 import ERC20_ABI from '@/abis/erc20.json'
 import REWARD_POOL_ABI from '@/abis/reward-pool.json'
 
-import { Erc20, ISpePool, Multicall2, RewardPool, SwapMining } from '@/abis/types'
+import { Erc20, ISpePool, RewardPool, SwapMining } from '@/abis/types'
 import { SupportedChainId } from '@/constants/chains'
 import { Vault } from '@/abis/types/Vault'
 import abiDatas from '../abis/ISpePool.json'
@@ -86,7 +86,7 @@ export const SWAP_MINING_ADDRESSES: AddressMap | string = {
   [SupportedChainId.BSC]: '0x01Af8d162E217eE0eF22f7ddb52488870335ca12',
 }
 
-export const MULTICALL2_ADDRESSES: AddressMap | string = {
+export const MULTICALL_ADDRESSES: AddressMap | string = {
   // [SupportedChainId.BSCTEST]: '0xC4eB70E1C4C1d866fb4f1Be73AA458dCDe9a1F99',
   [SupportedChainId.BSCTEST]: '0x11cee792b8D394f90127C1d631842a4898A422a0',
   [SupportedChainId.BSC]: '0x193869c927F2e416E71c3D178266cD2faf7ca2d0',
@@ -122,8 +122,8 @@ export function useSwapMiningContract() {
 }
 
 // 辅助合约，用于静态查询（轮询）数据
-export function useMulticall2Contract() {
-  return useContract<UniswapInterfaceMulticall>(MULTICALL2_ADDRESSES, MULTICALL_ABI, false)
+export function useMulticallContract() {
+  return useContract<UniswapInterfaceMulticall>(MULTICALL_ADDRESSES, MULTICALL_ABI, false)
 }
 
 // 金库合约

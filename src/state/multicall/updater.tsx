@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
 import { UniswapInterfaceMulticall } from 'types/v3'
 
-import { useMulticall2Contract } from '../../hooks/useContract'
+import { useMulticallContract } from '../../hooks/useContract'
 import useDebounce from '../../hooks/useDebounce'
 import { useActiveWeb3React } from '../../hooks/web3'
 import chunkArray from '../../utils/chunkArray'
@@ -160,12 +160,8 @@ export default function Updater(): null {
   const debouncedListeners = useDebounce(state.callListeners, 100)
   const latestBlockNumber = useBlockNumber()
   const { chainId } = useActiveWeb3React()
-  const multicall2Contract = useMulticall2Contract()
+  const multicall2Contract = useMulticallContract()
   const cancellations = useRef<{ blockNumber: number; cancellations: (() => void)[] }>()
-
-  useEffect(() => {
-    console.log('[](multicall2Contract):', multicall2Contract)
-  }, [multicall2Contract])
 
   const listeningKeys: { [callKey: string]: number } = useMemo(() => {
     return activeListeningKeys(debouncedListeners, chainId)
