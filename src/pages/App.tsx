@@ -36,11 +36,11 @@ export default function App() {
 
   // const result = useSingleCallResult(tokenContract, 'approve', inputs)
 
-  useEffect(() => {
-    if (!tokenContract || !addTransaction) return
+  // useEffect(() => {
+  //   if (!tokenContract || !addTransaction) return
 
-    tokenContract.approve('0x5B8698f10555F5Fb4fE58BFfc2169790e526D8AD', '10000').then((res) => addTransaction(res))
-  }, [addTransaction, tokenContract])
+  //   tokenContract.approve('0x5B8698f10555F5Fb4fE58BFfc2169790e526D8AD', '10000').then((res) => addTransaction(res))
+  // }, [addTransaction, tokenContract])
 
   return (
     <>
