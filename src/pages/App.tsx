@@ -11,22 +11,36 @@ import CallAdmin from './CallAdmin'
 import { useSingleCallResult } from '@/state/multicall/hooks'
 import { useActiveWeb3React } from '@/hooks/web3'
 import { useTokenContract } from '@/hooks/useContract'
+import { useTransactionAdder } from '@/state/transactions/hooks'
 
 export default function App() {
   const { account } = useActiveWeb3React()
   const tokenContract = useTokenContract('0x5B8698f10555F5Fb4fE58BFfc2169790e526D8AD')
 
-  const inputs = useMemo(() => {
-    if (!account) return []
+  // const inputs = useMemo(() => {
+  //   if (!account) return []
 
-    return [account]
-  }, [account])
+  //   return [account]
+  // }, [account])
 
-  const result = useSingleCallResult(tokenContract, 'balanceOf', inputs)
+  // const result = useSingleCallResult(tokenContract, 'balanceOf', inputs)
+
+  //   console.log('[](result):', result)
+  // }, [result])
+
+  const addTransaction = useTransactionAdder()
+
+  // const inputs = useMemo(() => {
+  //   return ['0x5B8698f10555F5Fb4fE58BFfc2169790e526D8AD', '10000']
+  // }, [])
+
+  // const result = useSingleCallResult(tokenContract, 'approve', inputs)
 
   useEffect(() => {
-    console.log('[](result):', result)
-  }, [result])
+    if (!tokenContract || !addTransaction) return
+
+    tokenContract.approve('0x5B8698f10555F5Fb4fE58BFfc2169790e526D8AD', '10000').then((res) => addTransaction(res))
+  }, [addTransaction, tokenContract])
 
   return (
     <>
