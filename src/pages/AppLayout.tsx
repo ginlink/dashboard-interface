@@ -4,6 +4,7 @@ import styled from 'styled-components'
 
 import Header from '../components/Header'
 import Sider from '../components/Sider'
+import Popups from '@/components/Popups'
 
 const { Content } = Layout
 
@@ -25,6 +26,8 @@ export default function AppLayout({ children }: { children: any }) {
         <HeaderBar>
           <Header />
         </HeaderBar>
+
+        <Popups />
         <Content style={{ margin: '16px 16px' }}>
           <LayoutContent>{children}</LayoutContent>
         </Content>

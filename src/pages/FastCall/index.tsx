@@ -181,8 +181,6 @@ export default function FastCall() {
   const onCreateContractHandler = useCallback(() => {
     if (!selectedFuncs || !addressInput) return message.warning('请添加函数、并输入地址')
 
-    if (!isAddress(addressInput)) return message.warning('请输入正确地址')
-
     const createdContract: Contract | undefined = createContract({
       library,
       account,

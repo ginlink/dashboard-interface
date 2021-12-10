@@ -1,4 +1,15 @@
+import { MultiSend } from '@/abis/types'
+import {
+  buildContractCall,
+  buildSafeTransaction,
+  buildSignatureBytes,
+  calculateSafeTransactionHash,
+  SafeTransaction,
+  signer,
+} from '@/utils/execution'
+import { buildMultiSendSafeTx } from '@/utils/multisend'
 import { FuncType, ParsedFunc } from '../CallAdmin/util'
+import { CallType } from './CreateTransactionModal'
 
 export type StaticBaseAbi = {
   inputs?: {
@@ -104,4 +115,71 @@ export function parseAbis(staticContract?: StaticBaseContract[]): ParsedContract
   //   // if (!contractName) return
 
   // }, {})
+}
+
+export type BundleCallDataProps = {
+  type?: CallType
+  contract?: any
+  multiSendContract?: MultiSend
+  safeAddress?: string
+  method?: string
+  params?: string[]
+  nonce?: number
+  chainId?: number | undefined
+}
+
+export function bundleCallData({
+  type,
+  contract,
+  multiSendContract,
+  safeAddress,
+  method,
+  params,
+  nonce,
+  chainId,
+}: BundleCallDataProps): [SafeTransaction | undefined, string | undefined] {
+  debugger
+
+  if (nonce === undefined) return [undefined, undefined]
+
+  if (!contract || !multiSendContract || !safeAddress || !method || !params || !chainId) return [undefined, undefined]
+
+  let txs: SafeTransaction[] | undefined = undefined
+
+  switch (type) {
+    case CallType.TRANSFER:
+      const data = contract.interface.encodeFunctionData('transfer', params)
+
+      txs = [buildSafeTransaction({ to: contract.address, data, safeTxGas: 1000000, nonce: nonce })]
+      break
+
+    case CallType.METHOD:
+      txs = [buildContractCall(contract, method, params, nonce)]
+      break
+
+    default:
+      break
+  }
+
+  if (!txs) return [undefined, undefined]
+
+  const safeTx = buildMultiSendSafeTx(multiSendContract, txs, nonce)
+
+  const safeApproveHash = calculateSafeTransactionHash(safeAddress, safeTx, chainId)
+
+  return [safeTx, safeApproveHash]
+}
+
+export function getExecByteData() {
+  // TODO注意更新owner
+  const owner = [
+    '0x0F70D0661bA51a0383f59E76dC0f2d44703A8680',
+    '0xD06803c7cE034098CB332Af4C647f293C8BcD76a',
+    '0xf0a734400c8BD2e80Ba166940B904C59Dd08b6F0',
+    '0xBf992941F09310b53A9F3436b0F40B25bCcc2C33',
+  ]
+
+  const ownerBty32 = owner.map((item) => signer(item))
+
+  return buildSignatureBytes(ownerBty32)
 }
