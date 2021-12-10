@@ -1,8 +1,10 @@
+import { constructSameAddressMap } from '@/utils/constructSameAddressMap'
 import { SupportedChainId } from './chains'
 
 type AddressMap = { [chainId: number]: string }
 
 export const AddressZero = '0x0000000000000000000000000000000000000000'
+
 // TODO    transaction  address  start
 export const TRANSACTION_SWAPMING_ADDRESSES: AddressMap = {
   [SupportedChainId.BSCTEST]: '0x77335A40e7e6b6898fF2523D0358fEB687252963',
@@ -29,3 +31,5 @@ export const TRANSACTION_MULTISEND_ADDRESS: AddressMap = {
 }
 
 // TODO    transaction  address  end
+
+export const UNI_ADDRESS: AddressMap = constructSameAddressMap('0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984', false)

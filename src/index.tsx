@@ -1,7 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { createWeb3ReactRoot, Web3ReactProvider } from '@web3-react/core'
+import ApplicationUpdater from './state/application/updater'
+import MulticallUpdater from './state/multicall/updater'
+import TransactionUpdater from './state/transactions/updater'
+
 import 'antd/dist/antd.css'
 import '@/assets/css/reset.css'
 
@@ -35,6 +39,16 @@ if (!!window.ethereum) {
   window.ethereum.autoRefreshOnNetworkChange = false
 }
 
+function Updater() {
+  return (
+    <>
+      <ApplicationUpdater />
+      <TransactionUpdater />
+      <MulticallUpdater />
+    </>
+  )
+}
+
 ReactDOM.render(
   <Provider store={store}>
     <HashRouter>
@@ -43,6 +57,7 @@ ReactDOM.render(
           <Web3ReactManager>
             <ThemeProvider>
               <ThemedGlobalStyle />
+              <Updater />
               <AppLayout>
                 <App />
               </AppLayout>

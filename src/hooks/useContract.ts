@@ -7,7 +7,6 @@ import { isAddress } from '@/utils'
 import ERC20_BYTES32_ABI from '@/abis/erc20_bytes32.json'
 import MDX_VAULT_ABI from '@/abis/vault.json'
 import swapMining from '@/abis/swap-mining.json'
-import MULTICALL_ABI from '@/abis/multicall2.json'
 import ERC20_ABI from '@/abis/erc20.json'
 import REWARD_POOL_ABI from '@/abis/reward-pool.json'
 
@@ -21,7 +20,7 @@ import {
   TRANSACTION_SWAPMING_ADDRESSES,
   TRANSACTION_OPERATABLE_ADDRESS,
   TRANSACTION_MULTISEND_ADDRESS,
-} from 'constants/address'
+} from '@/constants/addresses'
 import { abi as gnosisSafe } from '@/abis/GnosisSafe.json'
 import { abi as Ownable } from 'abis/Ownable.json'
 import { abi as multiSend } from 'abis/MultiSend.json'
@@ -29,6 +28,9 @@ import positionReward from 'abis/position-reward.json'
 import { GnosisSafe } from 'abis/types/GnosisSafe'
 import { PositionReward } from 'abis/types/PositionReward'
 import { MultiSend } from 'abis/types/MultiSend'
+
+import { UniswapInterfaceMulticall } from '@/types/v3'
+import { abi as MULTICALL_ABI } from 'plugins/@uniswap/v3-periphery/artifacts/contracts/lens/UniswapInterfaceMulticall.sol/UniswapInterfaceMulticall.json'
 
 export function getSigner(library: Web3Provider, account: string) {
   return library.getSigner(account).connectUnchecked()
@@ -85,7 +87,8 @@ export const SWAP_MINING_ADDRESSES: AddressMap | string = {
 }
 
 export const MULTICALL2_ADDRESSES: AddressMap | string = {
-  [SupportedChainId.BSCTEST]: '0xC4eB70E1C4C1d866fb4f1Be73AA458dCDe9a1F99',
+  // [SupportedChainId.BSCTEST]: '0xC4eB70E1C4C1d866fb4f1Be73AA458dCDe9a1F99',
+  [SupportedChainId.BSCTEST]: '0x11cee792b8D394f90127C1d631842a4898A422a0',
   [SupportedChainId.BSC]: '0x193869c927F2e416E71c3D178266cD2faf7ca2d0',
 }
 
@@ -120,7 +123,7 @@ export function useSwapMiningContract() {
 
 // 辅助合约，用于静态查询（轮询）数据
 export function useMulticall2Contract() {
-  return useContract<Multicall2>(MULTICALL2_ADDRESSES, MULTICALL_ABI, false) as Multicall2
+  return useContract<UniswapInterfaceMulticall>(MULTICALL2_ADDRESSES, MULTICALL_ABI, false)
 }
 
 // 金库合约
@@ -129,7 +132,7 @@ export function useVaultContract(vaultAddress: string | undefined, withSigner?: 
 }
 
 // 币合约，用于查询余额
-export function useTokenContract(tokenAddress: string) {
+export function useTokenContract(tokenAddress?: string) {
   return useContract<Erc20>(tokenAddress, ERC20_ABI)
 }
 

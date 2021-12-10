@@ -163,6 +163,10 @@ export default function Updater(): null {
   const multicall2Contract = useMulticall2Contract()
   const cancellations = useRef<{ blockNumber: number; cancellations: (() => void)[] }>()
 
+  useEffect(() => {
+    console.log('[](multicall2Contract):', multicall2Contract)
+  }, [multicall2Contract])
+
   const listeningKeys: { [callKey: string]: number } = useMemo(() => {
     return activeListeningKeys(debouncedListeners, chainId)
   }, [debouncedListeners, chainId])
