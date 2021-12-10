@@ -243,22 +243,22 @@ export default function CreateTransactionModal({
       {createType === TYPESTATE.TRANSFER ? (
         <InputBox>
           <InputItem>
-            <label>from</label>
+            <label>token地址</label>
             <Input allowClear={true} value={fromAddress} onChange={changeFromAddress} placeholder="from" />
           </InputItem>
           <InputItem>
-            <label>to</label>
+            <label>接收人地址</label>
             <Input allowClear={true} value={toAddress} onChange={changeToAddress} placeholder="to" />
           </InputItem>
           <InputItem>
-            <label>amount</label>
+            <label>数量</label>
             <Input type="number" value={amount} onChange={changeAmount} allowClear={true} placeholder="amount" />
           </InputItem>
         </InputBox>
       ) : (
         <InputBox>
           <InputItem>
-            <label></label>
+            <label>合约类型</label>
             {/* <Input allowClear={true} value={address} onChange={changeAddress} placeholder="address" /> */}
             <Select defaultValue="" style={{ width: 200 }} allowClear onChange={changeOption}>
               {optionArr.map((v: any, index: number) => {
@@ -271,7 +271,7 @@ export default function CreateTransactionModal({
             </Select>
           </InputItem>
           <InputItem>
-            <label>method</label>
+            <label>合约方法</label>
             {/* <Input allowClear={true} value={method} onChange={changeMethod} placeholder="method" /> */}
             <Select onChange={changeMethodName} style={{ width: 200 }} allowClear>
               {methodOptionArr.map((v: any, index: number) => {
@@ -284,7 +284,7 @@ export default function CreateTransactionModal({
             </Select>
           </InputItem>
           <InputItem>
-            <label>arg</label>
+            <label>合约参数</label>
             <Input value={arg} onChange={changeArg} allowClear={true} placeholder={funcParams} />
           </InputItem>
         </InputBox>
