@@ -1,5 +1,5 @@
 import { Contract, Wallet, utils, BigNumber, BigNumberish, Signer, PopulatedTransaction } from 'ethers'
-import { AddressZero } from '../constants/address'
+import { AddressZero } from '../constants/addresses'
 
 export const EIP_DOMAIN = {
   EIP712Domain: [

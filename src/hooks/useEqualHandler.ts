@@ -1,12 +1,3 @@
-/*
- * @Author: jiangjin
- * @Date: 2021-09-12 20:56:09
- * @LastEditTime: 2021-10-28 16:09:49
- * @LastEditors: jiangjin
- * @Description:
- *  用于useSelector的第二个参数，节流用，依赖不变化，则不通知我更新
- */
-
 export type CallResultsProps = {
   [chainId: number]: {
     [callKey: string]: {
