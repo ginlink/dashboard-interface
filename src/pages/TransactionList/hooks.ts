@@ -29,6 +29,7 @@ export const OWNERARR: Array<string> = [
 ]
 
 import { Erc20 } from '@/abis/types'
+import { useSingleCallResult } from '@/state/multicall/hooks'
 
 export type TransactionSubmitProps = {
   contract?: any
@@ -94,22 +95,23 @@ export function useSignatureBytes(owner: any[]) {
 //事务状态处理
 export function useTxStatus(record: RowItemType) {
   const transactionProxy = useTransactionProxy()
-  const [nonce, setNonce] = useState<number | undefined>(undefined)
   const [currentApproveNum, setCurrentApproveNum] = useState<number>(0)
+
+  const { result } = useSingleCallResult(transactionProxy, 'nonce')
+
+  const nonce = useMemo(() => {
+    if (!result) return
+    return result[0].toNumber()
+  }, [result])
 
   useEffect(() => {
     if (!transactionProxy) return
     if (!record) return
-
-    transactionProxy.nonce().then((res) => {
-      setNonce(res.toNumber())
-    })
     const promiseArr: Array<any> = []
     OWNERARR.map((v: string) => {
       promiseArr.push(transactionProxy?.approvedHashes(v, record.tx_hash))
     })
     Promise.all(promiseArr).then((res) => {
-      console.log('res:', res, nonce)
       let count = 0
       res.map((v) => {
         if (v.toNumber()) count += 1

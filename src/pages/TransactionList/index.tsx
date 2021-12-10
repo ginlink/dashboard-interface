@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import styled from 'styled-components/macro'
 import { Table } from 'antd'
 import { getTransctionList, addTx } from '@/services/api'
@@ -27,6 +27,7 @@ import { Contract } from '@ethersproject/contracts'
 import { bundleCallData, getExecByteData } from './util'
 import { SafeTransaction } from '@/utils/execution'
 import BigFloatNumber from 'bignumber.js'
+import { useSingleCallResult } from '@/state/multicall/hooks'
 
 const processingData = function (hash: string) {
   if (hash) {
@@ -180,10 +181,15 @@ export default function TransactionList() {
 
   const [callType, setCallType] = useState(CallType.TRANSFER)
 
-  const [nonce, setNonce] = useState<number | undefined>(undefined)
+  // const [nonce, setNonce] = useState<number | undefined>(undefined)
 
   const transactionProxy = useTransactionProxy()
+  const { result } = useSingleCallResult(transactionProxy, 'nonce')
 
+  const nonce = useMemo(() => {
+    if (!result) return
+    return result[0].toNumber()
+  }, [result])
   const tokenContract = useTokenContract(tokenAddress)
 
   const multiSendContract = useTransactionMultiSend()
@@ -247,12 +253,12 @@ export default function TransactionList() {
   //初始化end
 
   // get nonce
-  useEffect(() => {
-    if (!proxySinger) return
+  // useEffect(() => {
+  //   if (!proxySinger) return
 
-    // nonce不会很大，用toNumber
-    proxySinger.nonce().then((res) => setNonce(res.toNumber()))
-  }, [proxySinger])
+  //   // nonce不会很大，用toNumber
+  //   proxySinger.nonce().then((res) => setNonce(res.toNumber()))
+  // }, [proxySinger])
 
   const resetDataList = useCallback(async () => {
     const list = await getTransctionList()
