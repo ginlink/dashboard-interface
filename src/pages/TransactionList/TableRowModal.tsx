@@ -45,6 +45,7 @@ export type RowItemType = {
   tx_agent?: any
   tx_data: string
   tx_proaddr: string
+  tx_state?: number
 }
 
 type TableRowModalType = {

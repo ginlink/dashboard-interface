@@ -15,6 +15,11 @@ export enum TYPESTATE {
   TRANSFER = 1,
   METHOD = 2,
 }
+export enum TXSTATE {
+  COMPLETED = 1,
+  HAVEINHAND = 2,
+  INVALID = 3,
+}
 export const APPROVENUM = 2
 export const OWNERARR: Array<string> = [
   '0x0F70D0661bA51a0383f59E76dC0f2d44703A8680',
@@ -86,6 +91,7 @@ export function useSignatureBytes(owner: any[]) {
   }, [owner])
 }
 
+//事务状态处理
 export function useTxStatus(record: RowItemType) {
   const transactionProxy = useTransactionProxy()
   const [nonce, setNonce] = useState<number | undefined>(undefined)

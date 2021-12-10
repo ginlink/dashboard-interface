@@ -2,11 +2,19 @@ import React, { useState, useEffect, createRef, useCallback, useRef, useMemo } f
 import styled from 'styled-components/macro'
 import { Table, Tag, Space } from 'antd'
 import { getTransctionList, addTx } from '@/services/api'
-import { Modal, Button, message } from 'antd'
+import { Modal, Button, message, Pagination } from 'antd'
 import CreateTransactionModal from './CreateTransactionModal'
 import { ButtonPrimary } from '@/components/Button'
 import TableRowModal, { RowItemType } from './TableRowModal'
-import { OWNERARR, TransactionSubmitProps, TYPESTATE, useSignatureBytes, useTransacitonSubmitData } from './hooks'
+import {
+  APPROVENUM,
+  OWNERARR,
+  TransactionSubmitProps,
+  TXSTATE,
+  TYPESTATE,
+  useSignatureBytes,
+  useTransacitonSubmitData,
+} from './hooks'
 import { useTokenContract, useTransactionProxy } from '@/hooks/useContract'
 import { useActiveWeb3React } from '@/hooks/web3'
 import fu from '@/assets/images/fu.png'
@@ -229,11 +237,45 @@ export default function TransactionList() {
     })
   }, [tokenContract])
 
-  useEffect(() => {
-    getTransctionList().then((res) => {
-      setDataList(res)
+  //初始化start
+  const getDataLists = useCallback(async () => {
+    if (!transactionProxy) {
+      setDataList([])
+      return
+    }
+    if (!nonce) {
+      setDataList([])
+      return
+    }
+    const res = await getTransctionList()
+    //事务状态处理
+    res.map((item: any) => {
+      const promiseArr: Array<any> = []
+      OWNERARR.map((v: string) => {
+        promiseArr.push(transactionProxy?.approvedHashes(v, item.tx_hash))
+      })
+      let count = 0
+      Promise.all(promiseArr).then((res) => {
+        console.log('res:', res, nonce)
+        res.map((v) => {
+          if (v.toNumber()) count += 1
+        })
+      })
+      if (count >= APPROVENUM && nonce > Number(item.tx_id)) {
+        item.tx_state = TXSTATE.COMPLETED
+      } else if (count >= 0 && nonce == Number(item.tx_id)) {
+        item.tx_state = TXSTATE.HAVEINHAND
+      } else {
+        item.tx_state = TXSTATE.INVALID
+      }
     })
-  }, [])
+    setDataList(res)
+  }, [nonce, transactionProxy])
+
+  useEffect(() => {
+    getDataLists()
+  }, [getDataLists])
+  //初始化end
 
   useEffect(() => {
     if (!proxySinger) return
@@ -342,9 +384,7 @@ export default function TransactionList() {
       // api
       await addTx(addParam)
 
-      const list = await getTransctionList()
-
-      setDataList(list)
+      getDataLists()
 
       resetInput()
       setIsOpen(false)
@@ -396,14 +436,14 @@ export default function TransactionList() {
     },
     [chainId, singerByteData, transactionProxy]
   )
+
   const onViewRow = useCallback((row: RowItemType) => {
     setRowData(row)
-    setOpenRow(true)
-    // if (!!row.tx_hash) {
-    //   setOpenRow(true)
-    // } else {
-    //   message.warning('已失效')
-    // }
+    if (row.tx_state !== TXSTATE.INVALID) {
+      setOpenRow(true)
+    } else {
+      message.warning('已失效')
+    }
   }, [])
 
   // debug
@@ -418,7 +458,19 @@ export default function TransactionList() {
   return (
     <Wrapper>
       <BtnBox>
-        <AddressBox>代理地址：{TRANSACTION_PROXY_ADDRESS[chainId || 56]}</AddressBox>
+        <AddressBox>
+          代理地址：{TRANSACTION_PROXY_ADDRESS[chainId || 56]}
+          <img
+            className="copy-icon"
+            onClick={(e) => {
+              e.stopPropagation()
+              copy(TRANSACTION_PROXY_ADDRESS[chainId || 56])
+              message.success('Copy Success!')
+            }}
+            src={fu}
+            alt=""
+          />
+        </AddressBox>
         <CreateButtonPrimary
           onClick={() => {
             setCreateType(1)
@@ -450,6 +502,14 @@ export default function TransactionList() {
         openRow={openRow}
         item={rowData}
       ></TableRowModal>
+      {/* 分页 */}
+      {/* <Pagination
+        className={'pagination-style'}
+        defaultCurrent={1}
+        total={20}
+        showSizeChanger={false}
+        onChange={changePage}
+      /> */}
     </Wrapper>
   )
 }

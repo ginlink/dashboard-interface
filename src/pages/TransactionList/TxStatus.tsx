@@ -1,7 +1,6 @@
-import { useTransactionProxy } from '@/hooks/useContract'
-import React, { useState, useMemo, useEffect } from 'react'
+import React from 'react'
 import styled from 'styled-components/macro'
-import { APPROVENUM, OWNERARR, useTxStatus } from './hooks'
+import { useTxStatus } from './hooks'
 import { RowItemType } from './TableRowModal'
 
 type TxStatusType = {

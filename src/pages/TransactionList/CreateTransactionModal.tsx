@@ -211,9 +211,9 @@ export default function CreateTransactionModal({
             <Input value={arg} onChange={changeArg} allowClear={true} placeholder={funcParams} />
           </InputItem>
         </InputBox>
-      )} */}
-
-      {/* <ButtonPrimary onClick={onFinished}>创建</ButtonPrimary> */}
+      )}
+        <ButtonPrimary onClick={onFinished}>创建</ButtonPrimary>
+      */}
       {callType === CallType.TRANSFER ? (
         <Form
           labelCol={{ span: 5 }}
