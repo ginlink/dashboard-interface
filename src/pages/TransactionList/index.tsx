@@ -1,7 +1,17 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import styled from 'styled-components/macro'
 import { Table } from 'antd'
 import { getTransctionList, addTx } from '@/services/api'
+import { Modal, Button, Pagination } from 'antd'
+import {
+  APPROVENUM,
+  OWNERARR,
+  TransactionSubmitProps,
+  TXSTATE,
+  TYPESTATE,
+  useSignatureBytes,
+  useTransacitonSubmitData,
+} from './hooks'
 import { message } from 'antd'
 import CreateTransactionModal, { CallType, MethodParams, TransferParams } from './CreateTransactionModal'
 import { ButtonPrimary } from '@/components/Button'
@@ -17,6 +27,7 @@ import { Contract } from '@ethersproject/contracts'
 import { bundleCallData, getExecByteData } from './util'
 import { SafeTransaction } from '@/utils/execution'
 import BigFloatNumber from 'bignumber.js'
+import { useSingleCallResult } from '@/state/multicall/hooks'
 
 const processingData = function (hash: string) {
   if (hash) {
@@ -56,8 +67,8 @@ const columns = [
   },
   {
     title: '事务状态',
-    dataIndex: 'tx_id',
-    key: 'tx_id',
+    dataIndex: 'tx_state',
+    key: 'tx_state',
     width: 120,
     render: (text: string, record: RowItemType) => <TxStatus text={text} record={record}></TxStatus>,
   },
@@ -170,10 +181,15 @@ export default function TransactionList() {
 
   const [callType, setCallType] = useState(CallType.TRANSFER)
 
-  const [nonce, setNonce] = useState<number | undefined>(undefined)
+  // const [nonce, setNonce] = useState<number | undefined>(undefined)
 
   const transactionProxy = useTransactionProxy()
+  const { result } = useSingleCallResult(transactionProxy, 'nonce')
 
+  const nonce = useMemo(() => {
+    if (!result) return
+    return result[0].toNumber()
+  }, [result])
   const tokenContract = useTokenContract(tokenAddress)
 
   const multiSendContract = useTransactionMultiSend()
@@ -196,30 +212,59 @@ export default function TransactionList() {
     })
   }, [tokenContract])
 
-  // get nonce
-  useEffect(() => {
-    if (!proxySinger) return
+  //初始化start
+  const getDataLists = useCallback(async () => {
+    if (!transactionProxy) {
+      setDataList([])
+      return
+    }
+    if (!nonce) {
+      setDataList([])
+      return
+    }
+    const res = await getTransctionList()
+    //事务状态处理
+    res.map((item: any) => {
+      const promiseArr: Array<any> = []
+      OWNERARR.map((v: string) => {
+        promiseArr.push(transactionProxy?.approvedHashes(v, item.tx_hash))
+      })
+      let count = 0
+      Promise.all(promiseArr).then((res) => {
+        console.log('res:', res, nonce)
+        res.map((v) => {
+          if (v.toNumber()) count += 1
+        })
+      })
+      if (count >= APPROVENUM && nonce > Number(item.tx_id)) {
+        item.tx_state = TXSTATE.COMPLETED
+      } else if (count >= 0 && nonce == Number(item.tx_id)) {
+        item.tx_state = TXSTATE.HAVEINHAND
+      } else {
+        item.tx_state = TXSTATE.INVALID
+      }
+    })
+    setDataList(res)
+  }, [nonce, transactionProxy])
 
-    // nonce不会很大，用toNumber
-    proxySinger.nonce().then((res) => setNonce(res.toNumber()))
-  }, [proxySinger])
+  useEffect(() => {
+    getDataLists()
+  }, [getDataLists])
+  //初始化end
+
+  // get nonce
+  // useEffect(() => {
+  //   if (!proxySinger) return
+
+  //   // nonce不会很大，用toNumber
+  //   proxySinger.nonce().then((res) => setNonce(res.toNumber()))
+  // }, [proxySinger])
 
   const resetDataList = useCallback(async () => {
     const list = await getTransctionList()
 
     // refresh
     setDataList(list)
-  }, [])
-
-  const onViewRow = useCallback((row: RowItemType) => {
-    setRowData(row)
-    setOpenRow(true)
-
-    // if (!!row.tx_hash) {
-    //   setOpenRow(true)
-    // } else {
-    //   message.warning('已失效')
-    // }
   }, [])
 
   const onCreateFinishedHandler = useCallback(
@@ -331,10 +376,7 @@ export default function TransactionList() {
         debugger
         await proxySinger.approveHash(safeApproveHash)
 
-        // api
-        await addTx(addParam)
-
-        resetDataList()
+        getDataLists()
 
         setTokenAddress('')
         setContract(undefined)
@@ -404,6 +446,15 @@ export default function TransactionList() {
     [chainId, transactionProxy]
   )
 
+  const onViewRow = useCallback((row: RowItemType) => {
+    setRowData(row)
+    if (row.tx_state !== TXSTATE.INVALID) {
+      setOpenRow(true)
+    } else {
+      message.warning('已失效')
+    }
+  }, [])
+
   // debug
   useEffect(() => {
     console.log('[](contract):', contract)
@@ -451,6 +502,14 @@ export default function TransactionList() {
         openRow={openRow}
         item={rowData}
       ></TableRowModal>
+      {/* 分页 */}
+      {/* <Pagination
+        className={'pagination-style'}
+        defaultCurrent={1}
+        total={20}
+        showSizeChanger={false}
+        onChange={changePage}
+      /> */}
     </Wrapper>
   )
 }

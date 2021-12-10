@@ -15,6 +15,11 @@ export enum TYPESTATE {
   TRANSFER = 1,
   METHOD = 2,
 }
+export enum TXSTATE {
+  COMPLETED = 1,
+  HAVEINHAND = 2,
+  INVALID = 3,
+}
 export const APPROVENUM = 2
 export const OWNERARR: Array<string> = [
   '0x0F70D0661bA51a0383f59E76dC0f2d44703A8680',
@@ -24,6 +29,7 @@ export const OWNERARR: Array<string> = [
 ]
 
 import { Erc20 } from '@/abis/types'
+import { useSingleCallResult } from '@/state/multicall/hooks'
 
 export type TransactionSubmitProps = {
   contract?: any
@@ -86,24 +92,26 @@ export function useSignatureBytes(owner: any[]) {
   }, [owner])
 }
 
+//事务状态处理
 export function useTxStatus(record: RowItemType) {
   const transactionProxy = useTransactionProxy()
-  const [nonce, setNonce] = useState<number | undefined>(undefined)
   const [currentApproveNum, setCurrentApproveNum] = useState<number>(0)
+
+  const { result } = useSingleCallResult(transactionProxy, 'nonce')
+
+  const nonce = useMemo(() => {
+    if (!result) return
+    return result[0].toNumber()
+  }, [result])
 
   useEffect(() => {
     if (!transactionProxy) return
     if (!record) return
-
-    transactionProxy.nonce().then((res) => {
-      setNonce(res.toNumber())
-    })
     const promiseArr: Array<any> = []
     OWNERARR.map((v: string) => {
       promiseArr.push(transactionProxy?.approvedHashes(v, record.tx_hash))
     })
     Promise.all(promiseArr).then((res) => {
-      console.log('res:', res, nonce)
       let count = 0
       res.map((v) => {
         if (v.toNumber()) count += 1
