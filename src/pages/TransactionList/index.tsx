@@ -67,8 +67,8 @@ const columns = [
   },
   {
     title: '事务状态',
-    dataIndex: 'tx_id',
-    key: 'tx_id',
+    dataIndex: 'tx_state',
+    key: 'tx_state',
     width: 120,
     render: (text: string, record: RowItemType) => <TxStatus text={text} record={record}></TxStatus>,
   },
