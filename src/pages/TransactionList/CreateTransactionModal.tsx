@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import styled from 'styled-components/macro'
 import Modal from '@/components/Modal'
 import CloseOutlined from '@ant-design/icons/lib/icons/CloseOutlined'
-import { Space, Radio, Input, Select, message } from 'antd'
+import { Space, Radio, Input, Select, message, Form, Button } from 'antd'
 import { ButtonPrimary } from '@/components/Button'
 import { TYPESTATE } from './hooks'
 
@@ -27,7 +27,9 @@ const CloseWrapper = styled.div`
 const InputBox = styled.div`
   margin-top: 18px;
 `
-
+const SpaceBox = styled.div`
+  margin: 20px 0;
+`
 const InputItem = styled.div`
   display: flex;
   align-items: center;
@@ -124,6 +126,22 @@ export default function CreateTransactionModal({
     [contractMethods]
   )
 
+  const onFinish = (values: any) => {
+    if (!onFinished) return
+    console.log('参数', values)
+    onFinished(values)
+  }
+
+  const rules = useMemo(() => {
+    return {
+      fromAddress: [{ required: true, message: '请输入token地址!' }],
+      toAddress: [{ required: true, message: '请输入接收人地址!' }],
+      amount: [{ required: true, message: '请输入数量!' }],
+      contractName: [{ required: true, message: '请选择合约类型!' }],
+      funcParams: [{ required: true, message: '请选择合约方法!' }],
+      arg: [{ required: true, message: '请输入参数!' }],
+    }
+  }, [])
   return (
     <Modal isOpen={isOpen}>
       <CloseWrapper onClick={() => onClose && onClose()}>
@@ -131,19 +149,19 @@ export default function CreateTransactionModal({
       </CloseWrapper>
       <Space>
         <Radio.Group
-          value={createType}
+          value={callType}
           onChange={(e) => {
             const type: CallType = e.target.value
             setCallType(type)
             onChangeCallType && onChangeCallType(type)
           }}
         >
-          <Radio value={TYPESTATE.TRANSFER}>转账</Radio>
-          <Radio value={TYPESTATE.METHOD}>方法</Radio>
+          <Radio value={CallType.TRANSFER}>转账</Radio>
+          <Radio value={CallType.METHOD}>方法</Radio>
         </Radio.Group>
       </Space>
-
-      {callType === CallType.TRANSFER ? (
+      <SpaceBox></SpaceBox>
+      {/* {callType === CallType.TRANSFER ? (
         <InputBox>
           <InputItem>
             <label>token地址</label>
@@ -193,9 +211,75 @@ export default function CreateTransactionModal({
             <Input value={arg} onChange={changeArg} allowClear={true} placeholder={funcParams} />
           </InputItem>
         </InputBox>
-      )}
+      )} */}
 
-      <ButtonPrimary onClick={onFinished}>创建</ButtonPrimary>
+      {/* <ButtonPrimary onClick={onFinished}>创建</ButtonPrimary> */}
+      {callType === CallType.TRANSFER ? (
+        <Form
+          labelCol={{ span: 5 }}
+          wrapperCol={{ span: 20 }}
+          initialValues={{ remember: false }}
+          onFinish={onFinish}
+          autoComplete="off"
+        >
+          <Form.Item label="token地址" name="fromAddress" rules={rules.fromAddress}>
+            <Input allowClear={true} placeholder="token地址" />
+          </Form.Item>
+          <Form.Item label="接收人地址" name="toAddress" rules={rules.toAddress}>
+            <Input allowClear={true} placeholder="接收人地址" />
+          </Form.Item>
+          <Form.Item label="数量" name="amount" rules={rules.amount}>
+            <Input allowClear={true} placeholder="数量" />
+          </Form.Item>
+          <Form.Item wrapperCol={{ offset: 5, span: 20 }}>
+            <Button type="primary" htmlType="submit">
+              创建
+            </Button>
+          </Form.Item>
+        </Form>
+      ) : (
+        <Form
+          labelCol={{ span: 5 }}
+          wrapperCol={{ span: 20 }}
+          initialValues={{ remember: false }}
+          onFinish={onFinish}
+          autoComplete="off"
+        >
+          <Form.Item label="合约类型" name="contractName" rules={rules.contractName}>
+            <Select defaultValue="" style={{ width: '100%' }} allowClear onChange={onChangeContractHandler}>
+              {parsedAbis &&
+                Object.keys(parsedAbis).map((key, index) => {
+                  return (
+                    <Option value={key} key={index}>
+                      {key}
+                    </Option>
+                  )
+                })}
+            </Select>
+          </Form.Item>
+          <Form.Item label="合约方法" name="funcParams" rules={rules.funcParams}>
+            <Select onChange={onChangeMethodHandler} style={{ width: '100%' }} allowClear>
+              {contractMethods &&
+                contractMethods.map((item, index) => {
+                  const { nameAndParam } = item
+                  return (
+                    <Option value={nameAndParam ?? ''} key={index}>
+                      {nameAndParam}
+                    </Option>
+                  )
+                })}
+            </Select>
+          </Form.Item>
+          <Form.Item label="合约参数" name="arg" rules={rules.arg}>
+            <Input placeholder={funcParams} allowClear={true} />
+          </Form.Item>
+          <Form.Item wrapperCol={{ offset: 5, span: 20 }}>
+            <Button type="primary" htmlType="submit">
+              创建
+            </Button>
+          </Form.Item>
+        </Form>
+      )}
     </Modal>
   )
 }

@@ -52,18 +52,12 @@ const columns = [
     key: 'tx_id',
     width: 120,
   },
-  // {
-  //   title: '授权hash',
-  //   dataIndex: 'tx_hash',
-  //   key: 'tx_hash',
-  //   render: (text: any) => processingData(text),
-  // },
   {
     title: '事务状态',
     dataIndex: 'tx_id',
     key: 'tx_id',
     width: 120,
-    render: (text: any) => <TxStatus text={text}></TxStatus>,
+    render: (text: string, record: RowItemType) => <TxStatus text={text} record={record}></TxStatus>,
   },
   {
     title: '事务类型',
@@ -124,11 +118,6 @@ const columns = [
     key: 'tx_amount',
     width: 300,
   },
-  // {
-  //   title: '方法参数',
-  //   dataIndex: 'tx_fun_arg',
-  //   key: 'tx_fun_arg',
-  // },
 ]
 
 const Wrapper = styled.div`
@@ -222,12 +211,13 @@ export default function TransactionList() {
 
   const onViewRow = useCallback((row: RowItemType) => {
     setRowData(row)
+    setOpenRow(true)
 
-    if (!!row.tx_hash) {
-      setOpenRow(true)
-    } else {
-      message.warning('已失效')
-    }
+    // if (!!row.tx_hash) {
+    //   setOpenRow(true)
+    // } else {
+    //   message.warning('已失效')
+    // }
   }, [])
 
   const onCreateFinishedHandler = useCallback(
