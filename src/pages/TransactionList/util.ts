@@ -138,6 +138,8 @@ export function bundleCallData({
   nonce,
   chainId,
 }: BundleCallDataProps): [SafeTransaction | undefined, string | undefined] {
+  debugger
+
   if (nonce === undefined) return [undefined, undefined]
 
   if (!contract || !multiSendContract || !safeAddress || !method || !params || !chainId) return [undefined, undefined]
@@ -151,8 +153,8 @@ export function bundleCallData({
       txs = [buildSafeTransaction({ to: contract.address, data, safeTxGas: 1000000, nonce: nonce })]
       break
 
-    case CallType.TRANSFER:
-      txs = [buildContractCall(contract, method, params, 0)]
+    case CallType.METHOD:
+      txs = [buildContractCall(contract, method, params, nonce)]
       break
 
     default:

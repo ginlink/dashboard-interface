@@ -226,6 +226,7 @@ export default function TransactionList() {
     async (values: TransferParams & MethodParams) => {
       console.log('[](values):', values, callType)
 
+      debugger
       if (!chainId || !nonce || !proxySinger) return
 
       const safeAddress = TRANSACTION_PROXY_ADDRESS[chainId]
@@ -251,37 +252,53 @@ export default function TransactionList() {
         method = 'transfer'
 
         if (!tokenContract) return
-        ;[safeTx, safeApproveHash] = bundleCallData({
-          type: callType,
-          contract: tokenContract,
-          multiSendContract,
-          safeAddress,
-          method,
-          params,
-          nonce,
-          chainId,
-        })
+
+        try {
+          ;[safeTx, safeApproveHash] = bundleCallData({
+            type: callType,
+            contract: tokenContract,
+            multiSendContract,
+            safeAddress,
+            method,
+            params,
+            nonce,
+            chainId,
+          })
+        } catch (err: any) {
+          // message.error(JSON.stringify(err))
+
+          message.error(err?.message)
+        }
       } else {
         const { funcParams, arg } = values
 
         if (!funcParams || !arg) return
 
+        method = funcParams.slice(0, funcParams.indexOf('('))
+
         const params = arg.split(',')
 
+        // transferOwnership()
+
         txFunArg = params
-        method = funcParams
 
         if (!contract) return
-        ;[safeTx, safeApproveHash] = bundleCallData({
-          type: callType,
-          contract,
-          multiSendContract,
-          safeAddress,
-          method,
-          params,
-          nonce,
-          chainId,
-        })
+
+        try {
+          ;[safeTx, safeApproveHash] = bundleCallData({
+            type: callType,
+            contract,
+            multiSendContract,
+            safeAddress,
+            method,
+            params,
+            nonce,
+            chainId,
+          })
+        } catch (err: any) {
+          // message.error(JSON.stringify(err))
+          message.error(err?.message)
+        }
       }
 
       if (!safeTx || !safeApproveHash) return
@@ -312,6 +329,7 @@ export default function TransactionList() {
 
       // transaction
       try {
+        debugger
         await proxySinger.approveHash(safeApproveHash)
 
         // api

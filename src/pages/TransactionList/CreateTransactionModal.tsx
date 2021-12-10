@@ -15,6 +15,7 @@ import { getSignerOrProvider, SWAP_MINING_ADDRESSES } from '@/hooks/useContract'
 import { useActiveWeb3React } from '@/hooks/web3'
 import { TRANSACTION_OPERATABLE_ADDRESS, TRANSACTION_POSITION_REWARD_ADDRESS } from '@/constants/address'
 import { isAddress } from '@ethersproject/address'
+import { FuncType } from '../CallAdmin/util'
 
 const { Option } = Select
 
@@ -98,7 +99,7 @@ export default function CreateTransactionModal({
   const contractMethods = useMemo(() => {
     if (!parsedAbis || !contractName) return
 
-    return parsedAbis[contractName].funcs
+    return parsedAbis[contractName].funcs?.filter((item) => item.type == FuncType.WRITE)
   }, [contractName])
 
   const onChangeContractHandler = useCallback(
