@@ -35,26 +35,18 @@ const InputItem = styled.div`
   }
 `
 
+export enum CallType {
+  TRANSFER = 1,
+  METHOD,
+}
+
 const { Option } = Select
-type CreateTransactionType = {
+
+export type CreateTransactionProps = {
   isOpen: boolean
-  onClose: () => void
-  fromAddress?: string
-  changeFromAddress: (e: any) => void
-  toAddress?: string
-  changeToAddress: (e: any) => void
-  amount?: string
-  changeAmount: (e: any) => void
-  address?: string
-  changeAddress: (e: any) => void
-  method?: string
-  changeMethod: (e: any) => void
-  arg?: string
-  changeArg: (e: any) => void
-  createFn: () => void
-  createType: number
-  onChangeCreateType: (e: any) => void
-  changeContract?: (contract: Contract | undefined) => void
+  onClose?: () => void
+  onChangeCallType?: (type: CallType) => void
+  onFinished?: (values: any) => void
 }
 
 const abiArr = [swapMiningAbi, ownableAbi, positionRewardAbi]
@@ -65,26 +57,16 @@ console.log('[](parsedAbis):', parsedAbis)
 export default function CreateTransactionModal({
   isOpen,
   onClose,
-  fromAddress,
-  changeFromAddress,
-  toAddress,
-  changeToAddress,
-  createFn,
-  createType,
-  onChangeCreateType,
-  amount,
-  changeAmount,
-  method,
-  changeMethod,
-  arg,
-  changeArg,
-  changeContract,
-}: CreateTransactionType) {
+  onChangeCallType,
+  onFinished,
+}: CreateTransactionProps) {
   const { library, account, chainId } = useActiveWeb3React()
 
   const [funcParams, setFuncParams] = useState<string | undefined>(undefined)
 
   const [contractName, setContractName] = useState<string | undefined>(undefined)
+
+  const [callType, setCallType] = useState(CallType.TRANSFER)
 
   const contractAddresses: ContractAddresses | undefined = useMemo(() => {
     if (!chainId) return
@@ -149,12 +131,20 @@ export default function CreateTransactionModal({
         <CloseOutlined />
       </CloseWrapper>
       <Space>
-        <Radio.Group onChange={onChangeCreateType} value={createType}>
+        <Radio.Group
+          value={createType}
+          onChange={(e) => {
+            const type: CallType = e.target.value
+            setCallType(type)
+            onChangeCallType && onChangeCallType(type)
+          }}
+        >
           <Radio value={TYPESTATE.TRANSFER}>转账</Radio>
           <Radio value={TYPESTATE.METHOD}>方法</Radio>
         </Radio.Group>
       </Space>
-      {createType === TYPESTATE.TRANSFER ? (
+
+      {callType === CallType.TRANSFER ? (
         <InputBox>
           <InputItem>
             <label>token地址</label>
@@ -206,7 +196,7 @@ export default function CreateTransactionModal({
         </InputBox>
       )}
 
-      <ButtonPrimary onClick={createFn}>创建</ButtonPrimary>
+      <ButtonPrimary onClick={onFinished}>创建</ButtonPrimary>
     </Modal>
   )
 }
