@@ -86,7 +86,7 @@ export default function CreateTransactionModal({
 
   const [optionArr, setOptionArr] = useState<Array<any>>([
     {
-      name: 'swap-mining',
+      name: '交易挖矿',
       key: 1,
     },
     {
@@ -94,7 +94,7 @@ export default function CreateTransactionModal({
       key: 2,
     },
     {
-      name: 'position-reward',
+      name: '流动性挖矿',
       key: 3,
     },
   ])
