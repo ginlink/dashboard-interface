@@ -15,6 +15,8 @@ import { getSignerOrProvider, SWAP_MINING_ADDRESSES } from '@/hooks/useContract'
 import { useActiveWeb3React } from '@/hooks/web3'
 import { TRANSACTION_OPERATABLE_ADDRESS, TRANSACTION_POSITION_REWARD_ADDRESS } from '@/constants/address'
 
+const { Option } = Select
+
 const CloseWrapper = styled.div`
   position: absolute;
   right: 20px;
@@ -40,13 +42,12 @@ export enum CallType {
   METHOD,
 }
 
-const { Option } = Select
-
 export type CreateTransactionProps = {
   isOpen: boolean
   onClose?: () => void
   onChangeCallType?: (type: CallType) => void
   onFinished?: (values: any) => void
+  onChangeContract?: (contract: any) => void
 }
 
 const abiArr = [swapMiningAbi, ownableAbi, positionRewardAbi]
@@ -59,6 +60,7 @@ export default function CreateTransactionModal({
   onClose,
   onChangeCallType,
   onFinished,
+  onChangeContract,
 }: CreateTransactionProps) {
   const { library, account, chainId } = useActiveWeb3React()
 
@@ -104,9 +106,9 @@ export default function CreateTransactionModal({
 
       if (!contract) return message.warning('[err] create contract')
 
-      changeContract && changeContract(contract)
+      onChangeContract && onChangeContract(contract)
     },
-    [account, changeContract, contractAddresses, library]
+    [account, onChangeContract, contractAddresses, library]
   )
 
   const onChangeMethodHandler = useCallback(
@@ -114,15 +116,12 @@ export default function CreateTransactionModal({
       debugger
       if (!methodName || !contractMethods) return
 
-      // update parent
-      changeMethod(methodName)
-
       // update placeholder param
       const { key: index } = option
       const funcParam = contractMethods[index].param
       setFuncParams(funcParam)
     },
-    [changeMethod, contractMethods]
+    [contractMethods]
   )
 
   return (
