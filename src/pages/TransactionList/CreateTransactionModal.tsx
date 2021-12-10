@@ -14,6 +14,7 @@ import { Contract } from '@ethersproject/contracts'
 import { getSignerOrProvider, SWAP_MINING_ADDRESSES } from '@/hooks/useContract'
 import { useActiveWeb3React } from '@/hooks/web3'
 import { TRANSACTION_OPERATABLE_ADDRESS, TRANSACTION_POSITION_REWARD_ADDRESS } from '@/constants/address'
+import { isAddress } from '@ethersproject/address'
 
 const { Option } = Select
 
@@ -38,6 +39,18 @@ const InputItem = styled.div`
     width: 20%;
   }
 `
+
+export type TransferParams = {
+  amount?: string
+  fromAddress?: string
+  toAddress?: string
+}
+
+export type MethodParams = {
+  contractName?: string
+  funcParams?: string
+  arg?: string
+}
 
 export enum CallType {
   TRANSFER = 1,
@@ -134,14 +147,33 @@ export default function CreateTransactionModal({
 
   const rules = useMemo(() => {
     return {
-      fromAddress: [{ required: true, message: '请输入token地址!' }],
-      toAddress: [{ required: true, message: '请输入接收人地址!' }],
+      fromAddress: [
+        { required: true, message: '请输入token地址!' },
+        ({ getFieldValue }: { getFieldValue: any }) => ({
+          validator(_: any, value: string) {
+            if (!isAddress(value)) return Promise.reject('地址格式错误')
+
+            return Promise.resolve()
+          },
+        }),
+      ],
+      toAddress: [
+        { required: true, message: '请输入接收人地址!' },
+        ({ getFieldValue }: { getFieldValue: any }) => ({
+          validator(_: any, value: string) {
+            if (!isAddress(value)) return Promise.reject('地址格式错误')
+
+            return Promise.resolve()
+          },
+        }),
+      ],
       amount: [{ required: true, message: '请输入数量!' }],
       contractName: [{ required: true, message: '请选择合约类型!' }],
       funcParams: [{ required: true, message: '请选择合约方法!' }],
       arg: [{ required: true, message: '请输入参数!' }],
     }
   }, [])
+
   return (
     <Modal isOpen={isOpen}>
       <CloseWrapper onClick={() => onClose && onClose()}>
@@ -161,59 +193,7 @@ export default function CreateTransactionModal({
         </Radio.Group>
       </Space>
       <SpaceBox></SpaceBox>
-      {/* {callType === CallType.TRANSFER ? (
-        <InputBox>
-          <InputItem>
-            <label>token地址</label>
-            <Input allowClear={true} value={fromAddress} onChange={changeFromAddress} placeholder="from" />
-          </InputItem>
-          <InputItem>
-            <label>接收人地址</label>
-            <Input allowClear={true} value={toAddress} onChange={changeToAddress} placeholder="to" />
-          </InputItem>
-          <InputItem>
-            <label>数量</label>
-            <Input type="number" value={amount} onChange={changeAmount} allowClear={true} placeholder="amount" />
-          </InputItem>
-        </InputBox>
-      ) : (
-        <InputBox>
-          <InputItem>
-            <label>合约类型</label>
-            <Select defaultValue="" style={{ width: '100%' }} allowClear onChange={onChangeContractHandler}>
-              {parsedAbis &&
-                Object.keys(parsedAbis).map((key, index) => {
-                  return (
-                    <Option value={key} key={index}>
-                      {key}
-                    </Option>
-                  )
-                })}
-            </Select>
-          </InputItem>
-          <InputItem>
-            <label>合约方法</label>
-            <Select onChange={onChangeMethodHandler} style={{ width: '100%' }} allowClear>
-              {contractMethods &&
-                contractMethods.map((item, index) => {
-                  const { nameAndParam } = item
 
-                  return (
-                    <Option value={nameAndParam ?? ''} key={index}>
-                      {nameAndParam}
-                    </Option>
-                  )
-                })}
-            </Select>
-          </InputItem>
-          <InputItem>
-            <label>合约参数</label>
-            <Input value={arg} onChange={changeArg} allowClear={true} placeholder={funcParams} />
-          </InputItem>
-        </InputBox>
-      )} */}
-
-      {/* <ButtonPrimary onClick={onFinished}>创建</ButtonPrimary> */}
       {callType === CallType.TRANSFER ? (
         <Form
           labelCol={{ span: 5 }}

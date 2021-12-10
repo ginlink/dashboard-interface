@@ -137,13 +137,10 @@ export function bundleCallData({
   params,
   nonce,
   chainId,
-}: BundleCallDataProps): {
-  safeTx?: SafeTransaction
-  safeApproveHash?: string
-} {
-  if (nonce === undefined) return {}
+}: BundleCallDataProps): [SafeTransaction | undefined, string | undefined] {
+  if (nonce === undefined) return [undefined, undefined]
 
-  if (!contract || !multiSendContract || !safeAddress || !method || !params || !chainId) return {}
+  if (!contract || !multiSendContract || !safeAddress || !method || !params || !chainId) return [undefined, undefined]
 
   let txs: SafeTransaction[] | undefined = undefined
 
@@ -162,16 +159,13 @@ export function bundleCallData({
       break
   }
 
-  if (!txs) return {}
+  if (!txs) return [undefined, undefined]
 
   const safeTx = buildMultiSendSafeTx(multiSendContract, txs, nonce)
 
   const safeApproveHash = calculateSafeTransactionHash(safeAddress, safeTx, chainId)
 
-  return {
-    safeTx,
-    safeApproveHash,
-  }
+  return [safeTx, safeApproveHash]
 }
 
 export function getExecByteData() {

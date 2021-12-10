@@ -3,7 +3,7 @@ import styled from 'styled-components/macro'
 import { Table } from 'antd'
 import { getTransctionList, addTx } from '@/services/api'
 import { message } from 'antd'
-import CreateTransactionModal, { CallType } from './CreateTransactionModal'
+import CreateTransactionModal, { CallType, MethodParams, TransferParams } from './CreateTransactionModal'
 import { ButtonPrimary } from '@/components/Button'
 import TableRowModal, { RowItemType } from './TableRowModal'
 import { useTokenContract, useTransactionMultiSend, useTransactionProxy } from '@/hooks/useContract'
@@ -15,6 +15,8 @@ import TxStatus from './TxStatus'
 import { TRANSACTION_MULTISEND_ADDRESS, TRANSACTION_PROXY_ADDRESS } from '@/constants/address'
 import { Contract } from '@ethersproject/contracts'
 import { bundleCallData, getExecByteData } from './util'
+import { SafeTransaction } from '@/utils/execution'
+import BigFloatNumber from 'bignumber.js'
 
 const processingData = function (hash: string) {
   if (hash) {
@@ -221,32 +223,70 @@ export default function TransactionList() {
   }, [])
 
   const onCreateFinishedHandler = useCallback(
-    async (values: any) => {
+    async (values: TransferParams & MethodParams) => {
       console.log('[](values):', values, callType)
-      if (!chainId || !nonce || !proxySinger || !tokenContract || !contract) return
 
-      const { method, params } = values
-
-      if (!method || !params) return
+      if (!chainId || !nonce || !proxySinger) return
 
       const safeAddress = TRANSACTION_PROXY_ADDRESS[chainId]
 
-      // TODO处理amount * 10**18
-
       // bundle data
-      const { safeTx, safeApproveHash } = bundleCallData({
-        type: callType,
-        contract: callType ? tokenContract : contract,
-        multiSendContract,
-        safeAddress,
-        method,
-        params,
-        nonce,
-        chainId,
-      })
+      let [safeTx, safeApproveHash]: [SafeTransaction | undefined, string | undefined] = [undefined, undefined]
+
+      let txFunArg: any[] = []
+      let method = ''
+
+      if (callType === CallType.TRANSFER) {
+        const { fromAddress, toAddress, amount } = values
+
+        if (!fromAddress || !toAddress || !amount) return
+        setTokenAddress(fromAddress)
+
+        if (!decimals) return
+
+        const bigAmount = new BigFloatNumber(amount).multipliedBy(new BigFloatNumber(10).pow(decimals))
+
+        const params = [toAddress, bigAmount.toFixed()]
+        txFunArg = params
+        method = 'transfer'
+
+        if (!tokenContract) return
+        ;[safeTx, safeApproveHash] = bundleCallData({
+          type: callType,
+          contract: tokenContract,
+          multiSendContract,
+          safeAddress,
+          method,
+          params,
+          nonce,
+          chainId,
+        })
+      } else {
+        const { funcParams, arg } = values
+
+        if (!funcParams || !arg) return
+
+        const params = arg.split(',')
+
+        txFunArg = params
+        method = funcParams
+
+        if (!contract) return
+        ;[safeTx, safeApproveHash] = bundleCallData({
+          type: callType,
+          contract,
+          multiSendContract,
+          safeAddress,
+          method,
+          params,
+          nonce,
+          chainId,
+        })
+      }
 
       if (!safeTx || !safeApproveHash) return
 
+      // bundle api data
       const addParam = {
         txType: callType,
         txId: nonce,
@@ -254,14 +294,14 @@ export default function TransactionList() {
         txTo: '',
         txAmount: '',
         txHash: safeApproveHash,
-        txFunArg: params.join(','),
+        txFunArg: txFunArg.join(','),
         txData: safeTx.data,
         txProaddr: safeAddress,
         txFun: '',
       }
 
       if (callType === CallType.TRANSFER) {
-        addParam.txAmount = params?.[1]?.toString()
+        addParam.txAmount = txFunArg?.[1]?.toString()
         addParam.txHash = safeApproveHash
         addParam.txFun = 'transfer'
         addParam.txFrom = tokenAddress || ''
@@ -280,12 +320,24 @@ export default function TransactionList() {
         resetDataList()
 
         setTokenAddress('')
+        setContract(undefined)
         setIsOpen(false)
       } catch (err) {
         console.log('[onCreateHandler](err):', err)
       }
     },
-    [callType, chainId, contract, tokenAddress, multiSendContract, nonce, proxySinger, resetDataList, tokenContract]
+    [
+      callType,
+      chainId,
+      nonce,
+      proxySinger,
+      decimals,
+      tokenContract,
+      multiSendContract,
+      contract,
+      tokenAddress,
+      resetDataList,
+    ]
   )
 
   const onApproveHandler = useCallback(
