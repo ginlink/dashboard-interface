@@ -13,7 +13,7 @@ import { ContractAddresses, parseAbis, StaticBaseContract } from './util'
 import { Contract } from '@ethersproject/contracts'
 import { getSignerOrProvider, SWAP_MINING_ADDRESSES } from '@/hooks/useContract'
 import { useActiveWeb3React } from '@/hooks/web3'
-import { TRANSACTION_OPERATABLE_ADDRESS, TRANSACTION_POSITION_REWARD_ADDRESS } from '@/constants/address'
+import { TRANSACTION_OPERATABLE_ADDRESS, TRANSACTION_POSITION_REWARD_ADDRESS } from '@/constants/addresses'
 import { isAddress } from '@ethersproject/address'
 import { FuncType } from '../CallAdmin/util'
 
