@@ -6,7 +6,7 @@ import { Modal, Button, message } from 'antd'
 import CreateTransactionModal from './CreateTransactionModal'
 import { ButtonPrimary } from '@/components/Button'
 import TableRowModal, { RowItemType } from './TableRowModal'
-import { TransactionSubmitProps, TYPESTATE, useSignatureBytes, useTransacitonSubmitData } from './hooks'
+import { OWNERARR, TransactionSubmitProps, TYPESTATE, useSignatureBytes, useTransacitonSubmitData } from './hooks'
 import { useTokenContract, useTransactionProxy } from '@/hooks/useContract'
 import { useActiveWeb3React } from '@/hooks/web3'
 import fu from '@/assets/images/fu.png'
@@ -51,18 +51,12 @@ const columns = [
     key: 'tx_id',
     width: 120,
   },
-  // {
-  //   title: '授权hash',
-  //   dataIndex: 'tx_hash',
-  //   key: 'tx_hash',
-  //   render: (text: any) => processingData(text),
-  // },
   {
     title: '事务状态',
     dataIndex: 'tx_id',
     key: 'tx_id',
     width: 120,
-    render: (text: any) => <TxStatus text={text}></TxStatus>,
+    render: (text: string, record: RowItemType) => <TxStatus text={text} record={record}></TxStatus>,
   },
   {
     title: '事务类型',
@@ -123,11 +117,6 @@ const columns = [
     key: 'tx_amount',
     width: 300,
   },
-  // {
-  //   title: '方法参数',
-  //   dataIndex: 'tx_fun_arg',
-  //   key: 'tx_fun_arg',
-  // },
 ]
 
 const Wrapper = styled.div`
@@ -185,15 +174,7 @@ export default function TransactionList() {
 
   const tokenContract = useTokenContract(fromAddress)
 
-  const OWNER = useMemo(
-    () => [
-      '0x0F70D0661bA51a0383f59E76dC0f2d44703A8680',
-      '0xD06803c7cE034098CB332Af4C647f293C8BcD76a',
-      '0xf0a734400c8BD2e80Ba166940B904C59Dd08b6F0',
-      '0xBf992941F09310b53A9F3436b0F40B25bCcc2C33',
-    ],
-    []
-  )
+  const OWNER = useMemo(() => OWNERARR, [])
 
   const singerByteData = useSignatureBytes(OWNER)
 
@@ -415,15 +396,14 @@ export default function TransactionList() {
     },
     [chainId, singerByteData, transactionProxy]
   )
-
   const onViewRow = useCallback((row: RowItemType) => {
     setRowData(row)
-
-    if (!!row.tx_hash) {
-      setOpenRow(true)
-    } else {
-      message.warning('已失效')
-    }
+    setOpenRow(true)
+    // if (!!row.tx_hash) {
+    //   setOpenRow(true)
+    // } else {
+    //   message.warning('已失效')
+    // }
   }, [])
 
   // debug
@@ -461,29 +441,7 @@ export default function TransactionList() {
         columns={columns}
         dataSource={dataList}
       />
-      <CreateTransactionModal
-        onClose={() => setIsOpen(false)}
-        isOpen={isOpen}
-        fromAddress={fromAddress}
-        changeFromAddress={changeFromAddress}
-        toAddress={toAddress}
-        changeToAddress={changeToAddress}
-        amount={amount}
-        changeAmount={changeAmount}
-        method={method}
-        changeMethod={changeMethod}
-        address={address}
-        changeAddress={changeAddress}
-        arg={arg}
-        changeArg={changeArg}
-        createFn={onCreateHandler}
-        createType={createType}
-        onChangeCreateType={onChangeCreateType}
-        changeContract={(contract) => {
-          setContract(contract)
-          setMethodAddress(contract?.address)
-        }}
-      ></CreateTransactionModal>
+      <CreateTransactionModal onClose={() => setIsOpen(false)} isOpen={isOpen}></CreateTransactionModal>
 
       <TableRowModal
         approveFn={onApproveHandler}

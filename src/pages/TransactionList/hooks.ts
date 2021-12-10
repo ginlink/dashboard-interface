@@ -1,5 +1,5 @@
 import { BigNumberish } from 'ethers'
-
+import { RowItemType } from './TableRowModal'
 import {
   buildContractCall,
   buildSafeTransaction,
@@ -8,13 +8,20 @@ import {
   signer,
 } from '@/utils/execution'
 import { buildMultiSendSafeTx } from '@/utils/multisend'
-import { useTransactionMultiSend } from '@/hooks/useContract'
-import { useMemo } from 'react'
+import { useTransactionMultiSend, useTransactionProxy } from '@/hooks/useContract'
+import { useEffect, useMemo, useState } from 'react'
 
 export enum TYPESTATE {
   TRANSFER = 1,
   METHOD = 2,
 }
+export const APPROVENUM = 2
+export const OWNERARR: Array<string> = [
+  '0x0F70D0661bA51a0383f59E76dC0f2d44703A8680',
+  '0xD06803c7cE034098CB332Af4C647f293C8BcD76a',
+  '0xf0a734400c8BD2e80Ba166940B904C59Dd08b6F0',
+  '0xBf992941F09310b53A9F3436b0F40B25bCcc2C33',
+]
 
 import { Erc20 } from '@/abis/types'
 
@@ -77,4 +84,47 @@ export function useSignatureBytes(owner: any[]) {
     const ownerBty32 = owner.map((item) => signer(item))
     return buildSignatureBytes(ownerBty32)
   }, [owner])
+}
+
+export function useTxStatus(record: RowItemType) {
+  const transactionProxy = useTransactionProxy()
+  const [nonce, setNonce] = useState<number | undefined>(undefined)
+  const [currentApproveNum, setCurrentApproveNum] = useState<number>(0)
+
+  useEffect(() => {
+    if (!transactionProxy) return
+    if (!record) return
+
+    transactionProxy.nonce().then((res) => {
+      setNonce(res.toNumber())
+    })
+    const promiseArr: Array<any> = []
+    OWNERARR.map((v: string) => {
+      promiseArr.push(transactionProxy?.approvedHashes(v, record.tx_hash))
+    })
+    Promise.all(promiseArr).then((res) => {
+      console.log('res:', res, nonce)
+      let count = 0
+      res.map((v) => {
+        if (v.toNumber()) count += 1
+      })
+      setCurrentApproveNum(count)
+    })
+  }, [nonce, record, transactionProxy])
+
+  return useMemo(() => {
+    if (!nonce) {
+      return '--'
+    }
+
+    if (currentApproveNum >= APPROVENUM && nonce > Number(record.tx_id)) {
+      return '已完成'
+    }
+
+    if (currentApproveNum >= 0 && nonce == Number(record.tx_id)) {
+      return '进行中'
+    }
+
+    return '已失效'
+  }, [currentApproveNum, nonce, record.tx_id])
 }
