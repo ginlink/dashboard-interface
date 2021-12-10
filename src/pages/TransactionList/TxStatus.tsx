@@ -22,7 +22,6 @@ function getState(state: number) {
   return
 }
 export default function TxStatus({ text, record }: TxStatusType) {
-  // console.log('record:', record)
   // const getStatus = useTxStatus(record)
   // return <Wrapper>{getStatus}</Wrapper>
   return <Wrapper>{getState(text)}</Wrapper>
