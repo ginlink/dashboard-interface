@@ -1,15 +1,12 @@
-/*
- * @Author: your name
- * @Date: 2021-09-01 19:16:38
- * @LastEditTime: 2021-09-24 16:53:48
- * @LastEditors: jiangjin
- * @Description: In User Settings Edit
- * @FilePath: /converter-bsc-web/src/utils/index.ts
- */
+import { Wallet, utils, BigNumber, BigNumberish, Signer, PopulatedTransaction } from 'ethers'
+
+import { TypedDataSigner } from '@ethersproject/abstract-signer'
+
 import { getAddress } from '@ethersproject/address'
 import { AddressZero } from '@ethersproject/constants'
 import { Contract } from '@ethersproject/contracts'
 import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers'
+import { SafeSignature, SafeTransaction } from './execution'
 // import { Token } from 'plugins/@uniswap/sdk-core'
 // import { FeeAmount } from 'plugins/@uniswap/v3-sdk/dist/'
 // import { TokenAddressMap } from '../state/lists/hooks'
@@ -35,6 +32,37 @@ export function shortenAddress(address: string, chars = 4): string {
 // account is not optional
 export function getSigner(library: Web3Provider, account: string): JsonRpcSigner {
   return library.getSigner(account).connectUnchecked()
+}
+
+export const EIP712_SAFE_TX_TYPE = {
+  // "SafeTx(address to,uint256 value,bytes data,uint8 operation,uint256 safeTxGas,uint256 baseGas,uint256 gasPrice,address gasToken,address refundReceiver,uint256 nonce)"
+  SafeTx: [
+    { type: 'address', name: 'to' },
+    { type: 'uint256', name: 'value' },
+    { type: 'bytes', name: 'data' },
+    { type: 'uint8', name: 'operation' },
+    { type: 'uint256', name: 'safeTxGas' },
+    { type: 'uint256', name: 'baseGas' },
+    { type: 'uint256', name: 'gasPrice' },
+    { type: 'address', name: 'gasToken' },
+    { type: 'address', name: 'refundReceiver' },
+    { type: 'uint256', name: 'nonce' },
+  ],
+}
+
+export const safeSignTypedData = async (
+  signer: Signer & TypedDataSigner,
+  safe: Contract,
+  safeTx: SafeTransaction,
+  chainId?: BigNumberish
+): Promise<SafeSignature> => {
+  if (!chainId && !signer.provider) throw Error('Provider required to retrieve chainId')
+  const cid = chainId || (await signer.provider!.getNetwork()).chainId
+  const signerAddress = await signer.getAddress()
+  return {
+    signer: signerAddress,
+    data: await signer._signTypedData({ verifyingContract: safe.address, chainId: cid }, EIP712_SAFE_TX_TYPE, safeTx),
+  }
 }
 
 // account is optional

@@ -183,18 +183,18 @@ export default function TransactionList() {
 
   // const [nonce, setNonce] = useState<number | undefined>(undefined)
 
+  const tokenContract = useTokenContract(tokenAddress)
+
+  const multiSendContract = useTransactionMultiSend()
+
   const transactionProxy = useTransactionProxy()
+
   const { result } = useSingleCallResult(transactionProxy, 'nonce')
 
   const nonce = useMemo(() => {
     if (!result) return
     return result[0].toNumber()
   }, [result])
-  const tokenContract = useTokenContract(tokenAddress)
-
-  const multiSendContract = useTransactionMultiSend()
-
-  const proxySinger = useTransactionProxy()
 
   // get table list
   useEffect(() => {
@@ -254,11 +254,11 @@ export default function TransactionList() {
 
   // get nonce
   // useEffect(() => {
-  //   if (!proxySinger) return
+  //   if (!transactionProxy) return
 
   //   // nonce不会很大，用toNumber
-  //   proxySinger.nonce().then((res) => setNonce(res.toNumber()))
-  // }, [proxySinger])
+  //   transactionProxy.nonce().then((res) => setNonce(res.toNumber()))
+  // }, [transactionProxy])
 
   const resetDataList = useCallback(async () => {
     const list = await getTransctionList()
@@ -272,7 +272,7 @@ export default function TransactionList() {
       console.log('[](values):', values, callType)
 
       debugger
-      if (!chainId || !nonce || !proxySinger) return
+      if (!chainId || !nonce || !transactionProxy) return
 
       const safeAddress = TRANSACTION_PROXY_ADDRESS[chainId]
 
@@ -296,6 +296,8 @@ export default function TransactionList() {
         method = 'transfer'
 
         if (!tokenContract) return
+
+        debugger
 
         try {
           ;[safeTx, safeApproveHash] = bundleCallData({
@@ -374,7 +376,7 @@ export default function TransactionList() {
       // transaction
       try {
         debugger
-        await proxySinger.approveHash(safeApproveHash)
+        await transactionProxy.approveHash(safeApproveHash)
 
         getDataLists()
 
@@ -389,13 +391,13 @@ export default function TransactionList() {
       callType,
       chainId,
       nonce,
-      proxySinger,
+      transactionProxy,
       decimals,
       tokenContract,
       multiSendContract,
       contract,
       tokenAddress,
-      resetDataList,
+      getDataLists,
     ]
   )
 

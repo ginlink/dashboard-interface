@@ -49,6 +49,7 @@ export const calculateSafeTransactionHash = (safe: string, safeTx: SafeTransacti
 
 export const buildSignatureBytes = (signatures: SafeSignature[]): string => {
   signatures.sort((left, right) => left.signer.toLowerCase().localeCompare(right.signer.toLowerCase()))
+
   let signatureBytes = '0x'
   for (const sig of signatures) {
     signatureBytes += sig.data.slice(2)
@@ -112,4 +113,12 @@ export const signer = (user: string) => {
       '0000000000000000000000000000000000000000000000000000000000000000' +
       '01',
   }
+
+  // 伪造的签名
+  // const signatures =
+  //   '0x' +
+  //   '000000000000000000000000' +
+  //   user1.address.slice(2) +
+  //   '0000000000000000000000000000000000000000000000000000000000000041' +
+  //   '00' // r, s, v
 }

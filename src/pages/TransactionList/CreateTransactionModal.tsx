@@ -101,7 +101,8 @@ export default function CreateTransactionModal({
   const contractMethods = useMemo(() => {
     if (!parsedAbis || !contractName) return
 
-    return parsedAbis[contractName].funcs?.filter((item) => item.type == FuncType.WRITE)
+    // return parsedAbis[contractName].funcs?.filter((item) => item.type == FuncType.WRITE)
+    return parsedAbis[contractName].funcs
   }, [contractName])
 
   const onChangeContractHandler = useCallback(
