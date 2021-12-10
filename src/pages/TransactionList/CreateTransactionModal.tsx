@@ -1,15 +1,15 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import styled from 'styled-components/macro'
 import Modal from '@/components/Modal'
 import CloseOutlined from '@ant-design/icons/lib/icons/CloseOutlined'
-import { Space, Radio, Input, Select } from 'antd'
+import { Space, Radio, Input, Select, message } from 'antd'
 import { ButtonPrimary } from '@/components/Button'
 import { TYPESTATE } from './hooks'
 
 import swapMiningAbi from '@/abis/swap-mining.json'
 import ownableAbi from '@/abis/Ownable.json'
 import positionRewardAbi from '@/abis/position-reward.json'
-import { parseAbis, parseFunc, StaticBaseContract } from './util'
+import { ContractAddresses, parseAbis, StaticBaseContract } from './util'
 import { Contract } from '@ethersproject/contracts'
 import { getSignerOrProvider, SWAP_MINING_ADDRESSES } from '@/hooks/useContract'
 import { useActiveWeb3React } from '@/hooks/web3'
@@ -21,9 +21,11 @@ const CloseWrapper = styled.div`
   top: 20px;
   cursor: pointer;
 `
+
 const InputBox = styled.div`
   margin-top: 18px;
 `
+
 const InputItem = styled.div`
   display: flex;
   align-items: center;
@@ -58,7 +60,7 @@ type CreateTransactionType = {
 const abiArr = [swapMiningAbi, ownableAbi, positionRewardAbi]
 
 const parsedAbis = parseAbis(abiArr as StaticBaseContract[])
-// console.log('[](parsedAbis):', parsedAbis)
+console.log('[](parsedAbis):', parsedAbis)
 
 export default function CreateTransactionModal({
   isOpen,
@@ -72,8 +74,6 @@ export default function CreateTransactionModal({
   onChangeCreateType,
   amount,
   changeAmount,
-  address,
-  changeAddress,
   method,
   changeMethod,
   arg,
@@ -82,153 +82,67 @@ export default function CreateTransactionModal({
 }: CreateTransactionType) {
   const { library, account, chainId } = useActiveWeb3React()
 
-  const [swapMiningMethods, setSwapMiningMethods] = useState<Array<any>>([])
-  const [ownableMethods, setOwnableMethods] = useState<Array<any>>([])
-  const [positionRewardMethods, setPositionRewardMethods] = useState<Array<any>>([])
-  const [methodOptionArr, setMethodOptionArr] = useState<Array<string>>([])
-
   const [funcParams, setFuncParams] = useState<string | undefined>(undefined)
 
-  const [currentOptionIndex, setCurrentOptionIndex] = useState<number | undefined>()
+  const [contractName, setContractName] = useState<string | undefined>(undefined)
 
-  const [optionArr, setOptionArr] = useState<Array<any>>([
-    {
-      name: 'SwapMining',
-      key: 1,
-    },
-    {
-      name: 'Ownable',
-      key: 2,
-    },
-    {
-      name: 'positionReward',
-      key: 3,
-    },
-  ])
+  const contractAddresses: ContractAddresses | undefined = useMemo(() => {
+    if (!chainId) return
 
-  useEffect(() => {
-    //swap-mining abi
-    const swapMiningFilterAbi = swapMiningAbi.abi.filter((v) => v.type === 'function')
+    return {
+      SwapMining: SWAP_MINING_ADDRESSES[chainId],
+      Ownable: TRANSACTION_OPERATABLE_ADDRESS[chainId],
+      positionReward: TRANSACTION_POSITION_REWARD_ADDRESS[chainId],
+    }
+  }, [chainId])
 
-    const swapMiningReadData = [] as any
-    const swapMiningWriteData = [] as any
-    swapMiningFilterAbi.map((v: any) => {
-      if (v.stateMutability === 'view') {
-        swapMiningReadData.push(v.name)
-      } else {
-        swapMiningWriteData.push(v.name)
-      }
-    })
-    console.log('[swapMiningReadData, swapMiningWriteData]', [swapMiningReadData, swapMiningWriteData])
-    setSwapMiningMethods([swapMiningReadData, swapMiningWriteData])
+  const contractMethods = useMemo(() => {
+    if (!parsedAbis || !contractName) return
 
-    //Ownable abi
-    const ownableFilterAbi = ownableAbi.abi.filter((v) => v.type === 'function')
-    const ownableReadData = [] as any
-    const ownableWriteData = [] as any
-    ownableFilterAbi.map((v: any) => {
-      if (v.stateMutability === 'view') {
-        ownableReadData.push(v.name)
-      } else {
-        ownableWriteData.push(v.name)
-      }
-    })
-    console.log('[ownableReadData, ownableWriteData]', [ownableReadData, ownableWriteData])
-    setOwnableMethods([ownableReadData, ownableWriteData])
+    return parsedAbis[contractName].funcs
+  }, [contractName])
 
-    //position-reward abi
-    const positionRewardFilterAbi = positionRewardAbi.abi.filter((v) => v.type === 'function')
-    const positionRewardReadData = [] as any
-    const positionRewardWriteData = [] as any
-    positionRewardFilterAbi.map((v: any) => {
-      if (v.stateMutability === 'view') {
-        positionRewardReadData.push(v.name)
-      } else {
-        positionRewardWriteData.push(v.name)
-      }
-    })
-    console.log('[positionRewardReadData, positionRewardWriteData]', [positionRewardReadData, positionRewardWriteData])
-    setPositionRewardMethods([positionRewardReadData, positionRewardWriteData])
-  }, [])
+  const onChangeContractHandler = useCallback(
+    (contractName: string, option: any) => {
+      if (!contractName) return
 
-  const changeMethodName = useCallback(
-    (name) => {
-      changeMethod(name)
+      const { key } = option
 
-      setFuncParams(undefined)
+      // update
+      setContractName(contractName)
+      if (!contractAddresses || !parsedAbis || !library || !account) return
 
-      // placeholder param
-      if (!name || !parsedAbis || !currentOptionIndex) return
+      debugger
 
-      const parsedFuncs = parsedAbis[optionArr[currentOptionIndex - 1].name]?.funcs
+      // update parent contract
+      const contractAddress = contractAddresses[contractName]
+      const contractAbi = parsedAbis[contractName]?.abi
 
-      if (!parsedFuncs) return
+      const contract = new Contract(contractAddress, contractAbi, getSignerOrProvider(library, account))
 
-      const params = parsedFuncs.find((item) => item.name == name)?.param
+      if (!contract) return message.warning('[err] create contract')
 
-      setFuncParams(params)
-    },
-    [changeMethod, currentOptionIndex, optionArr]
-  )
-
-  const changeOption = useCallback(
-    (e) => {
-      if (!library || !account || !chainId) return
-
-      const obj = optionArr.find((v) => v.key === e)
-
-      const address = obj?.name
-
-      setCurrentOptionIndex(e)
-
-      changeAddress(address)
-
-      setFuncParams(undefined)
-
-      let contract: Contract | undefined = undefined
-      switch (e) {
-        case 1:
-          contract = new Contract(
-            SWAP_MINING_ADDRESSES[chainId],
-            swapMiningAbi.abi,
-            getSignerOrProvider(library, account)
-          )
-          setMethodOptionArr(swapMiningMethods[1])
-          break
-        case 2:
-          contract = new Contract(
-            TRANSACTION_OPERATABLE_ADDRESS[chainId],
-            ownableAbi.abi,
-            getSignerOrProvider(library, account)
-          )
-          setMethodOptionArr(ownableMethods[1])
-          break
-        case 3:
-          contract = new Contract(
-            TRANSACTION_POSITION_REWARD_ADDRESS[chainId],
-            positionRewardAbi.abi,
-            getSignerOrProvider(library, account)
-          )
-          setMethodOptionArr(positionRewardMethods[1])
-          break
-        default:
-          break
-      }
-      changeAddress(address)
       changeContract && changeContract(contract)
     },
-    [
-      account,
-      chainId,
-      changeAddress,
-      changeContract,
-      library,
-      optionArr,
-      ownableMethods,
-      positionRewardMethods,
-      swapMiningMethods,
-    ]
+    [account, changeContract, contractAddresses, library]
   )
+
+  const onChangeMethodHandler = useCallback(
+    (methodName: string, option: any) => {
+      debugger
+      if (!methodName || !contractMethods) return
+
+      // update parent
+      changeMethod(methodName)
+
+      // update placeholder param
+      const { key: index } = option
+      const funcParam = contractMethods[index].param
+      setFuncParams(funcParam)
+    },
+    [changeMethod, contractMethods]
+  )
+
   return (
     <Modal isOpen={isOpen}>
       <CloseWrapper onClick={() => onClose && onClose()}>
@@ -259,28 +173,30 @@ export default function CreateTransactionModal({
         <InputBox>
           <InputItem>
             <label>合约类型</label>
-            {/* <Input allowClear={true} value={address} onChange={changeAddress} placeholder="address" /> */}
-            <Select defaultValue="" style={{ width: 200 }} allowClear onChange={changeOption}>
-              {optionArr.map((v: any, index: number) => {
-                return (
-                  <Option value={v.key} key={index}>
-                    {v.name}
-                  </Option>
-                )
-              })}
+            <Select defaultValue="" style={{ width: '100%' }} allowClear onChange={onChangeContractHandler}>
+              {parsedAbis &&
+                Object.keys(parsedAbis).map((key, index) => {
+                  return (
+                    <Option value={key} key={index}>
+                      {key}
+                    </Option>
+                  )
+                })}
             </Select>
           </InputItem>
           <InputItem>
             <label>合约方法</label>
-            {/* <Input allowClear={true} value={method} onChange={changeMethod} placeholder="method" /> */}
-            <Select onChange={changeMethodName} style={{ width: 200 }} allowClear>
-              {methodOptionArr.map((v: any, index: number) => {
-                return (
-                  <Option value={v} key={index}>
-                    {v}
-                  </Option>
-                )
-              })}
+            <Select onChange={onChangeMethodHandler} style={{ width: '100%' }} allowClear>
+              {contractMethods &&
+                contractMethods.map((item, index) => {
+                  const { nameAndParam } = item
+
+                  return (
+                    <Option value={nameAndParam ?? ''} key={index}>
+                      {nameAndParam}
+                    </Option>
+                  )
+                })}
             </Select>
           </InputItem>
           <InputItem>

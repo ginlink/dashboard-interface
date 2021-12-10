@@ -9,6 +9,7 @@ export type ParsedFunc = {
   param?: string
   type?: FuncType
   origin?: string
+  nameAndParam?: string
 }
 
 const REG_NAME = /(?<=function ).+(?= \(.*\))/

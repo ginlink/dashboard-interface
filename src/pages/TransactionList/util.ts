@@ -12,7 +12,7 @@ export type StaticBaseAbi = {
   [key: string]: any
 }
 
-export function parseFunc(abi?: StaticBaseAbi[]): ParsedFunc[] | undefined {
+export function parseFuncs(abi?: StaticBaseAbi[]): ParsedFunc[] | undefined {
   if (!abi) return
 
   const realAbi = abi.filter((item) => item.type === 'function')
@@ -22,18 +22,21 @@ export function parseFunc(abi?: StaticBaseAbi[]): ParsedFunc[] | undefined {
 
     // const paramLen = inputs.length
 
-    const param = inputs?.map((param) => {
-      const { type, name: paramName } = param
+    const param = inputs
+      ?.map((param) => {
+        const { type, name: paramName } = param
 
-      return `${type} ${paramName}`
-    })
+        return `${type} ${paramName}`
+      })
+      ?.join(',')
 
     const isView = stateMutability && stateMutability === 'view'
 
     return {
       name,
       // params: paramLen ? params : undefined,
-      param: param?.join(','),
+      param,
+      nameAndParam: `${name}(${param})`,
 
       type: isView ? FuncType.READ : FuncType.WRITE,
     }
@@ -67,7 +70,12 @@ export type StaticBaseContract = {
 export type ParsedContract = {
   [key: string]: {
     funcs?: ParsedFunc[]
+    abi: any
   }
+}
+
+export type ContractAddresses = {
+  [key: string]: string
 }
 
 export function parseAbis(staticContract?: StaticBaseContract[]): ParsedContract | undefined {
@@ -79,7 +87,8 @@ export function parseAbis(staticContract?: StaticBaseContract[]): ParsedContract
     if (!contractName) return memo
 
     memo[contractName] = {
-      funcs: parseFunc(abi),
+      funcs: parseFuncs(abi),
+      abi: abi,
     }
 
     return memo
