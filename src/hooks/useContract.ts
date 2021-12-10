@@ -25,7 +25,7 @@ import {
 import { abi as gnosisSafe } from '@/abis/GnosisSafe.json'
 import { abi as Ownable } from 'abis/Ownable.json'
 import { abi as multiSend } from 'abis/MultiSend.json'
-import positionReward from 'abis/position-reward.json'
+import { abi as positionReward } from 'abis/position-reward.json'
 import { GnosisSafe } from 'abis/types/GnosisSafe'
 import { PositionReward } from 'abis/types/PositionReward'
 import { MultiSend } from 'abis/types/MultiSend'

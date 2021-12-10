@@ -9,7 +9,7 @@ import { TYPESTATE } from './hooks'
 import swapMiningAbi from '@/abis/swap-mining.json'
 import ownableAbi from '@/abis/Ownable.json'
 import positionRewardAbi from '@/abis/position-reward.json'
-import { parseFunc } from './util'
+import { parseAbis, parseFunc, StaticBaseContract } from './util'
 import { Contract } from '@ethersproject/contracts'
 import { getSignerOrProvider, SWAP_MINING_ADDRESSES } from '@/hooks/useContract'
 import { useActiveWeb3React } from '@/hooks/web3'
@@ -55,6 +55,11 @@ type CreateTransactionType = {
   changeContract?: (contract: Contract | undefined) => void
 }
 
+const abiArr = [swapMiningAbi, ownableAbi, positionRewardAbi]
+
+const parsedAbis = parseAbis(abiArr as StaticBaseContract[])
+// console.log('[](parsedAbis):', parsedAbis)
+
 export default function CreateTransactionModal({
   isOpen,
   onClose,
@@ -82,11 +87,13 @@ export default function CreateTransactionModal({
   const [positionRewardMethods, setPositionRewardMethods] = useState<Array<any>>([])
   const [methodOptionArr, setMethodOptionArr] = useState<Array<string>>([])
 
-  const [currentOption, setCurrentOption] = useState<number | undefined>()
+  const [funcParams, setFuncParams] = useState<string | undefined>(undefined)
+
+  const [currentOptionIndex, setCurrentOptionIndex] = useState<number | undefined>()
 
   const [optionArr, setOptionArr] = useState<Array<any>>([
     {
-      name: 'swap-mining',
+      name: 'SwapMining',
       key: 1,
     },
     {
@@ -94,16 +101,14 @@ export default function CreateTransactionModal({
       key: 2,
     },
     {
-      name: 'position-reward',
+      name: 'positionReward',
       key: 3,
     },
   ])
+
   useEffect(() => {
     //swap-mining abi
     const swapMiningFilterAbi = swapMiningAbi.abi.filter((v) => v.type === 'function')
-
-    const parsedFunc = parseFunc(swapMiningFilterAbi)
-    console.log('[](parsedFunc):', parsedFunc)
 
     const swapMiningReadData = [] as any
     const swapMiningWriteData = [] as any
@@ -132,7 +137,7 @@ export default function CreateTransactionModal({
     setOwnableMethods([ownableReadData, ownableWriteData])
 
     //position-reward abi
-    const positionRewardFilterAbi = positionRewardAbi.filter((v) => v.type === 'function')
+    const positionRewardFilterAbi = positionRewardAbi.abi.filter((v) => v.type === 'function')
     const positionRewardReadData = [] as any
     const positionRewardWriteData = [] as any
     positionRewardFilterAbi.map((v: any) => {
@@ -147,13 +152,23 @@ export default function CreateTransactionModal({
   }, [])
 
   const changeMethodName = useCallback(
-    (e) => {
-      changeMethod(e)
+    (name) => {
+      changeMethod(name)
 
-      // const arg =
-      // setArgPlaceHolder()
+      setFuncParams(undefined)
+
+      // placeholder param
+      if (!name || !parsedAbis || !currentOptionIndex) return
+
+      const parsedFuncs = parsedAbis[optionArr[currentOptionIndex - 1].name]?.funcs
+
+      if (!parsedFuncs) return
+
+      const params = parsedFuncs.find((item) => item.name == name)?.param
+
+      setFuncParams(params)
     },
-    [changeMethod]
+    [changeMethod, currentOptionIndex, optionArr]
   )
 
   const changeOption = useCallback(
@@ -162,11 +177,13 @@ export default function CreateTransactionModal({
 
       const obj = optionArr.find((v) => v.key === e)
 
-      const address = obj.name
+      const address = obj?.name
 
-      setCurrentOption(e)
+      setCurrentOptionIndex(e)
 
       changeAddress(address)
+
+      setFuncParams(undefined)
 
       let contract: Contract | undefined = undefined
       switch (e) {
@@ -189,7 +206,7 @@ export default function CreateTransactionModal({
         case 3:
           contract = new Contract(
             TRANSACTION_POSITION_REWARD_ADDRESS[chainId],
-            positionRewardAbi,
+            positionRewardAbi.abi,
             getSignerOrProvider(library, account)
           )
           setMethodOptionArr(positionRewardMethods[1])
@@ -268,7 +285,7 @@ export default function CreateTransactionModal({
           </InputItem>
           <InputItem>
             <label>arg</label>
-            <Input value={arg} onChange={changeArg} allowClear={true} placeholder="arg" />
+            <Input value={arg} onChange={changeArg} allowClear={true} placeholder={funcParams} />
           </InputItem>
         </InputBox>
       )}
