@@ -1,18 +1,21 @@
-import React, { useState, useEffect, createRef, useCallback, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import styled from 'styled-components/macro'
-import { Table, Tag, Space } from 'antd'
+import { Table } from 'antd'
 import { getTransctionList, addTx } from '@/services/api'
-import { Modal, Button, message } from 'antd'
-import CreateTransactionModal from './CreateTransactionModal'
+import { message } from 'antd'
+import CreateTransactionModal, { CallType } from './CreateTransactionModal'
 import { ButtonPrimary } from '@/components/Button'
 import TableRowModal, { RowItemType } from './TableRowModal'
-import { TransactionSubmitProps, TYPESTATE, useSignatureBytes, useTransacitonSubmitData } from './hooks'
-import { useTokenContract, useTransactionProxy } from '@/hooks/useContract'
+import { useTokenContract, useTransactionMultiSend, useTransactionProxy } from '@/hooks/useContract'
 import { useActiveWeb3React } from '@/hooks/web3'
 import fu from '@/assets/images/fu.png'
 import copy from 'copy-to-clipboard'
 import { txType } from '@/constants/txType'
 import TxStatus from './TxStatus'
+import { TRANSACTION_MULTISEND_ADDRESS, TRANSACTION_PROXY_ADDRESS } from '@/constants/address'
+import { Contract } from '@ethersproject/contracts'
+import { bundleCallData, getExecByteData } from './util'
+
 const processingData = function (hash: string) {
   if (hash) {
     const hideStr = hash.substring(4, hash.length - 4)
@@ -21,6 +24,7 @@ const processingData = function (hash: string) {
     return ''
   }
 }
+
 const conversionType = function (type: string) {
   if (Number(type) == txType.METHOD) {
     return '方法'
@@ -29,9 +33,6 @@ const conversionType = function (type: string) {
   }
 }
 
-import BigFloatNumber from 'bignumber.js'
-import { TRANSACTION_MULTISEND_ADDRESS, TRANSACTION_PROXY_ADDRESS } from '@/constants/address'
-import { Contract } from '@ethersproject/contracts'
 const columns = [
   {
     title: 'id',
@@ -141,9 +142,11 @@ const Wrapper = styled.div`
     margin-left: 8px;
   }
 `
+
 const CreateButtonPrimary = styled(ButtonPrimary)`
   width: fit-content;
 `
+
 const BtnBox = styled.div`
   display: flex;
   margin-bottom: 26px;
@@ -153,7 +156,9 @@ const BtnBox = styled.div`
     margin-left: 14px;
   }
 `
+
 const AddressBox = styled.div``
+
 export default function TransactionList() {
   const { chainId } = useActiveWeb3React()
 
@@ -163,83 +168,35 @@ export default function TransactionList() {
   const [openRow, setOpenRow] = useState<boolean>(false)
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
-  // const [fromAddress, setFromAddress] = useState<string | undefined>('0x5B8698f10555F5Fb4fE58BFfc2169790e526D8AD')
+  // const [tokenAddress, setTokenAddress] = useState<string | undefined>('0x5B8698f10555F5Fb4fE58BFfc2169790e526D8AD')
   // const [toAddress, setToAddress] = useState<string | undefined>('0xBf992941F09310b53A9F3436b0F40B25bCcc2C33')
 
-  const [fromAddress, setFromAddress] = useState<string | undefined>()
-  const [methodAddress, setMethodAddress] = useState<string | undefined>()
-  const [toAddress, setToAddress] = useState<string | undefined>()
-
-  const [amount, setAmount] = useState<string | undefined>()
-  const [address, setAddress] = useState<any>()
-  const [method, setMethod] = useState<any>()
-
-  const [arg, setArg] = useState<any>()
-  const [createType, setCreateType] = useState<number>(1)
+  const [tokenAddress, setTokenAddress] = useState<string | undefined>()
 
   const [decimals, setDecimals] = useState<number | undefined>(undefined)
 
   const [contract, setContract] = useState<Contract | undefined>(undefined)
 
-  const transactionProxy = useTransactionProxy()
-
-  const tokenContract = useTokenContract(fromAddress)
-
-  const OWNER = useMemo(
-    () => [
-      '0x0F70D0661bA51a0383f59E76dC0f2d44703A8680',
-      '0xD06803c7cE034098CB332Af4C647f293C8BcD76a',
-      '0xf0a734400c8BD2e80Ba166940B904C59Dd08b6F0',
-      '0xBf992941F09310b53A9F3436b0F40B25bCcc2C33',
-    ],
-    []
-  )
-
-  const singerByteData = useSignatureBytes(OWNER)
-
-  const proxySinger = useTransactionProxy()
+  const [callType, setCallType] = useState(CallType.TRANSFER)
 
   const [nonce, setNonce] = useState<number | undefined>(undefined)
 
-  const submitParams: TransactionSubmitProps = useMemo(() => {
-    if (!chainId) return {}
+  const transactionProxy = useTransactionProxy()
 
-    switch (createType) {
-      case TYPESTATE.TRANSFER:
-        if (!amount || !toAddress || !chainId || nonce === undefined || !decimals) return {}
+  const tokenContract = useTokenContract(tokenAddress)
 
-        const bigAmount = new BigFloatNumber(amount)
-        const _amount = bigAmount.multipliedBy(new BigFloatNumber(10).pow(decimals)).toFixed()
+  const multiSendContract = useTransactionMultiSend()
 
-        return {
-          contract: tokenContract,
-          chainId,
-          method: 'transfer',
-          params: [toAddress, _amount],
-          nonce: nonce,
-          safe: TRANSACTION_PROXY_ADDRESS[chainId],
-          fnType: TYPESTATE.TRANSFER,
-        }
-      case TYPESTATE.METHOD:
-        if (!contract || !method || !arg) return {}
+  const proxySinger = useTransactionProxy()
 
-        return {
-          contract: contract,
-          chainId,
-          method: method,
-          params: arg.split(','),
-          nonce: nonce,
-          safe: TRANSACTION_PROXY_ADDRESS[chainId],
-          fnType: TYPESTATE.METHOD,
-        }
-    }
+  // get table list
+  useEffect(() => {
+    getTransctionList().then((res) => {
+      setDataList(res)
+    })
+  }, [])
 
-    return {}
-  }, [amount, arg, chainId, contract, createType, decimals, method, nonce, toAddress, tokenContract])
-
-  // get data for transaction
-  const { safeTx, safeApproveHash } = useTransacitonSubmitData(submitParams)
-
+  // get decimals
   useEffect(() => {
     if (!tokenContract) return
 
@@ -248,12 +205,7 @@ export default function TransactionList() {
     })
   }, [tokenContract])
 
-  useEffect(() => {
-    getTransctionList().then((res) => {
-      setDataList(res)
-    })
-  }, [])
-
+  // get nonce
   useEffect(() => {
     if (!proxySinger) return
 
@@ -261,116 +213,90 @@ export default function TransactionList() {
     proxySinger.nonce().then((res) => setNonce(res.toNumber()))
   }, [proxySinger])
 
-  const changeFromAddress = useCallback((e) => {
-    setFromAddress(e.target.value)
-  }, [])
-  const changeToAddress = useCallback((e) => {
-    setToAddress(e.target.value)
-  }, [])
-  const changeAmount = useCallback((e) => {
-    setAmount(e.target.value)
-  }, [])
-  const changeAddress = useCallback((e) => {
-    setAddress(e)
-  }, [])
-  const changeMethod = useCallback((e) => {
-    setMethod(e)
-  }, [])
-  const changeArg = useCallback((e) => {
-    setArg(e.target.value)
+  const resetDataList = useCallback(async () => {
+    const list = await getTransctionList()
+
+    // refresh
+    setDataList(list)
   }, [])
 
-  const resetInput = useCallback(() => {
-    setFromAddress('')
-    setToAddress('')
-    setAmount('')
-    setAddress('')
-    setMethod('')
-    setArg('')
-  }, [])
+  const onViewRow = useCallback((row: RowItemType) => {
+    setRowData(row)
 
-  const onChangeCreateType = useCallback((e) => {
-    const type = e.target.value
-
-    if (!type) return
-
-    setCreateType(type)
-
-    if (type == TYPESTATE.TRANSFER) {
-      setMethod('transfer')
+    if (!!row.tx_hash) {
+      setOpenRow(true)
+    } else {
+      message.warning('已失效')
     }
   }, [])
 
-  const onCreateHandler = useCallback(async () => {
-    const { params, nonce, safe } = submitParams
-    debugger
+  const onCreateFinishedHandler = useCallback(
+    async (values: any) => {
+      console.log('[](values):', values, callType)
+      if (!chainId || !nonce || !proxySinger || !tokenContract || !contract) return
 
-    if (nonce === undefined) return
+      const { method, params } = values
 
-    if (!params) return
+      if (!method || !params) return
 
-    if (!safeApproveHash || !safeTx || !proxySinger) return
+      const safeAddress = TRANSACTION_PROXY_ADDRESS[chainId]
 
-    const addParam = {
-      txType: createType,
-      txId: nonce,
-      txFrom: '',
-      txTo: '',
-      txAmount: '',
-      txHash: safeApproveHash,
-      txFunArg: params.join(','),
-      txData: safeTx.data,
-      txProaddr: safe,
-      txFun: '',
-    }
-    // const addParam = {
-    //   txType: createType,
-    //   txId: nonce,
-    //   txFrom: fromAddress,
-    //   txTo: params[0],
-    //   txAmount: params[1]?.toString(),
-    //   txHash: safeApproveHash,
-    //   txFunArg: params.join(','),
-    //   txData: safeTx.data,
-    //   txProaddr: safe,
-    //   txFun: '',
-    // }
+      // TODO处理amount * 10**18
 
-    // for api
-    switch (createType) {
-      case TYPESTATE.TRANSFER:
-        if (!fromAddress) return
+      // bundle data
+      const { safeTx, safeApproveHash } = bundleCallData({
+        type: callType,
+        contract: callType ? tokenContract : contract,
+        multiSendContract,
+        safeAddress,
+        method,
+        params,
+        nonce,
+        chainId,
+      })
 
-        addParam.txAmount = params[1]?.toString()
+      if (!safeTx || !safeApproveHash) return
+
+      const addParam = {
+        txType: callType,
+        txId: nonce,
+        txFrom: '',
+        txTo: '',
+        txAmount: '',
+        txHash: safeApproveHash,
+        txFunArg: params.join(','),
+        txData: safeTx.data,
+        txProaddr: safeAddress,
+        txFun: '',
+      }
+
+      if (callType === CallType.TRANSFER) {
+        addParam.txAmount = params?.[1]?.toString()
         addParam.txHash = safeApproveHash
         addParam.txFun = 'transfer'
-        addParam.txFrom = fromAddress
-        break
-
-      case TYPESTATE.METHOD:
-        if (!methodAddress) return
+        addParam.txFrom = tokenAddress || ''
+      } else {
         addParam.txFun = method
-        addParam.txFrom = methodAddress
-        break
-    }
+        addParam.txFrom = contract?.address || ''
+      }
 
-    try {
       // transaction
-      await proxySinger.approveHash(safeApproveHash)
+      try {
+        await proxySinger.approveHash(safeApproveHash)
 
-      // api
-      await addTx(addParam)
+        // api
+        await addTx(addParam)
 
-      const list = await getTransctionList()
+        resetDataList()
 
-      setDataList(list)
-
-      resetInput()
-      setIsOpen(false)
-    } catch (err) {
-      console.log('[onCreateHandler](err):', err)
-    }
-  }, [submitParams, fromAddress, safeApproveHash, safeTx, proxySinger, createType, method, resetInput])
+        setTokenAddress('')
+        setIsOpen(false)
+      } catch (err) {
+        console.log('[onCreateHandler](err):', err)
+      }
+    },
+    [callType, chainId, contract, tokenAddress, multiSendContract, nonce, proxySinger, resetDataList, tokenContract]
+  )
 
   const onApproveHandler = useCallback(
     (item) => {
@@ -386,6 +312,7 @@ export default function TransactionList() {
   const onConfirmHandler = useCallback(
     async (item: RowItemType) => {
       if (!chainId || !transactionProxy) return
+
       const { tx_data } = item
 
       if (!tx_data) return
@@ -393,9 +320,11 @@ export default function TransactionList() {
       // console.log('item', item)
       // console.log(await transactionProxy?.nonce())
 
+      const mutiSendAddress = TRANSACTION_MULTISEND_ADDRESS[chainId]
+
       transactionProxy
         .execTransaction(
-          TRANSACTION_MULTISEND_ADDRESS[chainId],
+          mutiSendAddress,
           0,
           tx_data,
           1,
@@ -404,7 +333,7 @@ export default function TransactionList() {
           0,
           '0x0000000000000000000000000000000000000000',
           '0x0000000000000000000000000000000000000000',
-          singerByteData
+          getExecByteData()
         )
         .then((res) => {
           console.log('res', res)
@@ -413,24 +342,10 @@ export default function TransactionList() {
           console.log('[](err):', err)
         })
     },
-    [chainId, singerByteData, transactionProxy]
+    [chainId, transactionProxy]
   )
 
-  const onViewRow = useCallback((row: RowItemType) => {
-    setRowData(row)
-
-    if (!!row.tx_hash) {
-      setOpenRow(true)
-    } else {
-      message.warning('已失效')
-    }
-  }, [])
-
   // debug
-  useEffect(() => {
-    console.log('[](submitParams):', submitParams)
-  }, [submitParams])
-
   useEffect(() => {
     console.log('[](contract):', contract)
   }, [contract])
@@ -438,10 +353,9 @@ export default function TransactionList() {
   return (
     <Wrapper>
       <BtnBox>
-        <AddressBox>代理地址：{TRANSACTION_PROXY_ADDRESS[chainId || 56]}</AddressBox>
+        <AddressBox>代理地址：{chainId ? TRANSACTION_PROXY_ADDRESS[chainId] : ''}</AddressBox>
         <CreateButtonPrimary
           onClick={() => {
-            setCreateType(1)
             setIsOpen(true)
           }}
         >
@@ -461,28 +375,13 @@ export default function TransactionList() {
         columns={columns}
         dataSource={dataList}
       />
+
       <CreateTransactionModal
         onClose={() => setIsOpen(false)}
         isOpen={isOpen}
-        fromAddress={fromAddress}
-        changeFromAddress={changeFromAddress}
-        toAddress={toAddress}
-        changeToAddress={changeToAddress}
-        amount={amount}
-        changeAmount={changeAmount}
-        method={method}
-        changeMethod={changeMethod}
-        address={address}
-        changeAddress={changeAddress}
-        arg={arg}
-        changeArg={changeArg}
-        createFn={onCreateHandler}
-        createType={createType}
-        onChangeCreateType={onChangeCreateType}
-        changeContract={(contract) => {
-          setContract(contract)
-          setMethodAddress(contract?.address)
-        }}
+        onChangeCallType={(type) => setCallType(type)}
+        onChangeContract={(contract) => setContract(contract)}
+        onFinished={onCreateFinishedHandler}
       ></CreateTransactionModal>
 
       <TableRowModal
