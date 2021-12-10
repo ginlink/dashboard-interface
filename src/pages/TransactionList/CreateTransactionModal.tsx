@@ -64,6 +64,7 @@ export type CreateTransactionProps = {
   onChangeCallType?: (type: CallType) => void
   onFinished?: (values: any) => void
   onChangeContract?: (contract: any) => void
+  onChangeTokenAddress?: (address: string) => void
 }
 
 const abiArr = [swapMiningAbi, ownableAbi, positionRewardAbi]
@@ -77,6 +78,7 @@ export default function CreateTransactionModal({
   onChangeCallType,
   onFinished,
   onChangeContract,
+  onChangeTokenAddress,
 }: CreateTransactionProps) {
   const { library, account, chainId } = useActiveWeb3React()
 
@@ -171,9 +173,18 @@ export default function CreateTransactionModal({
       amount: [{ required: true, message: '请输入数量!' }],
       contractName: [{ required: true, message: '请选择合约类型!' }],
       funcParams: [{ required: true, message: '请选择合约方法!' }],
-      arg: [{ required: true, message: '请输入参数!' }],
+      arg: [],
     }
   }, [])
+
+  const onChangeTokenAddressHandler = useCallback(
+    (address: string) => {
+      if (!isAddress(address)) return
+
+      onChangeTokenAddress && onChangeTokenAddress(address)
+    },
+    [onChangeTokenAddress]
+  )
 
   return (
     <Modal isOpen={isOpen}>
@@ -198,13 +209,17 @@ export default function CreateTransactionModal({
       {callType === CallType.TRANSFER ? (
         <Form
           labelCol={{ span: 5 }}
-          wrapperCol={{ span: 20 }}
+          wrapperCol={{ span: 19 }}
           initialValues={{ remember: false }}
           onFinish={onFinish}
           autoComplete="off"
         >
           <Form.Item label="token地址" name="fromAddress" rules={rules.fromAddress}>
-            <Input allowClear={true} placeholder="token地址" />
+            <Input
+              onChange={(e) => onChangeTokenAddressHandler(e.target.value)}
+              allowClear={true}
+              placeholder="token地址"
+            />
           </Form.Item>
           <Form.Item label="接收人地址" name="toAddress" rules={rules.toAddress}>
             <Input allowClear={true} placeholder="接收人地址" />
@@ -220,7 +235,7 @@ export default function CreateTransactionModal({
         </Form>
       ) : (
         <Form
-          labelCol={{ span: 5 }}
+          labelCol={{ span: 4 }}
           wrapperCol={{ span: 20 }}
           initialValues={{ remember: false }}
           onFinish={onFinish}
@@ -239,7 +254,8 @@ export default function CreateTransactionModal({
             </Select>
           </Form.Item>
           <Form.Item label="合约方法" name="funcParams" rules={rules.funcParams}>
-            <Select onChange={onChangeMethodHandler} style={{ width: '100%' }} allowClear>
+            {/* <Select onChange={onChangeMethodHandler} style={{ width: '100%' }} allowClear> */}
+            <Select onChange={onChangeMethodHandler} allowClear>
               {contractMethods &&
                 contractMethods.map((item, index) => {
                   const { nameAndParam } = item
@@ -254,7 +270,7 @@ export default function CreateTransactionModal({
           <Form.Item label="合约参数" name="arg" rules={rules.arg}>
             <Input placeholder={funcParams} allowClear={true} />
           </Form.Item>
-          <Form.Item wrapperCol={{ offset: 5, span: 20 }}>
+          <Form.Item wrapperCol={{ offset: 4, span: 20 }}>
             <Button type="primary" htmlType="submit">
               创建
             </Button>

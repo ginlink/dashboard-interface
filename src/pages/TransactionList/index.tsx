@@ -241,7 +241,6 @@ export default function TransactionList() {
         const { fromAddress, toAddress, amount } = values
 
         if (!fromAddress || !toAddress || !amount) return
-        setTokenAddress(fromAddress)
 
         if (!decimals) return
 
@@ -272,15 +271,15 @@ export default function TransactionList() {
       } else {
         const { funcParams, arg } = values
 
-        if (!funcParams || !arg) return
+        if (!funcParams) return
 
         method = funcParams.slice(0, funcParams.indexOf('('))
 
-        const params = arg.split(',')
+        const params = arg?.split(',')
 
         // transferOwnership()
 
-        txFunArg = params
+        txFunArg = params ? params : []
 
         if (!contract) return
 
@@ -441,6 +440,7 @@ export default function TransactionList() {
         isOpen={isOpen}
         onChangeCallType={(type) => setCallType(type)}
         onChangeContract={(contract) => setContract(contract)}
+        onChangeTokenAddress={(address) => setTokenAddress(address)}
         onFinished={onCreateFinishedHandler}
       ></CreateTransactionModal>
 
