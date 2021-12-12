@@ -1,4 +1,4 @@
-import { BigNumberish } from 'ethers'
+import { BigNumberish, Contract } from 'ethers'
 import { RowItemType } from './TableRowModal'
 import {
   buildContractCall,
@@ -33,7 +33,7 @@ import { useSingleCallResult } from '@/state/multicall/hooks'
 
 export type TransactionSubmitProps = {
   contract?: any
-  safe?: string
+  safe?: Contract
   method?: string
   params?: [string, BigNumberish] | undefined
   nonce?: number

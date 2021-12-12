@@ -43,8 +43,16 @@ export interface SafeSignature {
   data: string
 }
 
-export const calculateSafeTransactionHash = (safe: string, safeTx: SafeTransaction, chainId: BigNumberish): string => {
-  return utils._TypedDataEncoder.hash({ verifyingContract: safe, chainId }, EIP712_SAFE_TX_TYPE, safeTx)
+export const preimageSafeTransactionHash = (safe: Contract, safeTx: SafeTransaction, chainId: BigNumberish): string => {
+  return utils._TypedDataEncoder.encode({ verifyingContract: safe.address, chainId }, EIP712_SAFE_TX_TYPE, safeTx)
+}
+
+export const calculateSafeTransactionHash = (
+  safe: Contract,
+  safeTx: SafeTransaction,
+  chainId: BigNumberish
+): string => {
+  return utils._TypedDataEncoder.hash({ verifyingContract: safe.address, chainId }, EIP712_SAFE_TX_TYPE, safeTx)
 }
 
 export const buildSignatureBytes = (signatures: SafeSignature[]): string => {
@@ -65,6 +73,8 @@ export const buildContractCall = (
   delegateCall?: boolean,
   overrides?: Partial<SafeTransaction>
 ): SafeTransaction => {
+  debugger
+
   const data = contract.interface.encodeFunctionData(method, params)
   return buildSafeTransaction(
     Object.assign(
@@ -78,6 +88,7 @@ export const buildContractCall = (
     )
   )
 }
+
 export const buildSafeTransaction = (template: {
   to: string
   value?: BigNumber | number | string
@@ -121,4 +132,26 @@ export const signer = (user: string) => {
   //   user1.address.slice(2) +
   //   '0000000000000000000000000000000000000000000000000000000000000041' +
   //   '00' // r, s, v
+}
+
+export const executeTx = async (
+  safe: Contract,
+  safeTx: SafeTransaction,
+  signatures: SafeSignature[],
+  overrides?: any
+): Promise<any> => {
+  const signatureBytes = buildSignatureBytes(signatures)
+  return safe.execTransaction(
+    safeTx.to,
+    safeTx.value,
+    safeTx.data,
+    safeTx.operation,
+    safeTx.safeTxGas,
+    safeTx.baseGas,
+    safeTx.gasPrice,
+    safeTx.gasToken,
+    safeTx.refundReceiver,
+    signatureBytes,
+    overrides || {}
+  )
 }

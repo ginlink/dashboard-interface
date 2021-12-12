@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import styled from 'styled-components/macro'
 import { Table } from 'antd'
-import { getTransctionList, addTx } from '@/services/api'
+import { getTransctionList, addTx, addTxType } from '@/services/api'
 import { Modal, Button, Pagination } from 'antd'
 import {
   APPROVENUM,
@@ -16,7 +16,13 @@ import { message } from 'antd'
 import CreateTransactionModal, { CallType, MethodParams, TransferParams } from './CreateTransactionModal'
 import { ButtonPrimary } from '@/components/Button'
 import TableRowModal, { RowItemType } from './TableRowModal'
-import { useTokenContract, useTransactionMultiSend, useTransactionProxy } from '@/hooks/useContract'
+import {
+  getSigner,
+  useSafeProxy,
+  useTokenContract,
+  useTransactionMultiSend,
+  useTransactionProxy,
+} from '@/hooks/useContract'
 import { useActiveWeb3React } from '@/hooks/web3'
 import fu from '@/assets/images/fu.png'
 import copy from 'copy-to-clipboard'
@@ -25,9 +31,11 @@ import TxStatus from './TxStatus'
 import { TRANSACTION_MULTISEND_ADDRESS, TRANSACTION_PROXY_ADDRESS } from '@/constants/addresses'
 import { Contract } from '@ethersproject/contracts'
 import { bundleCallData, getExecByteData } from './util'
-import { SafeTransaction } from '@/utils/execution'
+import { buildContractCall, executeTx, SafeSignature, SafeTransaction } from '@/utils/execution'
 import BigFloatNumber from 'bignumber.js'
 import { useSingleCallResult } from '@/state/multicall/hooks'
+import { buildMultiSendSafeTx } from '@/utils/multisend'
+import { safeSignTypedData } from '@/utils'
 
 const processingData = function (hash: string) {
   if (hash) {
@@ -183,13 +191,16 @@ export default function TransactionList() {
 
   // const [nonce, setNonce] = useState<number | undefined>(undefined)
 
+  const { library, account } = useActiveWeb3React()
+
+  const [signatures, setSignatures] = useState<SafeSignature[]>([])
+  const [safeTx, setSafeTx] = useState<SafeTransaction | undefined>(undefined)
+
+  const safeProxy = useSafeProxy()
+  const multiSend = useTransactionMultiSend()
   const tokenContract = useTokenContract(tokenAddress)
 
-  const multiSendContract = useTransactionMultiSend()
-
-  const transactionProxy = useTransactionProxy()
-
-  const { result } = useSingleCallResult(transactionProxy, 'nonce')
+  const { result } = useSingleCallResult(safeProxy, 'nonce')
 
   const nonce = useMemo(() => {
     if (!result) return
@@ -214,7 +225,7 @@ export default function TransactionList() {
 
   //初始化start
   const getDataLists = useCallback(async () => {
-    if (!transactionProxy) {
+    if (!safeProxy) {
       setDataList([])
       return
     }
@@ -224,28 +235,28 @@ export default function TransactionList() {
     }
     const res = await getTransctionList()
     //事务状态处理
-    res.map((item: any) => {
-      const promiseArr: Array<any> = []
-      OWNERARR.map((v: string) => {
-        promiseArr.push(transactionProxy?.approvedHashes(v, item.tx_hash))
-      })
-      let count = 0
-      Promise.all(promiseArr).then((res) => {
-        console.log('res:', res, nonce)
-        res.map((v) => {
-          if (v.toNumber()) count += 1
-        })
-      })
-      if (count >= APPROVENUM && nonce > Number(item.tx_id)) {
-        item.tx_state = TXSTATE.COMPLETED
-      } else if (count >= 0 && nonce == Number(item.tx_id)) {
-        item.tx_state = TXSTATE.HAVEINHAND
-      } else {
-        item.tx_state = TXSTATE.INVALID
-      }
-    })
+    // res.map((item: any) => {
+    //   const promiseArr: Array<any> = []
+    //   OWNERARR.map((v: string) => {
+    //     promiseArr.push(safeProxy?.approvedHashes(v, item.tx_hash))
+    //   })
+    //   let count = 0
+    //   Promise.all(promiseArr).then((res) => {
+    //     console.log('res:', res, nonce)
+    //     res.map((v) => {
+    //       if (v.toNumber()) count += 1
+    //     })
+    //   })
+    //   if (count >= APPROVENUM && nonce > Number(item.tx_id)) {
+    //     item.tx_state = TXSTATE.COMPLETED
+    //   } else if (count >= 0 && nonce == Number(item.tx_id)) {
+    //     item.tx_state = TXSTATE.HAVEINHAND
+    //   } else {
+    //     item.tx_state = TXSTATE.INVALID
+    //   }
+    // })
     setDataList(res)
-  }, [nonce, transactionProxy])
+  }, [nonce, safeProxy])
 
   useEffect(() => {
     getDataLists()
@@ -254,11 +265,11 @@ export default function TransactionList() {
 
   // get nonce
   // useEffect(() => {
-  //   if (!transactionProxy) return
+  //   if (!safeProxy) return
 
   //   // nonce不会很大，用toNumber
-  //   transactionProxy.nonce().then((res) => setNonce(res.toNumber()))
-  // }, [transactionProxy])
+  //   safeProxy.nonce().then((res) => setNonce(res.toNumber()))
+  // }, [safeProxy])
 
   const resetDataList = useCallback(async () => {
     const list = await getTransctionList()
@@ -267,194 +278,281 @@ export default function TransactionList() {
     setDataList(list)
   }, [])
 
+  // const onCreateFinishedHandler = useCallback(
+  //   async (values: TransferParams & MethodParams) => {
+  //     console.log('[](values):', values, callType)
+
+  //     debugger
+  //     if (!chainId || !nonce || !safeProxy) return
+
+  //     const safeAddress = TRANSACTION_PROXY_ADDRESS[chainId]
+
+  //     // bundle data
+  //     let [safeTx, safeApproveHash]: [SafeTransaction | undefined, string | undefined] = [undefined, undefined]
+
+  //     let txFunArg: any[] = []
+  //     let method = ''
+
+  //     if (callType === CallType.TRANSFER) {
+  //       const { fromAddress, toAddress, amount } = values
+
+  //       if (!fromAddress || !toAddress || !amount) return
+
+  //       if (!decimals) return
+
+  //       const bigAmount = new BigFloatNumber(amount).multipliedBy(new BigFloatNumber(10).pow(decimals))
+
+  //       const params = [toAddress, bigAmount.toFixed()]
+  //       txFunArg = params
+  //       method = 'transfer'
+
+  //       if (!tokenContract) return
+
+  //       debugger
+
+  //       try {
+  //         ;[safeTx, safeApproveHash] = bundleCallData({
+  //           type: callType,
+  //           contract: tokenContract,
+  //           multiSendContract,
+  //           safe: safeProxy,
+  //           method,
+  //           params,
+  //           nonce,
+  //           chainId,
+  //         })
+  //       } catch (err: any) {
+  //         // message.error(JSON.stringify(err))
+
+  //         message.error(err?.message)
+  //       }
+  //     } else {
+  //       const { funcParams, arg } = values
+
+  //       if (!funcParams) return
+
+  //       method = funcParams.slice(0, funcParams.indexOf('('))
+
+  //       const params = arg?.split(',')
+
+  //       // transferOwnership()
+
+  //       txFunArg = params ? params : []
+
+  //       if (!contract) return
+
+  //       try {
+  //         ;[safeTx, safeApproveHash] = bundleCallData({
+  //           type: callType,
+  //           contract,
+  //           multiSendContract,
+  //           safe: safeProxy,
+  //           method,
+  //           params,
+  //           nonce,
+  //           chainId,
+  //         })
+  //       } catch (err: any) {
+  //         // message.error(JSON.stringify(err))
+  //         message.error(err?.message)
+  //       }
+  //     }
+
+  //     if (!safeTx || !safeApproveHash) return
+
+  //     // bundle api data
+  //     const addParam = {
+  //       txType: callType,
+  //       txId: nonce,
+  //       txFrom: '',
+  //       txTo: '',
+  //       txAmount: '',
+  //       txHash: safeApproveHash,
+  //       txFunArg: txFunArg.join(','),
+  //       txData: safeTx.data,
+  //       txProaddr: safeAddress,
+  //       txFun: '',
+  //     }
+
+  //     if (callType === CallType.TRANSFER) {
+  //       addParam.txAmount = txFunArg?.[1]?.toString()
+  //       addParam.txHash = safeApproveHash
+  //       addParam.txFun = 'transfer'
+  //       addParam.txFrom = tokenAddress || ''
+  //     } else {
+  //       addParam.txFun = method
+  //       addParam.txFrom = contract?.address || ''
+  //     }
+
+  //     // transaction
+  //     try {
+  //       debugger
+  //       await safeProxy.approveHash(safeApproveHash)
+
+  //       getDataLists()
+
+  //       setTokenAddress('')
+  //       setContract(undefined)
+  //       setIsOpen(false)
+  //     } catch (err) {
+  //       console.log('[onCreateHandler](err):', err)
+  //     }
+  //   },
+  //   [
+  //     callType,
+  //     chainId,
+  //     nonce,
+  //     safeProxy,
+  //     decimals,
+  //     tokenContract,
+  //     multiSendContract,
+  //     contract,
+  //     tokenAddress,
+  //     getDataLists,
+  //   ]
+  // )
+
   const onCreateFinishedHandler = useCallback(
     async (values: TransferParams & MethodParams) => {
-      console.log('[](values):', values, callType)
+      const { fromAddress, toAddress, amount, contractName, funcParams, arg } = values
 
-      debugger
-      if (!chainId || !nonce || !transactionProxy) return
+      if (!multiSend || !safeProxy) return
 
-      const safeAddress = TRANSACTION_PROXY_ADDRESS[chainId]
+      const nonce = (await safeProxy.nonce())?.toNumber()
 
-      // bundle data
-      let [safeTx, safeApproveHash]: [SafeTransaction | undefined, string | undefined] = [undefined, undefined]
+      // const tx0 = buildContractCall(simpleState, 'updateNum', ['1'], nonce)
 
-      let txFunArg: any[] = []
-      let method = ''
+      // const tx1 = buildContractCall(simpleState, 'updateAge', ['1'], nonce)
+
+      let tx: SafeTransaction | undefined = undefined
 
       if (callType === CallType.TRANSFER) {
-        const { fromAddress, toAddress, amount } = values
+        if (!tokenContract || !amount) return
 
-        if (!fromAddress || !toAddress || !amount) return
+        const decimals = await tokenContract.decimals()
 
-        if (!decimals) return
+        const parsedAmount = new BigFloatNumber(amount).multipliedBy(new BigFloatNumber(10).pow(decimals)).toFixed()
 
-        const bigAmount = new BigFloatNumber(amount).multipliedBy(new BigFloatNumber(10).pow(decimals))
+        tx = buildContractCall(tokenContract, 'transfer', [toAddress, parsedAmount], nonce)
+      } else if (callType === CallType.METHOD) {
+        if (!contract || !funcParams) return
 
-        const params = [toAddress, bigAmount.toFixed()]
-        txFunArg = params
-        method = 'transfer'
+        const param = arg?.split(',')
 
-        if (!tokenContract) return
-
-        debugger
-
-        try {
-          ;[safeTx, safeApproveHash] = bundleCallData({
-            type: callType,
-            contract: tokenContract,
-            multiSendContract,
-            safeAddress,
-            method,
-            params,
-            nonce,
-            chainId,
-          })
-        } catch (err: any) {
-          // message.error(JSON.stringify(err))
-
-          message.error(err?.message)
-        }
-      } else {
-        const { funcParams, arg } = values
-
-        if (!funcParams) return
-
-        method = funcParams.slice(0, funcParams.indexOf('('))
-
-        const params = arg?.split(',')
-
-        // transferOwnership()
-
-        txFunArg = params ? params : []
-
-        if (!contract) return
-
-        try {
-          ;[safeTx, safeApproveHash] = bundleCallData({
-            type: callType,
-            contract,
-            multiSendContract,
-            safeAddress,
-            method,
-            params,
-            nonce,
-            chainId,
-          })
-        } catch (err: any) {
-          // message.error(JSON.stringify(err))
-          message.error(err?.message)
-        }
+        tx = buildContractCall(contract, funcParams, param || [], nonce)
       }
 
-      if (!safeTx || !safeApproveHash) return
+      if (!library || !account) return
 
-      // bundle api data
-      const addParam = {
+      if (!tx) return
+
+      const safeTx = buildMultiSendSafeTx(multiSend, [tx], nonce)
+
+      setSafeTx(safeTx)
+
+      // send tx data to service
+
+      const requsetParam: addTxType = {
         txType: callType,
         txId: nonce,
         txFrom: '',
         txTo: '',
         txAmount: '',
-        txHash: safeApproveHash,
-        txFunArg: txFunArg.join(','),
+        txHash: '',
+        txFunArg: '',
         txData: safeTx.data,
-        txProaddr: safeAddress,
+        txProaddr: safeProxy.address,
         txFun: '',
       }
 
-      if (callType === CallType.TRANSFER) {
-        addParam.txAmount = txFunArg?.[1]?.toString()
-        addParam.txHash = safeApproveHash
-        addParam.txFun = 'transfer'
-        addParam.txFrom = tokenAddress || ''
-      } else {
-        addParam.txFun = method
-        addParam.txFrom = contract?.address || ''
-      }
-
-      // transaction
-      try {
-        debugger
-        await transactionProxy.approveHash(safeApproveHash)
-
-        getDataLists()
-
-        setTokenAddress('')
-        setContract(undefined)
-        setIsOpen(false)
-      } catch (err) {
-        console.log('[onCreateHandler](err):', err)
-      }
+      await addTx(requsetParam)
+      setIsOpen(false)
+      getDataLists()
     },
-    [
-      callType,
-      chainId,
-      nonce,
-      transactionProxy,
-      decimals,
-      tokenContract,
-      multiSendContract,
-      contract,
-      tokenAddress,
-      getDataLists,
-    ]
+    [account, callType, contract, getDataLists, library, multiSend, safeProxy, tokenContract]
   )
 
   const onApproveHandler = useCallback(
-    (item) => {
+    async (item) => {
       console.log('item', item)
 
-      transactionProxy?.approveHash(item.tx_hash).then((res) => {
-        console.log('res', res)
+      // safeProxy?.approveHash(item.tx_hash).then((res) => {
+      //   console.log('res', res)
+      // })
+
+      if (!library || !account) return
+
+      if (!safeProxy || !safeTx) return
+
+      const signer = getSigner(library, account)
+
+      const signature = await safeSignTypedData(signer, safeProxy, safeTx, chainId)
+
+      console.log('[](safeTx):', safeTx, nonce, signature)
+
+      // send data to service
+
+      setSignatures((prev) => {
+        return [...prev, signature]
       })
     },
-    [transactionProxy]
+    [account, chainId, library, nonce, safeProxy, safeTx]
   )
 
-  const onConfirmHandler = useCallback(
-    async (item: RowItemType) => {
-      if (!chainId || !transactionProxy) return
+  // const onConfirmHandler = useCallback(
+  //   async (item: RowItemType) => {
+  //     if (!chainId || !safeProxy) return
 
-      const { tx_data } = item
+  //     const { tx_data } = item
 
-      if (!tx_data) return
+  //     if (!tx_data) return
 
-      // console.log('item', item)
-      // console.log(await transactionProxy?.nonce())
+  //     // console.log('item', item)
+  //     // console.log(await safeProxy?.nonce())
 
-      const mutiSendAddress = TRANSACTION_MULTISEND_ADDRESS[chainId]
+  //     const mutiSendAddress = TRANSACTION_MULTISEND_ADDRESS[chainId]
 
-      transactionProxy
-        .execTransaction(
-          mutiSendAddress,
-          0,
-          tx_data,
-          1,
-          0,
-          0,
-          0,
-          '0x0000000000000000000000000000000000000000',
-          '0x0000000000000000000000000000000000000000',
-          getExecByteData()
-        )
-        .then((res) => {
-          console.log('res', res)
-        })
-        .catch((err) => {
-          console.log('[](err):', err)
-        })
-    },
-    [chainId, transactionProxy]
-  )
+  //     safeProxy
+  //       .execTransaction(
+  //         mutiSendAddress,
+  //         0,
+  //         tx_data,
+  //         1,
+  //         0,
+  //         0,
+  //         0,
+  //         '0x0000000000000000000000000000000000000000',
+  //         '0x0000000000000000000000000000000000000000',
+  //         getExecByteData()
+  //       )
+  //       .then((res) => {
+  //         console.log('res', res)
+  //       })
+  //       .catch((err) => {
+  //         console.log('[](err):', err)
+  //       })
+  //   },
+  //   [chainId, safeProxy]
+  // )
 
-  const onViewRow = useCallback((row: RowItemType) => {
+  const onConfirmHandler = useCallback(async () => {
+    if (!safeProxy || !safeTx) return
+
+    console.log('[](safeTx):', safeTx, signatures)
+
+    // exec
+    await executeTx(safeProxy, safeTx, signatures)
+  }, [safeProxy, safeTx, signatures])
+
+  const onViewRowHandler = useCallback((row: RowItemType) => {
     setRowData(row)
-    if (row.tx_state !== TXSTATE.INVALID) {
-      setOpenRow(true)
-    } else {
-      message.warning('已失效')
-    }
+
+    setOpenRow(true)
+    // if (row.tx_state !== TXSTATE.INVALID) {
+    //   setOpenRow(true)
+    // } else {
+    //   message.warning('已失效')
+    // }
   }, [])
 
   // debug
@@ -478,7 +576,7 @@ export default function TransactionList() {
         onRow={(record) => {
           return {
             onClick: () => {
-              onViewRow(record)
+              onViewRowHandler(record)
             }, // 点击行
           }
         }}

@@ -10,7 +10,7 @@ import swapMining from '@/abis/swap-mining.json'
 import ERC20_ABI from '@/abis/erc20.json'
 import REWARD_POOL_ABI from '@/abis/reward-pool.json'
 
-import { Erc20, ISpePool, RewardPool, SwapMining } from '@/abis/types'
+import { Erc20, ISpePool, RewardPool, SafeFactory, SwapMining } from '@/abis/types'
 import { SupportedChainId } from '@/constants/chains'
 import { Vault } from '@/abis/types/Vault'
 import abiDatas from '../abis/ISpePool.json'
@@ -20,17 +20,22 @@ import {
   TRANSACTION_SWAPMING_ADDRESSES,
   TRANSACTION_OPERATABLE_ADDRESS,
   TRANSACTION_MULTISEND_ADDRESS,
+  SAFE_FACTORY_ADDRESS,
 } from '@/constants/addresses'
 import { abi as gnosisSafe } from '@/abis/GnosisSafe.json'
 import { abi as Ownable } from 'abis/Ownable.json'
 import { abi as multiSend } from 'abis/MultiSend.json'
 import { abi as positionReward } from 'abis/position-reward.json'
+import { abi as SAFE_FACTORY_ABI } from 'abis/safe_factory.json'
+import { abi as SIMPLE_STATE_ABI } from 'abis/simple_state.json'
+import { abi as SWAP_MING_ABI } from 'abis/swap-mining.json'
 import { GnosisSafe } from 'abis/types/GnosisSafe'
 import { PositionReward } from 'abis/types/PositionReward'
 import { MultiSend } from 'abis/types/MultiSend'
 
 import { UniswapInterfaceMulticall } from '@/types/v3'
 import { abi as MULTICALL_ABI } from 'plugins/@uniswap/v3-periphery/artifacts/contracts/lens/UniswapInterfaceMulticall.sol/UniswapInterfaceMulticall.json'
+import { SimpleState } from '@/abis/types/SimpleState'
 
 export function getSigner(library: Web3Provider, account: string) {
   return library.getSigner(account).connectUnchecked()
@@ -156,4 +161,20 @@ export function useTransactionReward() {
 
 export function useTransactionMultiSend() {
   return useContract<MultiSend>(TRANSACTION_MULTISEND_ADDRESS, multiSend)
+}
+
+export function useSafeFactory() {
+  return useContract<SafeFactory>(SAFE_FACTORY_ADDRESS, SAFE_FACTORY_ABI)
+}
+
+export function useSafeProxy() {
+  return useContract<GnosisSafe>('0x9894d1C28d474BeA3Ef95D6badFC160373df8a8A', gnosisSafe)
+}
+
+export function useSimpleState() {
+  return useContract<SimpleState>('0x8c0e71928F3f099C0E0d94e31cf17f30D605bfD3', SIMPLE_STATE_ABI)
+}
+
+export function useSwapMing() {
+  return useContract<SwapMining>('0x01Af8d162E217eE0eF22f7ddb52488870335ca12', SWAP_MING_ABI)
 }
