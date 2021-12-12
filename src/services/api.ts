@@ -7,7 +7,8 @@ interface SearchParams {
   start_time?: string
   end_time?: string
 }
-type addTxType = {
+
+export type addTxType = {
   txType?: number
   txId?: string | number
   txFrom?: string
