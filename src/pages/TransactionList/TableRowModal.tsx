@@ -109,9 +109,10 @@ export default function TableRowModal({
   const openSuccess = useMemo(() => {
     if (!signatures || !safeProxyInfo || safeProxyInfo.threshold == undefined || nonce == undefined) return true
     if (current) return true
+    if (nonce.toString() != item.txId) return true
     if (signatures.length >= safeProxyInfo.threshold) return false
     return true
-  }, [current, nonce, safeProxyInfo, signatures])
+  }, [current, item.txId, nonce, safeProxyInfo, signatures])
 
   return (
     <Modal isOpen={openRow}>

@@ -481,8 +481,12 @@ export default function TransactionList() {
 
       // exec
       await executeTx(safeProxy, safeTx, signatures)
+      message.success('执行交易已发送！')
+      resetDataList()
+      setIsOpen(false)
+      setOpenRow(false)
     },
-    [safeProxy]
+    [resetDataList, safeProxy]
   )
 
   const onViewRowHandler = useCallback((row: TxPropsApi) => {
