@@ -6,6 +6,7 @@ import { Input } from 'antd'
 import { txType } from '@/constants/txType'
 import { ButtonPrimary } from '@/components/Button'
 import { TxPropsApi } from '@/services/api'
+import { shortenAddress } from '@/utils'
 
 const CloseWrapper = styled.div`
   position: absolute;
@@ -32,6 +33,12 @@ const BtnBox = styled.div`
     width: 36%;
   }
 `
+const OwnesBox = styled.div`
+  margin-top: 14px;
+`
+const OwnesItem = styled.div`
+  margin-top: 14px;
+`
 
 type TableRowModalType = {
   openRow: boolean
@@ -39,9 +46,19 @@ type TableRowModalType = {
   closeRowModal: () => void
   approveFn: (item: TxPropsApi) => void
   confrimFn: (item: TxPropsApi) => void
+  threshold: string | undefined
+  ownes: Array<string> | undefined
 }
 
-export default function TableRowModal({ openRow, item, closeRowModal, approveFn, confrimFn }: TableRowModalType) {
+export default function TableRowModal({
+  openRow,
+  item,
+  closeRowModal,
+  approveFn,
+  confrimFn,
+  ownes,
+  threshold,
+}: TableRowModalType) {
   return (
     <Modal isOpen={openRow}>
       <CloseWrapper onClick={() => closeRowModal && closeRowModal()}>
@@ -86,6 +103,11 @@ export default function TableRowModal({ openRow, item, closeRowModal, approveFn,
         <ButtonPrimary onClick={() => approveFn(item)}>授权</ButtonPrimary>
         <ButtonPrimary onClick={() => confrimFn(item)}>确认</ButtonPrimary>
       </BtnBox>
+      <OwnesBox>
+        {ownes?.map((res) => {
+          return <OwnesItem key={res}>{shortenAddress(res, 6)}</OwnesItem>
+        })}
+      </OwnesBox>
     </Modal>
   )
 }

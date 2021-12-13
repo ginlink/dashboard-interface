@@ -93,7 +93,7 @@ export default function CreateTransactionModal({
   const [callType, setCallType] = useState(CallType.TRANSFER)
 
   const [form] = Form.useForm()
-
+  debugger
   const contractAddresses: ContractAddresses | undefined = useMemo(() => {
     if (!chainId) return
 

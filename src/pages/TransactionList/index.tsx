@@ -12,6 +12,7 @@ import {
   useSignatureBytes,
   useTransacitonSubmitData,
 } from './hooks'
+import { BigNumberish, CallOverrides } from 'ethers'
 import { message } from 'antd'
 import CreateTransactionModal, { CallType, MethodParams, TransferParams } from './CreateTransactionModal'
 import { ButtonPrimary } from '@/components/Button'
@@ -181,6 +182,10 @@ export default function TransactionList() {
 
   const [callType, setCallType] = useState(CallType.TRANSFER)
 
+  const [ownes, setownes] = useState<Array<string> | undefined>(undefined)
+
+  const [threshold, setThreshold] = useState<string | undefined>(undefined)
+
   const { library, account } = useActiveWeb3React()
 
   const safeProxy = useTransactionProxy()
@@ -201,6 +206,16 @@ export default function TransactionList() {
       setDataList(res)
     })
   }, [])
+  useEffect(() => {
+    safeProxy?.getOwners().then((data) => {
+      console.log('getOwners', data)
+      setownes(data)
+    })
+    safeProxy?.getThreshold().then((data) => {
+      console.log('getThreshold', data)
+      setThreshold(data.toString())
+    })
+  }, [safeProxy])
 
   //初始化start
   const getDataLists = useCallback(async () => {
@@ -484,6 +499,8 @@ export default function TransactionList() {
         approveFn={onApproveHandler}
         confrimFn={onConfirmHandler}
         closeRowModal={() => setOpenRow(false)}
+        ownes={ownes}
+        threshold={threshold}
         openRow={openRow}
         item={rowData}
       ></TableRowModal>
