@@ -177,18 +177,11 @@ export default function TransactionList() {
 
   const [tokenAddress, setTokenAddress] = useState<string | undefined>()
 
-  const [decimals, setDecimals] = useState<number | undefined>(undefined)
-
   const [contract, setContract] = useState<Contract | undefined>(undefined)
 
   const [callType, setCallType] = useState(CallType.TRANSFER)
 
-  // const [nonce, setNonce] = useState<number | undefined>(undefined)
-
   const { library, account } = useActiveWeb3React()
-
-  const [signatures, setSignatures] = useState<SafeSignature[]>([])
-  const [safeTx, setSafeTx] = useState<SafeTransaction | undefined>(undefined)
 
   const safeProxy = useTransactionProxy()
   const multiSend = useTransactionMultiSend()
@@ -208,15 +201,6 @@ export default function TransactionList() {
       setDataList(res)
     })
   }, [])
-
-  // get decimals
-  useEffect(() => {
-    if (!tokenContract) return
-
-    tokenContract.decimals().then((res) => {
-      setDecimals(res)
-    })
-  }, [tokenContract])
 
   //初始化start
   const getDataLists = useCallback(async () => {
@@ -275,7 +259,7 @@ export default function TransactionList() {
 
   const onCreateFinishedHandler = useCallback(
     async (values: TransferParams & MethodParams) => {
-      const { fromAddress, toAddress, amount, contractName, funcParams, arg } = values
+      const { fromAddress, toAddress, amount, contractName, funcName, arg } = values
 
       if (!multiSend || !safeProxy) return
 
@@ -304,27 +288,37 @@ export default function TransactionList() {
       if (callType === CallType.TRANSFER) {
         if (!tokenContract || !amount) return
 
-        // TODO如果不是token地址，这里会报错，需要处理
-        const decimals = await tokenContract.decimals()
+        let decimals: number | undefined = undefined
+
+        try {
+          decimals = await tokenContract.decimals()
+        } catch (err) {
+          console.log('[decimals](err):', err)
+          message.warning('expect token address!')
+        }
+
+        if (!decimals) return
 
         const parsedAmount = new BigFloatNumber(amount).multipliedBy(new BigFloatNumber(10).pow(decimals)).toFixed()
 
         tx = buildContractCall(tokenContract, 'transfer', [toAddress, parsedAmount], nonce)
 
         debugger
-        requestParam.txFrom = fromAddress
+        requestParam.txFrom = tokenContract.address
         requestParam.txTo = toAddress
         requestParam.txAmount = parsedAmount
         requestParam.txFun = 'transfer'
       } else if (callType === CallType.METHOD) {
-        if (!contract || !funcParams) return
+        if (!contract || !funcName) return
 
         // const param = arg?.split(',')
         const param = parseParam(arg)
 
-        tx = buildContractCall(contract, funcParams, param || [], nonce)
+        tx = buildContractCall(contract, funcName, param || [], nonce)
 
-        const funcName = funcParams.indexOf('(') != -1 ? funcParams.slice(0, funcParams.indexOf('(')) : funcParams
+        // const funcName = funcName.indexOf('(') != -1 ? funcName.slice(0, funcName.indexOf('(')) : funcName
+
+        requestParam.txFrom = contract.address
         requestParam.txFunArg = arg
         requestParam.txFun = funcName
       }
@@ -339,15 +333,14 @@ export default function TransactionList() {
 
       requestParam.txData = JSON.stringify(safeTx)
 
-      // send tx data to service
-
       debugger
+      // send tx data to service
 
       await addTx(requestParam)
       setIsOpen(false)
-      getDataLists()
+      resetDataList()
     },
-    [account, callType, contract, getDataLists, library, multiSend, safeProxy, tokenContract]
+    [account, callType, contract, library, multiSend, resetDataList, safeProxy, tokenContract]
   )
 
   const onApproveHandler = useCallback(
