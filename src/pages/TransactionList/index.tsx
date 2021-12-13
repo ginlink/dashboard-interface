@@ -16,13 +16,7 @@ import { message } from 'antd'
 import CreateTransactionModal, { CallType, MethodParams, TransferParams } from './CreateTransactionModal'
 import { ButtonPrimary } from '@/components/Button'
 import TableRowModal from './TableRowModal'
-import {
-  getSigner,
-  useSafeProxy,
-  useTokenContract,
-  useTransactionMultiSend,
-  useTransactionProxy,
-} from '@/hooks/useContract'
+import { getSigner, useTokenContract, useTransactionMultiSend, useTransactionProxy } from '@/hooks/useContract'
 import { useActiveWeb3React } from '@/hooks/web3'
 import fu from '@/assets/images/fu.png'
 import copy from 'copy-to-clipboard'
@@ -196,7 +190,7 @@ export default function TransactionList() {
   const [signatures, setSignatures] = useState<SafeSignature[]>([])
   const [safeTx, setSafeTx] = useState<SafeTransaction | undefined>(undefined)
 
-  const safeProxy = useSafeProxy()
+  const safeProxy = useTransactionProxy()
   const multiSend = useTransactionMultiSend()
   const tokenContract = useTokenContract(tokenAddress)
 

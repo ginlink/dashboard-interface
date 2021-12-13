@@ -11,9 +11,13 @@ import ownableAbi from '@/abis/Ownable.json'
 import positionRewardAbi from '@/abis/position-reward.json'
 import { ContractAddresses, parseAbis, StaticBaseContract } from './util'
 import { Contract } from '@ethersproject/contracts'
-import { getSignerOrProvider, SWAP_MINING_ADDRESSES } from '@/hooks/useContract'
+import { getSignerOrProvider } from '@/hooks/useContract'
 import { useActiveWeb3React } from '@/hooks/web3'
-import { TRANSACTION_OPERATABLE_ADDRESS, TRANSACTION_POSITION_REWARD_ADDRESS } from '@/constants/addresses'
+import {
+  TRANSACTION_OPERATABLE_ADDRESS,
+  TRANSACTION_POSITION_REWARD_ADDRESS,
+  TRANSACTION_SWAPMING_ADDRESSES,
+} from '@/constants/addresses'
 import { isAddress } from '@ethersproject/address'
 import { FuncType } from '../CallAdmin/util'
 
@@ -92,7 +96,7 @@ export default function CreateTransactionModal({
     if (!chainId) return
 
     return {
-      SwapMining: SWAP_MINING_ADDRESSES[chainId],
+      SwapMining: TRANSACTION_SWAPMING_ADDRESSES[chainId],
       Ownable: TRANSACTION_OPERATABLE_ADDRESS[chainId],
       positionReward: TRANSACTION_POSITION_REWARD_ADDRESS[chainId],
     }

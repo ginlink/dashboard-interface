@@ -1,9 +1,21 @@
 import { constructSameAddressMap } from '@/utils/constructSameAddressMap'
 import { SupportedChainId } from './chains'
 
-type AddressMap = { [chainId: number]: string }
+export type AddressMap = { [chainId: number]: string }
 
 export const AddressZero = '0x0000000000000000000000000000000000000000'
+
+export function getAddress(address: string | AddressMap, chainId: number | undefined) {
+  if (!chainId) return
+
+  return typeof address == 'string' ? address : address ? address[chainId] : undefined
+}
+
+export const MULTICALL_ADDRESSES: AddressMap | string = {
+  // [SupportedChainId.BSCTEST]: '0xC4eB70E1C4C1d866fb4f1Be73AA458dCDe9a1F99',
+  [SupportedChainId.BSCTEST]: '0x11cee792b8D394f90127C1d631842a4898A422a0',
+  [SupportedChainId.BSC]: '0x193869c927F2e416E71c3D178266cD2faf7ca2d0',
+}
 
 // TODO    transaction  address  start
 export const TRANSACTION_SWAPMING_ADDRESSES: AddressMap = {
