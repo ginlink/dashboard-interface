@@ -80,14 +80,24 @@ export function parseParam(arg?: string) {
     const matched = currentStr.match(startSquareBracketsReg)
     if (matched) {
       const matchedStr = matched[0]
+
+      const parsed = JSON.parse(matchedStr)
+
+      // matchedStr = matchedStr.replaceAll('\\', '')
+
+      console.log('[](matchedStr):', matchedStr)
+
+      debugger
       const matchedLen = matchedStr.length
-      param.push(matchedStr)
+      // param.push(matchedStr)
+      param.push(parsed)
 
       pos += matchedLen
       ++pos //jump comma
     } else {
       const commaPos = currentStr.indexOf(',')
-      const normalStr = currentStr.slice(0, commaPos)
+
+      const normalStr = commaPos != -1 ? currentStr.slice(0, commaPos) : currentStr.slice(0)
       const normalStrLen = normalStr.length
       param.push(normalStr)
 
@@ -98,6 +108,13 @@ export function parseParam(arg?: string) {
 
   return param
 }
+
+// console.log(
+//   '[](parseParam):',
+//   parseParam(
+//     '["0x07BdAA598FC89BC304F9942178c0fF9592A8Df16","100,0x716A55613218a6c7814a1aDCD4575a4397Db352B","1639377600"],100'
+//   )
+// )
 
 export type StaticBaseContract = {
   contractName?: string

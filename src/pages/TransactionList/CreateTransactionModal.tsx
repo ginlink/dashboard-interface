@@ -263,9 +263,9 @@ export default function CreateTransactionModal({
             <Select onChange={onChangeMethodHandler} allowClear>
               {contractMethods &&
                 contractMethods.map((item, index) => {
-                  const { nameAndParam } = item
+                  const { nameAndParam, name } = item
                   return (
-                    <Option value={nameAndParam ?? ''} key={index}>
+                    <Option value={name ?? ''} key={index}>
                       {nameAndParam}
                     </Option>
                   )
