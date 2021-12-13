@@ -141,7 +141,7 @@ export default function CreateTransactionModal({
 
       // update placeholder param
       const { key: index } = option
-      const funcParam = contractMethods[index].param
+      const funcParam = contractMethods[index].name
       setFuncParams(funcParam)
     },
     [contractMethods]

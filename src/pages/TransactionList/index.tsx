@@ -311,6 +311,7 @@ export default function TransactionList() {
 
         tx = buildContractCall(tokenContract, 'transfer', [toAddress, parsedAmount], nonce)
 
+        debugger
         requestParam.txFrom = fromAddress
         requestParam.txTo = toAddress
         requestParam.txAmount = parsedAmount
@@ -322,8 +323,9 @@ export default function TransactionList() {
 
         tx = buildContractCall(contract, funcParams, param || [], nonce)
 
+        const funcName = funcParams.indexOf('(') != -1 ? funcParams.slice(0, funcParams.indexOf('(')) : funcParams
         requestParam.txFunArg = arg
-        requestParam.txFun = funcParams
+        requestParam.txFun = funcName
       }
 
       if (!library || !account) return
