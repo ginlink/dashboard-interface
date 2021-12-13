@@ -1,11 +1,11 @@
+import { TxPropsApi } from '@/services/api'
 import React from 'react'
 import styled from 'styled-components/macro'
 import { TXSTATE, useTxStatus } from './hooks'
-import { RowItemType } from './TableRowModal'
 
 type TxStatusType = {
   text: any
-  record: RowItemType
+  record: TxPropsApi
 }
 const Wrapper = styled.div``
 function getState(state: number) {

@@ -5,6 +5,7 @@ import CloseOutlined from '@ant-design/icons/lib/icons/CloseOutlined'
 import { Input } from 'antd'
 import { txType } from '@/constants/txType'
 import { ButtonPrimary } from '@/components/Button'
+import { TxPropsApi } from '@/services/api'
 
 const CloseWrapper = styled.div`
   position: absolute;
@@ -32,28 +33,28 @@ const BtnBox = styled.div`
   }
 `
 
-export type RowItemType = {
-  id: number
-  tx_id: string
-  tx_hash: string
-  tx_type: string
-  tx_from: string
-  tx_to: string
-  tx_amount: string
-  tx_fun: string
-  tx_fun_arg: string
-  tx_agent?: any
-  tx_data: string
-  tx_proaddr: string
-  tx_state?: number
-}
+// export type RowItemType = {
+//   id: number
+//   txId: string
+//   txHash: string
+//   txType: string
+//   txFrom: string
+//   txTo: string
+//   txAmount: string
+//   txFun: string
+//   txFunArg: string
+//   tx_agent?: any
+//   txData: string
+//   txProaddr: string
+//   tx_state?: number
+// }
 
 type TableRowModalType = {
   openRow: boolean
-  item: RowItemType
+  item: TxPropsApi
   closeRowModal: () => void
-  approveFn: (item: RowItemType) => void
-  confrimFn: (item: RowItemType) => void
+  approveFn: (item: TxPropsApi) => void
+  confrimFn: (item: TxPropsApi) => void
 }
 
 export default function TableRowModal({ openRow, item, closeRowModal, approveFn, confrimFn }: TableRowModalType) {
@@ -62,36 +63,40 @@ export default function TableRowModal({ openRow, item, closeRowModal, approveFn,
       <CloseWrapper onClick={() => closeRowModal && closeRowModal()}>
         <CloseOutlined />
       </CloseWrapper>
-      {parseInt(item.tx_type) == txType.TRANSFER ? (
-        <InputBox>
-          <InputItem>
-            <label>from</label>
-            <Input disabled={true} value={item.tx_from} />
-          </InputItem>
-          <InputItem>
-            <label>to</label>
-            <Input disabled={true} value={item.tx_to} />
-          </InputItem>
-          <InputItem>
-            <label>amount</label>
-            <Input disabled={true} type="number" value={item.tx_amount} />
-          </InputItem>
-        </InputBox>
+      {item?.txType ? (
+        item.txType == txType.TRANSFER ? (
+          <InputBox>
+            <InputItem>
+              <label>from</label>
+              <Input disabled={true} value={item.txFrom} />
+            </InputItem>
+            <InputItem>
+              <label>to</label>
+              <Input disabled={true} value={item.txTo} />
+            </InputItem>
+            <InputItem>
+              <label>amount</label>
+              <Input disabled={true} type="number" value={item.txAmount} />
+            </InputItem>
+          </InputBox>
+        ) : (
+          <InputBox>
+            <InputItem>
+              <label>address</label>
+              <Input disabled={true} value={''} />
+            </InputItem>
+            <InputItem>
+              <label>method</label>
+              <Input disabled={true} value={item.txFun} />
+            </InputItem>
+            <InputItem>
+              <label>arg</label>
+              <Input disabled={true} value={item.txFunArg} />
+            </InputItem>
+          </InputBox>
+        )
       ) : (
-        <InputBox>
-          <InputItem>
-            <label>address</label>
-            <Input disabled={true} value={''} />
-          </InputItem>
-          <InputItem>
-            <label>method</label>
-            <Input disabled={true} value={item.tx_fun} />
-          </InputItem>
-          <InputItem>
-            <label>arg</label>
-            <Input disabled={true} value={item.tx_fun_arg} />
-          </InputItem>
-        </InputBox>
+        <>123</>
       )}
       <BtnBox>
         <ButtonPrimary onClick={() => approveFn(item)}>授权</ButtonPrimary>
