@@ -213,6 +213,8 @@ export default function CreateTransactionModal({
             const type: CallType = e.target.value
             setCallType(type)
             onChangeCallType && onChangeCallType(type)
+
+            // form.
           }}
         >
           <Radio value={CallType.TRANSFER}>转账</Radio>
@@ -221,14 +223,7 @@ export default function CreateTransactionModal({
       </Space>
       <SpaceBox></SpaceBox>
 
-      <Form
-        labelCol={{ span: 4 }}
-        wrapperCol={{ span: 20 }}
-        initialValues={{ remember: false }}
-        onFinish={onFinish}
-        autoComplete="off"
-        form={form}
-      >
+      <Form labelCol={{ span: 5 }} wrapperCol={{ span: 19 }} onFinish={onFinish} autoComplete="off" form={form}>
         {callType === CallType.TRANSFER ? (
           <>
             <Form.Item label="token地址" name="fromAddress" rules={rules.fromAddress}>
@@ -253,7 +248,7 @@ export default function CreateTransactionModal({
         ) : (
           <>
             <Form.Item label="合约类型" name="contractName" rules={rules.contractName}>
-              <Select defaultValue="" style={{ width: '100%' }} allowClear onChange={onChangeContractHandler}>
+              <Select style={{ width: '100%' }} allowClear onChange={onChangeContractHandler}>
                 {parsedAbis &&
                   Object.keys(parsedAbis).map((key, index) => {
                     return (

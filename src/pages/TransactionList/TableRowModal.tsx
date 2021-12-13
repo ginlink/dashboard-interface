@@ -7,6 +7,10 @@ import { txType } from '@/constants/txType'
 import { ButtonPrimary } from '@/components/Button'
 import { TxPropsApi } from '@/services/api'
 import { shortenAddress } from '@/utils'
+import { SafeProxyInfo } from './index'
+import { SafeSignature } from '@/utils/execution'
+import Row from '@/components/Row'
+import { useActiveWeb3React } from '@/hooks/web3'
 
 const CloseWrapper = styled.div`
   position: absolute;
@@ -36,18 +40,23 @@ const BtnBox = styled.div`
 const OwnesBox = styled.div`
   margin-top: 14px;
 `
-const OwnesItem = styled.div`
+const OwnesItem = styled(Row)`
   margin-top: 14px;
+  justify-content: space-between;
 `
-
+const OwnesSinger = styled.div<{
+  color: string
+}>`
+  color: ${({ color }) => color};
+`
 type TableRowModalType = {
   openRow: boolean
   item: TxPropsApi
   closeRowModal: () => void
   approveFn: (item: TxPropsApi) => void
   confrimFn: (item: TxPropsApi) => void
-  threshold: string | undefined
-  ownes: Array<string> | undefined
+  safeProxyInfo?: SafeProxyInfo
+  nonce?: number
 }
 
 export default function TableRowModal({
@@ -56,9 +65,54 @@ export default function TableRowModal({
   closeRowModal,
   approveFn,
   confrimFn,
-  ownes,
-  threshold,
+  safeProxyInfo,
+  nonce,
 }: TableRowModalType) {
+  const current = useMemo(() => {
+    if (nonce == undefined || item.txId == undefined) return true
+
+    if (nonce.toString() < item.txId) {
+      return true
+    }
+    return false
+  }, [item.txId, nonce])
+  const { account } = useActiveWeb3React()
+  const signatures = useMemo(() => {
+    let _signaures: SafeSignature[] | undefined = undefined
+    try {
+      _signaures = item.txSingal ? JSON.parse(item.txSingal) : undefined
+    } catch (err) {
+      console.log('[](err):', err)
+    }
+
+    return _signaures
+  }, [item])
+  const findSigner = (address: string) => {
+    if (!signatures || nonce == undefined) return -1
+    return signatures?.findIndex((res) => {
+      return res.signer.toLocaleLowerCase() == address.toLocaleLowerCase()
+    })
+  }
+  const userIsApporve = useMemo(() => {
+    if (!account || !safeProxyInfo) return true
+    if (current) return true
+    const isOnwer = safeProxyInfo.owners?.findIndex((res) => {
+      return res.toLocaleLowerCase() == account.toLocaleLowerCase()
+    })
+    if (isOnwer == -1) return true
+    if (findSigner(account) >= 0) {
+      return true
+    }
+    return false
+  }, [account, current, safeProxyInfo])
+
+  const openSuccess = useMemo(() => {
+    if (!signatures || !safeProxyInfo || safeProxyInfo.threshold == undefined || nonce == undefined) return true
+    if (current) return true
+    if (signatures.length >= safeProxyInfo.threshold) return false
+    return true
+  }, [current, nonce, safeProxyInfo, signatures])
+
   return (
     <Modal isOpen={openRow}>
       <CloseWrapper onClick={() => closeRowModal && closeRowModal()}>
@@ -100,12 +154,25 @@ export default function TableRowModal({
         <>123</>
       )}
       <BtnBox>
-        <ButtonPrimary onClick={() => approveFn(item)}>授权</ButtonPrimary>
-        <ButtonPrimary onClick={() => confrimFn(item)}>确认</ButtonPrimary>
+        <ButtonPrimary onClick={() => approveFn(item)} disabled={userIsApporve}>
+          授权
+        </ButtonPrimary>
+        <ButtonPrimary onClick={() => confrimFn(item)} disabled={openSuccess}>
+          确认
+        </ButtonPrimary>
       </BtnBox>
       <OwnesBox>
-        {ownes?.map((res) => {
-          return <OwnesItem key={res}>{shortenAddress(res, 6)}</OwnesItem>
+        {safeProxyInfo?.owners?.map((res: string) => {
+          return (
+            <OwnesItem key={res}>
+              {shortenAddress(res, 6)}
+              {findSigner(res) >= 0 ? (
+                <OwnesSinger color={'green'}>已授权</OwnesSinger>
+              ) : (
+                <OwnesSinger color={'#8b8686'}>未授权</OwnesSinger>
+              )}
+            </OwnesItem>
+          )
         })}
       </OwnesBox>
     </Modal>
