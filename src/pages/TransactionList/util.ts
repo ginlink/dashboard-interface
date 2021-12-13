@@ -55,6 +55,50 @@ export function parseFuncs(abi?: StaticBaseAbi[]): ParsedFunc[] | undefined {
   })
 }
 
+const startSquareBracketsReg = /^\[.*?\]/
+
+export function parseParam(arg?: string) {
+  // ["0x07BdAA598FC89BC304F9942178c0fF9592A8Df16","100,0x716A55613218a6c7814a1aDCD4575a4397Db352B","1639377600"],100
+
+  if (!arg) return
+
+  // not include []
+  if (!/\[/.test(arg)) {
+    return arg.split(',')
+  }
+
+  // prepare
+  arg = arg.trim()
+
+  let pos = 0
+  const param: string[] = []
+  const len = arg.length
+
+  while (pos < len) {
+    const currentStr = arg.slice(pos)
+
+    const matched = currentStr.match(startSquareBracketsReg)
+    if (matched) {
+      const matchedStr = matched[0]
+      const matchedLen = matchedStr.length
+      param.push(matchedStr)
+
+      pos += matchedLen
+      ++pos //jump comma
+    } else {
+      const commaPos = currentStr.indexOf(',')
+      const normalStr = currentStr.slice(0, commaPos)
+      const normalStrLen = normalStr.length
+      param.push(normalStr)
+
+      pos += normalStrLen
+      ++pos //jump comma
+    }
+  }
+
+  return param
+}
+
 export type StaticBaseContract = {
   contractName?: string
   abi?: StaticBaseAbi[]

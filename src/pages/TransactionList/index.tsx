@@ -24,7 +24,7 @@ import { txType } from '@/constants/txType'
 import TxStatus from './TxStatus'
 import { TRANSACTION_MULTISEND_ADDRESS, TRANSACTION_PROXY_ADDRESS } from '@/constants/addresses'
 import { Contract } from '@ethersproject/contracts'
-import { bundleCallData, getExecByteData } from './util'
+import { bundleCallData, getExecByteData, parseParam } from './util'
 import { buildContractCall, executeTx, SafeSignature, SafeTransaction } from '@/utils/execution'
 import BigFloatNumber from 'bignumber.js'
 import { useSingleCallResult } from '@/state/multicall/hooks'
@@ -319,7 +319,8 @@ export default function TransactionList() {
       } else if (callType === CallType.METHOD) {
         if (!contract || !funcParams) return
 
-        const param = arg?.split(',')
+        // const param = arg?.split(',')
+        const param = parseParam(arg)
 
         tx = buildContractCall(contract, funcParams, param || [], nonce)
 
