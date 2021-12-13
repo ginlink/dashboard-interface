@@ -33,22 +33,6 @@ const BtnBox = styled.div`
   }
 `
 
-// export type RowItemType = {
-//   id: number
-//   txId: string
-//   txHash: string
-//   txType: string
-//   txFrom: string
-//   txTo: string
-//   txAmount: string
-//   txFun: string
-//   txFunArg: string
-//   tx_agent?: any
-//   txData: string
-//   txProaddr: string
-//   tx_state?: number
-// }
-
 type TableRowModalType = {
   openRow: boolean
   item: TxPropsApi
@@ -83,7 +67,7 @@ export default function TableRowModal({ openRow, item, closeRowModal, approveFn,
           <InputBox>
             <InputItem>
               <label>address</label>
-              <Input disabled={true} value={''} />
+              <Input disabled={true} value={item.txFrom} />
             </InputItem>
             <InputItem>
               <label>method</label>

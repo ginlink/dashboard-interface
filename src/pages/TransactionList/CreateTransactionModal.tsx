@@ -53,7 +53,7 @@ export type TransferParams = {
 
 export type MethodParams = {
   contractName?: string
-  funcParams?: string
+  funcName?: string
   arg?: string
 }
 
@@ -86,7 +86,7 @@ export default function CreateTransactionModal({
 }: CreateTransactionProps) {
   const { library, account, chainId } = useActiveWeb3React()
 
-  const [funcParams, setFuncParams] = useState<string | undefined>(undefined)
+  const [funcName, setFuncParams] = useState<string | undefined>(undefined)
 
   const [contractName, setContractName] = useState<string | undefined>(undefined)
 
@@ -177,7 +177,7 @@ export default function CreateTransactionModal({
       ],
       amount: [{ required: true, message: '请输入数量!' }],
       contractName: [{ required: true, message: '请选择合约类型!' }],
-      funcParams: [{ required: true, message: '请选择合约方法!' }],
+      funcName: [{ required: true, message: '请选择合约方法!' }],
       arg: [],
     }
   }, [])
@@ -258,14 +258,14 @@ export default function CreateTransactionModal({
                 })}
             </Select>
           </Form.Item>
-          <Form.Item label="合约方法" name="funcParams" rules={rules.funcParams}>
+          <Form.Item label="合约方法" name="funcName" rules={rules.funcName}>
             {/* <Select onChange={onChangeMethodHandler} style={{ width: '100%' }} allowClear> */}
             <Select onChange={onChangeMethodHandler} allowClear>
               {contractMethods &&
                 contractMethods.map((item, index) => {
-                  const { nameAndParam } = item
+                  const { nameAndParam, name } = item
                   return (
-                    <Option value={nameAndParam ?? ''} key={index}>
+                    <Option value={name ?? ''} key={index}>
                       {nameAndParam}
                     </Option>
                   )
@@ -273,7 +273,7 @@ export default function CreateTransactionModal({
             </Select>
           </Form.Item>
           <Form.Item label="合约参数" name="arg" rules={rules.arg}>
-            <Input placeholder={funcParams} allowClear={true} />
+            <Input placeholder={funcName} allowClear={true} />
           </Form.Item>
           <Form.Item wrapperCol={{ offset: 4, span: 20 }}>
             <Button type="primary" htmlType="submit">
