@@ -92,6 +92,8 @@ export default function CreateTransactionModal({
 
   const [callType, setCallType] = useState(CallType.TRANSFER)
 
+  const [form] = Form.useForm()
+
   const contractAddresses: ContractAddresses | undefined = useMemo(() => {
     if (!chainId) return
 
@@ -109,6 +111,16 @@ export default function CreateTransactionModal({
     return parsedAbis[contractName].funcs
   }, [contractName])
 
+  // TODO按钮状态
+
+  // const isReady = useMemo(() => {
+  //   const values = form.getFieldsValue()
+
+  //   console.log('[](values):', values)
+
+  //   return true
+  // }, [form])
+
   const onChangeContractHandler = useCallback(
     (contractName: string, option: any) => {
       if (!contractName) return
@@ -118,8 +130,6 @@ export default function CreateTransactionModal({
       // update
       setContractName(contractName)
       if (!contractAddresses || !parsedAbis || !library || !account) return
-
-      debugger
 
       // update parent contract
       const contractAddress = contractAddresses[contractName]
@@ -211,77 +221,75 @@ export default function CreateTransactionModal({
       </Space>
       <SpaceBox></SpaceBox>
 
-      {callType === CallType.TRANSFER ? (
-        <Form
-          labelCol={{ span: 5 }}
-          wrapperCol={{ span: 19 }}
-          initialValues={{ remember: false }}
-          onFinish={onFinish}
-          autoComplete="off"
-        >
-          <Form.Item label="token地址" name="fromAddress" rules={rules.fromAddress}>
-            <Input
-              onChange={(e) => onChangeTokenAddressHandler(e.target.value)}
-              allowClear={true}
-              placeholder="token地址"
-            />
-          </Form.Item>
-          <Form.Item label="接收人地址" name="toAddress" rules={rules.toAddress}>
-            <Input allowClear={true} placeholder="接收人地址" />
-          </Form.Item>
-          <Form.Item label="数量" name="amount" rules={rules.amount}>
-            <Input allowClear={true} placeholder="数量" />
-          </Form.Item>
-          <Form.Item wrapperCol={{ offset: 5, span: 20 }}>
-            <Button type="primary" htmlType="submit">
-              创建
-            </Button>
-          </Form.Item>
-        </Form>
-      ) : (
-        <Form
-          labelCol={{ span: 4 }}
-          wrapperCol={{ span: 20 }}
-          initialValues={{ remember: false }}
-          onFinish={onFinish}
-          autoComplete="off"
-        >
-          <Form.Item label="合约类型" name="contractName" rules={rules.contractName}>
-            <Select defaultValue="" style={{ width: '100%' }} allowClear onChange={onChangeContractHandler}>
-              {parsedAbis &&
-                Object.keys(parsedAbis).map((key, index) => {
-                  return (
-                    <Option value={key} key={index}>
-                      {key}
-                    </Option>
-                  )
-                })}
-            </Select>
-          </Form.Item>
-          <Form.Item label="合约方法" name="funcName" rules={rules.funcName}>
-            {/* <Select onChange={onChangeMethodHandler} style={{ width: '100%' }} allowClear> */}
-            <Select onChange={onChangeMethodHandler} allowClear>
-              {contractMethods &&
-                contractMethods.map((item, index) => {
-                  const { nameAndParam, name } = item
-                  return (
-                    <Option value={name ?? ''} key={index}>
-                      {nameAndParam}
-                    </Option>
-                  )
-                })}
-            </Select>
-          </Form.Item>
-          <Form.Item label="合约参数" name="arg" rules={rules.arg}>
-            <Input placeholder={funcName} allowClear={true} />
-          </Form.Item>
-          <Form.Item wrapperCol={{ offset: 4, span: 20 }}>
-            <Button type="primary" htmlType="submit">
-              创建
-            </Button>
-          </Form.Item>
-        </Form>
-      )}
+      <Form
+        labelCol={{ span: 4 }}
+        wrapperCol={{ span: 20 }}
+        initialValues={{ remember: false }}
+        onFinish={onFinish}
+        autoComplete="off"
+        form={form}
+      >
+        {callType === CallType.TRANSFER ? (
+          <>
+            <Form.Item label="token地址" name="fromAddress" rules={rules.fromAddress}>
+              <Input
+                onChange={(e) => onChangeTokenAddressHandler(e.target.value)}
+                allowClear={true}
+                placeholder="token地址"
+              />
+            </Form.Item>
+            <Form.Item label="接收人地址" name="toAddress" rules={rules.toAddress}>
+              <Input allowClear={true} placeholder="接收人地址" />
+            </Form.Item>
+            <Form.Item label="数量" name="amount" rules={rules.amount}>
+              <Input allowClear={true} placeholder="数量" />
+            </Form.Item>
+            <Form.Item wrapperCol={{ offset: 5, span: 20 }}>
+              <Button type="primary" htmlType="submit">
+                创建
+              </Button>
+            </Form.Item>
+          </>
+        ) : (
+          <>
+            <Form.Item label="合约类型" name="contractName" rules={rules.contractName}>
+              <Select defaultValue="" style={{ width: '100%' }} allowClear onChange={onChangeContractHandler}>
+                {parsedAbis &&
+                  Object.keys(parsedAbis).map((key, index) => {
+                    return (
+                      <Option value={key} key={index}>
+                        {key}
+                      </Option>
+                    )
+                  })}
+              </Select>
+            </Form.Item>
+            <Form.Item label="合约方法" name="funcName" rules={rules.funcName}>
+              {/* <Select onChange={onChangeMethodHandler} style={{ width: '100%' }} allowClear> */}
+              <Select onChange={onChangeMethodHandler} allowClear>
+                {contractMethods &&
+                  contractMethods.map((item, index) => {
+                    const { nameAndParam, name } = item
+                    return (
+                      <Option value={name ?? ''} key={index}>
+                        {nameAndParam}
+                      </Option>
+                    )
+                  })}
+              </Select>
+            </Form.Item>
+            <Form.Item label="合约参数" name="arg" rules={rules.arg}>
+              <Input placeholder={funcName} allowClear={true} />
+            </Form.Item>
+            <Form.Item wrapperCol={{ offset: 4, span: 20 }}>
+              {/* <Button type="primary" htmlType="submit" disabled={!isReady}> */}
+              <Button type="primary" htmlType="submit">
+                创建
+              </Button>
+            </Form.Item>
+          </>
+        )}
+      </Form>
     </Modal>
   )
 }
