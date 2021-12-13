@@ -1,10 +1,25 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import AddAddressModal from '@/components/AddAddressModal'
-import { ButtonPrimary, SmallButtonError, SmallButtonPrimary, SmallButtonYellow } from '@/components/Button'
-import { CtAddress, crateCtAddressApi, getCtAddressApi, deleteCtAddressApi, updateCtAddressApi } from '@/services/api'
+import {
+  ButtonPrimary,
+  ButtonPrimaryReverse,
+  SmallButtonError,
+  SmallButtonPrimary,
+  SmallButtonYellow,
+} from '@/components/Button'
+import {
+  CtAddress,
+  crateCtAddressApi,
+  getCtAddressApi,
+  deleteCtAddressApi,
+  updateCtAddressApi,
+  searchCtAddressApi,
+  AddressSearchParams,
+} from '@/services/api'
 import { TYPE } from '@/theme'
-import { Card, Form, message, Popconfirm, Space, Table } from 'antd'
+import { Card, Form, Input, message, Popconfirm, Row, Select, Space, Table } from 'antd'
 import styled from 'styled-components/macro'
+import Loader from '@/components/Loader'
 
 const Wrapper = styled.div``
 
@@ -52,21 +67,37 @@ const defaultColumns = [
   },
 ]
 
+const chainIds = [
+  { id: 56, name: 'bsc' },
+  {
+    id: 97,
+    name: 'bsc-test',
+  },
+]
+
 export default function CtAddressPage() {
   const [open, setOpen] = useState(false)
   const [updateId, setUpdateId] = useState(0)
 
   const [dataSource, setDataSource] = useState<any[] | undefined>(undefined)
+  const [searchParam, setSearchParam] = useState<AddressSearchParams | undefined>(undefined)
 
-  const [form] = Form.useForm()
+  const [isSearching, setIsSearching] = useState(false)
 
-  const freshData = useCallback(() => {
-    getCtAddressApi().then((res: { list?: CtAddress[]; count?: number }) => {
+  const addForm = Form.useForm()[0]
+  const searchForm = Form.useForm()[0]
+
+  const freshData = useCallback((searchParam?: AddressSearchParams) => {
+    searchCtAddressApi(searchParam).then((res: { list?: CtAddress[]; count?: number }) => {
       console.log('[](res):', res)
 
       const { list, count } = res
 
-      if (!list || !list.length) return
+      if (!list || !list.length) {
+        setDataSource(undefined)
+        setIsSearching(false)
+        return
+      }
 
       const dataSource: any[] = []
 
@@ -86,6 +117,7 @@ export default function CtAddressPage() {
       })
 
       setDataSource(dataSource)
+      setIsSearching(false)
     })
   }, [])
 
@@ -118,7 +150,7 @@ export default function CtAddressPage() {
               <SmallButtonYellow
                 onClick={() => {
                   setOpen(true)
-                  form.setFieldsValue(record)
+                  addForm.setFieldsValue(record)
                   setUpdateId(record.id)
                 }}
               >
@@ -129,7 +161,7 @@ export default function CtAddressPage() {
         },
       },
     ]
-  }, [form, freshData])
+  }, [addForm, freshData])
 
   const onFinish = useCallback(
     async (values: any) => {
@@ -157,14 +189,42 @@ export default function CtAddressPage() {
           message.success('Add success!')
         }
 
-        form.resetFields()
+        addForm.resetFields()
         freshData()
         setOpen(false)
       } catch (err) {
         console.log('[](err):', err)
       }
     },
-    [form, freshData, updateId]
+    [addForm, freshData, updateId]
+  )
+
+  const onSearchFinish = useCallback(
+    (values: { chainId?: string; address?: string; symbol?: string }) => {
+      console.log('[](values):', values)
+      const { chainId, address, symbol } = values
+
+      setSearchParam((prev) => {
+        const newParam: AddressSearchParams = {
+          ...prev,
+          key_chainid: chainId ? parseInt(chainId) : undefined,
+          key_address: address,
+          key_symbol: symbol,
+        }
+
+        // filter undefined
+        for (const key in newParam) {
+          if (!newParam[key]) {
+            delete newParam[key]
+          }
+        }
+
+        freshData(newParam)
+
+        return newParam
+      })
+    },
+    [freshData]
   )
 
   useEffect(() => {
@@ -174,18 +234,73 @@ export default function CtAddressPage() {
   return (
     <Wrapper>
       <Card>
-        <Space style={{ justifyContent: 'space-between', display: 'flex' }}>
-          <TYPE.subHeader>搜索面板</TYPE.subHeader>
+        <Row style={{ justifyContent: 'space-between', display: 'flex' }}>
+          {/* <TYPE.subHeader>搜索面板</TYPE.subHeader> */}
+          <Form name="basic" onFinish={onSearchFinish} autoComplete="off" form={searchForm}>
+            <Space>
+              <Form.Item label="chainId" name="chainId">
+                <Select style={{ minWidth: '100px' }}>
+                  <Select.Option value={''}> </Select.Option>
+                  {chainIds.map((item) => {
+                    const { id, name } = item
+
+                    return <Select.Option value={id} key={id}>{`[${id}] ${name}`}</Select.Option>
+                  })}
+                </Select>
+              </Form.Item>
+
+              <Form.Item label="address" name="address">
+                <Input />
+              </Form.Item>
+
+              <Form.Item label="symbol" name="symbol">
+                <Input />
+              </Form.Item>
+
+              <Space>
+                <Form.Item>
+                  <ButtonPrimary
+                    disabled={isSearching}
+                    style={{ width: 'fit-content', height: 'fit-content' }}
+                    onClick={(e) => {
+                      e.preventDefault()
+
+                      setIsSearching(true)
+                      searchForm.submit()
+                    }}
+                  >
+                    Search
+                    {isSearching && <Loader size="14px" stroke="#448ef7" style={{ marginLeft: '4px' }} />}
+                  </ButtonPrimary>
+                </Form.Item>
+
+                <Form.Item>
+                  <ButtonPrimaryReverse
+                    onClick={(e) => {
+                      searchForm.resetFields()
+
+                      e.preventDefault()
+                    }}
+                    style={{ width: 'fit-content', height: 'fit-content' }}
+                  >
+                    Reset
+                  </ButtonPrimaryReverse>
+                </Form.Item>
+              </Space>
+            </Space>
+          </Form>
+
           <ButtonPrimary
             onClick={() => {
-              form?.resetFields()
+              addForm?.resetFields()
               setUpdateId(0)
               setOpen(true)
             }}
+            style={{ width: 'fit-content', height: 'fit-content' }}
           >
             新增
           </ButtonPrimary>
-        </Space>
+        </Row>
       </Card>
 
       {/* <Card style={{ marginTop: '16px' }}>
@@ -205,12 +320,12 @@ export default function CtAddressPage() {
       <AddAddressModal
         open={open}
         updateId={updateId}
-        form={form}
+        form={addForm}
         onDismiss={() => setOpen(false)}
         onSuccess={() => {
-          if (!form) return
+          if (!addForm) return
 
-          form.submit()
+          addForm.submit()
         }}
         onFinish={onFinish}
       />

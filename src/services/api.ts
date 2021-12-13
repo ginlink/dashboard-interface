@@ -72,6 +72,16 @@ export type CtAddress = {
   desc?: string
 }
 
+export class AddressSearchParams {
+  page?: number
+  limit?: number
+  key_address?: string
+  key_symbol?: string
+  key_chainid?: number;
+
+  [key: string]: any
+}
+
 export const getTableLists = (searchParams: SearchParams) => {
   return http.post('/record/search', searchParams) as Promise<any>
 }
@@ -121,4 +131,8 @@ export const deleteCtAddressApi = (id: number) => {
 
 export const updateCtAddressApi = (id: number, data: CtAddress) => {
   return http.patch(BASE_URL_15 + '/ct-address' + '/' + id, data) as Promise<any>
+}
+
+export const searchCtAddressApi = (addressSearchParams?: AddressSearchParams) => {
+  return http.get(BASE_URL_15 + '/ct-address' + '/search', addressSearchParams) as Promise<any>
 }
