@@ -168,7 +168,7 @@ export function useSafeFactory() {
 }
 
 export function useSafeProxy() {
-  return useContract<GnosisSafe>('0x9894d1C28d474BeA3Ef95D6badFC160373df8a8A', gnosisSafe)
+  return useContract<GnosisSafe>(TRANSACTION_PROXY_ADDRESS, gnosisSafe)
 }
 
 export function useSimpleState() {
@@ -176,5 +176,5 @@ export function useSimpleState() {
 }
 
 export function useSwapMing() {
-  return useContract<SwapMining>('0x01Af8d162E217eE0eF22f7ddb52488870335ca12', SWAP_MING_ABI)
+  return useContract<SwapMining>(TRANSACTION_SWAPMING_ADDRESSES, SWAP_MING_ABI)
 }
