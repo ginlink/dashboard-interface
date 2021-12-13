@@ -26,20 +26,29 @@ interface poolItemInterface {
 }
 export default function PoolItemContentComponent({ item }: { item: poolItemInterface }) {
   const contract = usePositionContract(item.addr)
-  const [token0, setToken0] = useState<string>()
-  const [token1, setToken1] = useState<string>()
+  const [token0, setToken0] = useState<string>('')
+  const [token1, setToken1] = useState<string>('')
 
   useEffect(() => {
-    console.log('contract', contract)
     if (contract) {
-      contract?.token0().then((res) => {
-        console.log('res0', res)
-        setToken0(res)
-      })
-      contract?.token1().then((res) => {
-        console.log('res1', res)
-        setToken1(res)
-      })
+      contract
+        ?.token0()
+        .then((res) => {
+          console.log('res0', res)
+          setToken0(res)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+      contract
+        ?.token1()
+        .then((res) => {
+          console.log('res1', res)
+          setToken1(res)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     }
   }, [contract])
 
