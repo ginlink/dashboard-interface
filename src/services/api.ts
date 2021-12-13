@@ -26,17 +26,17 @@ interface SearchParams {
 
 export type TxPropsApi = {
   id?: number
-  tx_type?: number
-  tx_id?: string | number
-  tx_from?: string
-  tx_to?: string
-  tx_amount?: any
-  tx_hash?: string
-  tx_fun?: string
-  tx_fun_arg?: string
-  tx_data?: string
-  tx_proaddr?: string
-  tx_singal?: string
+  txType?: number
+  txId?: string | number
+  txFrom?: string
+  txTo?: string
+  txAmount?: any
+  txHash?: string
+  txFun?: string
+  txFunArg?: string
+  txData?: string
+  txProaddr?: string
+  txSingal?: string
 }
 
 export type CtFunctionRecord = {
@@ -73,11 +73,11 @@ export const searchFuncApi = (key: string) => {
 
 //事务列表
 export const getTransctionList = () => {
-  return http.post('/getTxList', '') as Promise<any>
+  return http.post('http://192.168.3.45:9771' + '/getTxList', '') as Promise<any>
 }
 
 export const addTx = (param: TxPropsApi) => {
-  return http.post('/addTx', param) as Promise<any>
+  return http.post('http://192.168.3.45:9771' + '/addTx', param) as Promise<any>
 }
 
 export const updateTxById = (id: number, data: Partial<TxPropsApi>) => {

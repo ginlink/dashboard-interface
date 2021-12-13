@@ -109,7 +109,7 @@ export function useTxStatus(record: TxPropsApi) {
     if (!record) return
     // const promiseArr: Array<any> = []
     // OWNERARR.map((v: string) => {
-    //   promiseArr.push(transactionProxy?.approvedHashes(v, record.tx_hash))
+    //   promiseArr.push(transactionProxy?.approvedHashes(v, record.txHash))
     // })
     // Promise.all(promiseArr).then((res) => {
     //   let count = 0
@@ -125,14 +125,14 @@ export function useTxStatus(record: TxPropsApi) {
       return '--'
     }
 
-    if (currentApproveNum >= APPROVENUM && nonce > Number(record.tx_id)) {
+    if (currentApproveNum >= APPROVENUM && nonce > Number(record.txId)) {
       return '已完成'
     }
 
-    if (currentApproveNum >= 0 && nonce == Number(record.tx_id)) {
+    if (currentApproveNum >= 0 && nonce == Number(record.txId)) {
       return '进行中'
     }
 
     return '已失效'
-  }, [currentApproveNum, nonce, record.tx_id])
+  }, [currentApproveNum, nonce, record.txId])
 }

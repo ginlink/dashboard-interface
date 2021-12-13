@@ -35,17 +35,17 @@ const BtnBox = styled.div`
 
 // export type RowItemType = {
 //   id: number
-//   tx_id: string
-//   tx_hash: string
-//   tx_type: string
-//   tx_from: string
-//   tx_to: string
-//   tx_amount: string
-//   tx_fun: string
-//   tx_fun_arg: string
+//   txId: string
+//   txHash: string
+//   txType: string
+//   txFrom: string
+//   txTo: string
+//   txAmount: string
+//   txFun: string
+//   txFunArg: string
 //   tx_agent?: any
-//   tx_data: string
-//   tx_proaddr: string
+//   txData: string
+//   txProaddr: string
 //   tx_state?: number
 // }
 
@@ -63,20 +63,20 @@ export default function TableRowModal({ openRow, item, closeRowModal, approveFn,
       <CloseWrapper onClick={() => closeRowModal && closeRowModal()}>
         <CloseOutlined />
       </CloseWrapper>
-      {item?.tx_type ? (
-        item.tx_type == txType.TRANSFER ? (
+      {item?.txType ? (
+        item.txType == txType.TRANSFER ? (
           <InputBox>
             <InputItem>
               <label>from</label>
-              <Input disabled={true} value={item.tx_from} />
+              <Input disabled={true} value={item.txFrom} />
             </InputItem>
             <InputItem>
               <label>to</label>
-              <Input disabled={true} value={item.tx_to} />
+              <Input disabled={true} value={item.txTo} />
             </InputItem>
             <InputItem>
               <label>amount</label>
-              <Input disabled={true} type="number" value={item.tx_amount} />
+              <Input disabled={true} type="number" value={item.txAmount} />
             </InputItem>
           </InputBox>
         ) : (
@@ -87,11 +87,11 @@ export default function TableRowModal({ openRow, item, closeRowModal, approveFn,
             </InputItem>
             <InputItem>
               <label>method</label>
-              <Input disabled={true} value={item.tx_fun} />
+              <Input disabled={true} value={item.txFun} />
             </InputItem>
             <InputItem>
               <label>arg</label>
-              <Input disabled={true} value={item.tx_fun_arg} />
+              <Input disabled={true} value={item.txFunArg} />
             </InputItem>
           </InputBox>
         )
