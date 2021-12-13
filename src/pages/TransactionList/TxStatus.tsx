@@ -24,7 +24,5 @@ function getState(state: TxStatusEnum) {
 }
 
 export default function TxStatus({ text, record }: TxStatusType) {
-  console.log('[](record):', record, text)
-
   return <Wrapper>{getState(text)}</Wrapper>
 }

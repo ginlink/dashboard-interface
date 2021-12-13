@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import styled from 'styled-components/macro'
 import { Table } from 'antd'
-import { getTransctionList, addTx, TxPropsApi, updateTxById, getTxById, TxStatusEnum } from '@/services/api'
+import { getTransctionList, addTx, TxPropsApi, updateTxById, getTxById, TxStatusEnum } from 'services/api'
 import { Modal, Button, Pagination } from 'antd'
 import {
   APPROVENUM,
@@ -12,6 +12,7 @@ import {
   useSignatureBytes,
   useTransacitonSubmitData,
 } from './hooks'
+import { BigNumberish, CallOverrides } from 'ethers'
 import { message } from 'antd'
 import CreateTransactionModal, { CallType, MethodParams, TransferParams } from './CreateTransactionModal'
 import { ButtonPrimary } from '@/components/Button'
@@ -161,7 +162,7 @@ const BtnBox = styled.div`
   }
 `
 
-type SafeProxyInfo = {
+export type SafeProxyInfo = {
   owners?: string[]
   threshold?: number
 }
@@ -172,13 +173,12 @@ export default function TransactionList() {
   const { chainId } = useActiveWeb3React()
 
   const [dataList, setDataList] = useState<any>([])
+
   const [rowData, setRowData] = useState<any>({})
 
   const [openRow, setOpenRow] = useState<boolean>(false)
-  const [isOpen, setIsOpen] = useState<boolean>(false)
 
-  // const [tokenAddress, setTokenAddress] = useState<string | undefined>('0x5B8698f10555F5Fb4fE58BFfc2169790e526D8AD')
-  // const [toAddress, setToAddress] = useState<string | undefined>('0xBf992941F09310b53A9F3436b0F40B25bCcc2C33')
+  const [isOpen, setIsOpen] = useState<boolean>(false)
 
   const [tokenAddress, setTokenAddress] = useState<string | undefined>()
 
@@ -203,6 +203,13 @@ export default function TransactionList() {
     return result[0]?.toNumber()
   }, [result])
 
+  // get table list
+  useEffect(() => {
+    getTransctionList().then((res) => {
+      console.log('[](res):', res)
+      setDataList(res)
+    })
+  }, [])
   const resetDataList = useCallback(async () => {
     if (!nonce || !safeProxyInfo) return
 
@@ -437,11 +444,12 @@ export default function TransactionList() {
         signatures = [signature]
       }
 
-      debugger
-
       await updateTxById(id, { txSingal: JSON.stringify(signatures) })
+      message.success('授权成功！')
+      resetDataList()
+      setOpenRow(false)
     },
-    [account, chainId, library, nonce, safeProxy]
+    [account, chainId, library, nonce, resetDataList, safeProxy]
   )
 
   const onConfirmHandler = useCallback(
@@ -454,7 +462,7 @@ export default function TransactionList() {
 
       const { txSingal, txData }: TxPropsApi = (await getTxById(id))?.[0] || {}
 
-      // console.log('[](safeTx):', safeTx, signatures)
+      console.log('[](txSingal):', txSingal)
 
       if (!txSingal) return message.error('签名不存在')
       if (!txData) return message.error('数据不存在')
@@ -473,8 +481,12 @@ export default function TransactionList() {
 
       // exec
       await executeTx(safeProxy, safeTx, signatures)
+      message.success('执行交易已发送！')
+      resetDataList()
+      setIsOpen(false)
+      setOpenRow(false)
     },
-    [safeProxy]
+    [resetDataList, safeProxy]
   )
 
   const onViewRowHandler = useCallback((row: TxPropsApi) => {
@@ -532,8 +544,10 @@ export default function TransactionList() {
         approveFn={onApproveHandler}
         confrimFn={onConfirmHandler}
         closeRowModal={() => setOpenRow(false)}
+        safeProxyInfo={safeProxyInfo}
         openRow={openRow}
         item={rowData}
+        nonce={nonce}
       ></TableRowModal>
       {/* 分页 */}
       {/* <Pagination

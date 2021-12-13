@@ -93,7 +93,7 @@ export default function CreateTransactionModal({
   const [callType, setCallType] = useState(CallType.TRANSFER)
 
   const [form] = Form.useForm()
-
+  debugger
   const contractAddresses: ContractAddresses | undefined = useMemo(() => {
     if (!chainId) return
 
@@ -107,8 +107,8 @@ export default function CreateTransactionModal({
   const contractMethods = useMemo(() => {
     if (!parsedAbis || !contractName) return
 
-    // return parsedAbis[contractName].funcs?.filter((item) => item.type == FuncType.WRITE)
-    return parsedAbis[contractName].funcs
+    return parsedAbis[contractName].funcs?.filter((item) => item.type == FuncType.WRITE)
+    // return parsedAbis[contractName].funcs
   }, [contractName])
 
   // TODO按钮状态
