@@ -490,3 +490,29 @@ export function ButtonRadioChecked({ active = false, children, ...rest }: { acti
     )
   }
 }
+
+export const SmallButtonError = styled(ButtonError)`
+  padding: 0 2px;
+  border-radius: 4px;
+  height: unset;
+  width: fit-content;
+`
+export const SmallButtonPrimary = styled(ButtonPrimary)`
+  padding: 0 2px;
+  border-radius: 4px;
+  width: fit-content;
+`
+export const SmallButtonYellow = styled(ButtonPrimary)`
+  padding: 0 2px;
+  border-radius: 4px;
+  width: fit-content;
+
+  background-color: ${({ theme }) => theme.yellow1};
+  :hover,
+  :active,
+  :focus {
+    background-color: ${({ theme }) => darken(0.1, theme.yellow1)};
+
+    box-shadow: unset;
+  }
+`

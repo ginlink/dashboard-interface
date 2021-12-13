@@ -38,6 +38,7 @@ import { buildMultiSendSafeTx } from '@/utils/multisend'
 import { ButtonPrimary } from '@/components/Button'
 import { Card, Space } from 'antd'
 import { Contract, Signature, utils } from 'ethers'
+import CtAddress from './CtAddress'
 
 function bundleSafeTransactionData({
   contract,
@@ -449,21 +450,21 @@ export default function App() {
 
   return (
     <>
-      <Card>
+      {/* <Card>
         <Space>
           <ButtonPrimary onClick={onCreateProxyHandler}>create proxy</ButtonPrimary>
           <ButtonPrimary onClick={onSetupHandler}>setup</ButtonPrimary>
-          {/* <ButtonPrimary onClick={onSimpleStateHandler}>更改simple_state_num</ButtonPrimary>
+          <ButtonPrimary onClick={onSimpleStateHandler}>更改simple_state_num</ButtonPrimary>
           <ButtonPrimary onClick={onApproveHandler}>授权</ButtonPrimary>
           <ButtonPrimary onClick={onSingerHandler}>签名</ButtonPrimary>
-          <ButtonPrimary onClick={safeProxyTest}>查询授权</ButtonPrimary> */}
-          {/* <ButtonPrimary onClick={onMultiSendTransferHandler}>MuliSend_transfer</ButtonPrimary> */}
+          <ButtonPrimary onClick={safeProxyTest}>查询授权</ButtonPrimary>
+          <ButtonPrimary onClick={onMultiSendTransferHandler}>MuliSend_transfer</ButtonPrimary>
           <ButtonPrimary onClick={onMultiSendUpdateNumSignatureHandler}>MuliSend_updateNum_signature</ButtonPrimary>
           <ButtonPrimary onClick={onMultiSendUpdateNumHandler}>MuliSend_updateNum</ButtonPrimary>
           <ButtonPrimary onClick={onSwapMingHandler}>SwapMing</ButtonPrimary>
           <ButtonPrimary onClick={onConfirmHandler}>确认</ButtonPrimary>
         </Space>
-      </Card>
+      </Card> */}
 
       <Switch>
         <Route strict exact path="/home" component={Home} />
@@ -471,6 +472,7 @@ export default function App() {
         <Route strict exact path="/transactionList" component={TransactionList} />
         <Route strict exact path="/fast_call" component={FastCall} />
         <Route strict exact path="/call_admin" component={CallAdmin} />
+        <Route strict exact path="/ct_address" component={CtAddress} />
 
         <Redirect from="/" to="/home" />
       </Switch>
