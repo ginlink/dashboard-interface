@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import styled from 'styled-components/macro'
 import { Table } from 'antd'
-import { getTransctionList, addTx, TxPropsApi, updateTxById, getTxById } from '@/services/api'
+import { getTransctionList, addTx, TxPropsApi, updateTxById, getTxById, TxStatusEnum } from '@/services/api'
 import { Modal, Button, Pagination } from 'antd'
 import {
   APPROVENUM,
@@ -24,7 +24,7 @@ import { txType } from '@/constants/txType'
 import TxStatus from './TxStatus'
 import { TRANSACTION_MULTISEND_ADDRESS, TRANSACTION_PROXY_ADDRESS } from '@/constants/addresses'
 import { Contract } from '@ethersproject/contracts'
-import { bundleCallData, getExecByteData, parseParam } from './util'
+import { bundleCallData, getExecByteData, isMeet, parseParam } from './util'
 import { buildContractCall, executeTx, SafeSignature, SafeTransaction } from '@/utils/execution'
 import BigFloatNumber from 'bignumber.js'
 import { useSingleCallResult } from '@/state/multicall/hooks'
@@ -69,8 +69,8 @@ const columns = [
   },
   {
     title: '事务状态',
-    dataIndex: 'tx_state',
-    key: 'tx_state',
+    dataIndex: 'txStatus',
+    key: 'txStatus',
     width: 120,
     render: (text: string, record: TxPropsApi) => <TxStatus text={text} record={record}></TxStatus>,
   },
@@ -161,6 +161,11 @@ const BtnBox = styled.div`
   }
 `
 
+type SafeProxyInfo = {
+  owners?: string[]
+  threshold?: number
+}
+
 const AddressBox = styled.div``
 
 export default function TransactionList() {
@@ -181,81 +186,124 @@ export default function TransactionList() {
 
   const [callType, setCallType] = useState(CallType.TRANSFER)
 
+  const [safeProxyInfo, setSafeProxyInfo] = useState<SafeProxyInfo | undefined>(undefined)
+
   const { library, account } = useActiveWeb3React()
 
   const safeProxy = useTransactionProxy()
   const multiSend = useTransactionMultiSend()
   const tokenContract = useTokenContract(tokenAddress)
 
+  // get dynamic nonce
   const { result } = useSingleCallResult(safeProxy, 'nonce')
 
-  const nonce = useMemo(() => {
+  const nonce: number | undefined = useMemo(() => {
     if (!result) return
-    return result[0].toNumber()
+
+    return result[0]?.toNumber()
   }, [result])
+
+  const resetDataList = useCallback(async () => {
+    if (!nonce || !safeProxyInfo) return
+
+    // const offsetNonce = nonce - 1
+    const offsetNonce = nonce
+
+    getTransctionList().then((res: TxPropsApi[]) => {
+      // compute status
+      const list = res.map((item) => {
+        const { txId: txIdString, txSingal } = item
+
+        let status = TxStatusEnum.UNKNOWN
+
+        if (!txIdString) return { ...item, txStatus: status }
+
+        const txId = parseInt(txIdString)
+
+        // illegal
+        if (txId > offsetNonce) {
+          return {
+            ...item,
+            txStatus: status,
+          }
+        }
+
+        let signatures: SafeSignature[] | undefined = undefined
+        try {
+          signatures = txSingal ? JSON.parse(txSingal) : undefined
+        } catch (err) {
+          console.log('[](err):', err)
+        }
+
+        const { owners, threshold } = safeProxyInfo
+
+        if (txId < offsetNonce) {
+          status = TxStatusEnum.FAILED
+        }
+
+        if (owners && signatures && threshold) {
+          if (
+            isMeet(
+              owners,
+              signatures.map((item) => item.signer),
+              threshold
+            )
+          ) {
+            status = TxStatusEnum.SUCCESS
+          }
+        }
+
+        if (txId == offsetNonce) {
+          status = TxStatusEnum.LOADING
+        }
+
+        return {
+          ...item,
+          txStatus: status,
+        }
+      })
+
+      setDataList(list)
+    })
+  }, [nonce, safeProxyInfo])
+
+  // get owners and threshold
+  useEffect(() => {
+    if (!safeProxy) return
+
+    safeProxy
+      .getOwners()
+      .then((res) => {
+        setSafeProxyInfo((prev) => {
+          return {
+            ...prev,
+            owners: res,
+          }
+        })
+      })
+      .catch((err) => {
+        console.log('[](err):', err)
+      })
+
+    safeProxy
+      .getThreshold()
+      .then((res) => {
+        setSafeProxyInfo((prev) => {
+          return {
+            ...prev,
+            threshold: res.toNumber(),
+          }
+        })
+      })
+      .catch((err) => {
+        console.log('[](err):', err)
+      })
+  }, [safeProxy])
 
   // get table list
   useEffect(() => {
-    getTransctionList().then((res) => {
-      console.log('[](res):', res)
-      setDataList(res)
-    })
-  }, [])
-
-  //初始化start
-  const getDataLists = useCallback(async () => {
-    // if (!safeProxy) {
-    //   setDataList([])
-    //   return
-    // }
-    // if (!nonce) {
-    //   setDataList([])
-    //   return
-    // }
-    // const res = await getTransctionList()
-    //事务状态处理
-    // res.map((item: any) => {
-    //   const promiseArr: Array<any> = []
-    //   OWNERARR.map((v: string) => {
-    //     promiseArr.push(safeProxy?.approvedHashes(v, item.txHash))
-    //   })
-    //   let count = 0
-    //   Promise.all(promiseArr).then((res) => {
-    //     console.log('res:', res, nonce)
-    //     res.map((v) => {
-    //       if (v.toNumber()) count += 1
-    //     })
-    //   })
-    //   if (count >= APPROVENUM && nonce > Number(item.txId)) {
-    //     item.tx_state = TXSTATE.COMPLETED
-    //   } else if (count >= 0 && nonce == Number(item.txId)) {
-    //     item.tx_state = TXSTATE.HAVEINHAND
-    //   } else {
-    //     item.tx_state = TXSTATE.INVALID
-    //   }
-    // })
-    // setDataList(res)
-  }, [nonce, safeProxy])
-
-  useEffect(() => {
-    getDataLists()
-  }, [getDataLists])
-  //初始化end
-
-  // get nonce
-  // useEffect(() => {
-  //   if (!safeProxy) return
-
-  //   // nonce不会很大，用toNumber
-  //   safeProxy.nonce().then((res) => setNonce(res.toNumber()))
-  // }, [safeProxy])
-
-  const resetDataList = useCallback(async () => {
-    const list = await getTransctionList()
-
-    // refresh
-    setDataList(list)
-  }, [])
+    resetDataList()
+  }, [resetDataList])
 
   const onCreateFinishedHandler = useCallback(
     async (values: TransferParams & MethodParams) => {
@@ -273,7 +321,7 @@ export default function TransactionList() {
 
       const requestParam: TxPropsApi = {
         txType: callType,
-        txId: nonce,
+        txId: nonce + '',
         txFrom: '',
         txTo: '',
         txAmount: '',

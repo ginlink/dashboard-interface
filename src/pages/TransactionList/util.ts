@@ -246,3 +246,27 @@ export function getExecByteData() {
 
   return buildSignatureBytes(ownerBty32)
 }
+
+export function isMeet(stable?: string[], target?: string[], num?: number) {
+  if (!stable || !target || !num) return false
+
+  const len0 = stable.length
+  const len1 = target.length
+
+  let counter = 0
+  for (let i = 0; i < len0; ++i) {
+    const a = stable[i]
+
+    for (let j = 0; j < len1; ++j) {
+      const b = target[j]
+
+      if (a.toLowerCase() == b.toLowerCase()) {
+        ++counter
+      }
+
+      if (counter >= num) return true
+    }
+  }
+
+  return false
+}

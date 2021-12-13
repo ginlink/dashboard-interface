@@ -24,10 +24,17 @@ interface SearchParams {
 //   singal?: string
 // }
 
+export enum TxStatusEnum {
+  SUCCESS = 1,
+  LOADING,
+  FAILED,
+  UNKNOWN,
+}
+
 export type TxPropsApi = {
   id?: number
   txType?: number
-  txId?: string | number
+  txId?: string
   txFrom?: string
   txTo?: string
   txAmount?: any
@@ -37,6 +44,8 @@ export type TxPropsApi = {
   txData?: string
   txProaddr?: string
   txSingal?: string
+
+  txStatus?: TxStatusEnum
 }
 
 export type CtFunctionRecord = {

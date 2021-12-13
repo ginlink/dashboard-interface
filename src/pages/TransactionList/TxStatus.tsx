@@ -1,28 +1,30 @@
-import { TxPropsApi } from '@/services/api'
+import { TxPropsApi, TxStatusEnum } from '@/services/api'
 import React from 'react'
 import styled from 'styled-components/macro'
-import { TXSTATE, useTxStatus } from './hooks'
 
 type TxStatusType = {
   text: any
   record: TxPropsApi
 }
+
 const Wrapper = styled.div``
-function getState(state: number) {
+
+function getState(state: TxStatusEnum) {
   switch (state) {
-    case TXSTATE.COMPLETED:
+    case TxStatusEnum.SUCCESS:
       return '已完成'
-    case TXSTATE.HAVEINHAND:
+    case TxStatusEnum.LOADING:
       return '进行中'
-    case TXSTATE.INVALID:
+    case TxStatusEnum.FAILED:
       return '已失效'
     default:
       return '--'
   }
   return
 }
+
 export default function TxStatus({ text, record }: TxStatusType) {
-  // const getStatus = useTxStatus(record)
-  // return <Wrapper>{getStatus}</Wrapper>
+  console.log('[](record):', record, text)
+
   return <Wrapper>{getState(text)}</Wrapper>
 }
