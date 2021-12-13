@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import styled from 'styled-components/macro'
 import { Table } from 'antd'
-import { getTransctionList, addTx, addTxType } from '@/services/api'
+import { getTransctionList, addTx, TxPropsApi, updateTxById, getTxById } from '@/services/api'
 import { Modal, Button, Pagination } from 'antd'
 import {
   APPROVENUM,
@@ -15,7 +15,7 @@ import {
 import { message } from 'antd'
 import CreateTransactionModal, { CallType, MethodParams, TransferParams } from './CreateTransactionModal'
 import { ButtonPrimary } from '@/components/Button'
-import TableRowModal, { RowItemType } from './TableRowModal'
+import TableRowModal from './TableRowModal'
 import {
   getSigner,
   useSafeProxy,
@@ -78,7 +78,7 @@ const columns = [
     dataIndex: 'tx_state',
     key: 'tx_state',
     width: 120,
-    render: (text: string, record: RowItemType) => <TxStatus text={text} record={record}></TxStatus>,
+    render: (text: string, record: TxPropsApi) => <TxStatus text={text} record={record}></TxStatus>,
   },
   {
     title: '事务类型',
@@ -210,6 +210,7 @@ export default function TransactionList() {
   // get table list
   useEffect(() => {
     getTransctionList().then((res) => {
+      console.log('[](res):', res)
       setDataList(res)
     })
   }, [])
@@ -225,15 +226,15 @@ export default function TransactionList() {
 
   //初始化start
   const getDataLists = useCallback(async () => {
-    if (!safeProxy) {
-      setDataList([])
-      return
-    }
-    if (!nonce) {
-      setDataList([])
-      return
-    }
-    const res = await getTransctionList()
+    // if (!safeProxy) {
+    //   setDataList([])
+    //   return
+    // }
+    // if (!nonce) {
+    //   setDataList([])
+    //   return
+    // }
+    // const res = await getTransctionList()
     //事务状态处理
     // res.map((item: any) => {
     //   const promiseArr: Array<any> = []
@@ -255,7 +256,7 @@ export default function TransactionList() {
     //     item.tx_state = TXSTATE.INVALID
     //   }
     // })
-    setDataList(res)
+    // setDataList(res)
   }, [nonce, safeProxy])
 
   useEffect(() => {
@@ -426,6 +427,20 @@ export default function TransactionList() {
 
       let tx: SafeTransaction | undefined = undefined
 
+      const requestParam: TxPropsApi = {
+        tx_type: callType,
+        tx_id: nonce,
+        tx_from: '',
+        tx_to: '',
+        tx_amount: '',
+        tx_hash: '',
+        tx_fun_arg: '',
+        tx_data: '',
+        tx_proaddr: safeProxy.address,
+        tx_fun: '',
+        tx_singal: '',
+      }
+
       if (callType === CallType.TRANSFER) {
         if (!tokenContract || !amount) return
 
@@ -434,12 +449,20 @@ export default function TransactionList() {
         const parsedAmount = new BigFloatNumber(amount).multipliedBy(new BigFloatNumber(10).pow(decimals)).toFixed()
 
         tx = buildContractCall(tokenContract, 'transfer', [toAddress, parsedAmount], nonce)
+
+        requestParam.tx_from = fromAddress
+        requestParam.tx_to = toAddress
+        requestParam.tx_amount = parsedAmount
+        requestParam.tx_fun = 'transfer'
       } else if (callType === CallType.METHOD) {
         if (!contract || !funcParams) return
 
         const param = arg?.split(',')
 
         tx = buildContractCall(contract, funcParams, param || [], nonce)
+
+        requestParam.tx_fun_arg = arg
+        requestParam.tx_fun = funcParams
       }
 
       if (!library || !account) return
@@ -448,24 +471,15 @@ export default function TransactionList() {
 
       const safeTx = buildMultiSendSafeTx(multiSend, [tx], nonce)
 
-      setSafeTx(safeTx)
+      if (!safeTx) return
+
+      requestParam.tx_data = JSON.stringify(safeTx)
 
       // send tx data to service
 
-      const requsetParam: addTxType = {
-        txType: callType,
-        txId: nonce,
-        txFrom: '',
-        txTo: '',
-        txAmount: '',
-        txHash: '',
-        txFunArg: '',
-        txData: safeTx.data,
-        txProaddr: safeProxy.address,
-        txFun: '',
-      }
+      debugger
 
-      await addTx(requsetParam)
+      await addTx(requestParam)
       setIsOpen(false)
       getDataLists()
     },
@@ -473,18 +487,27 @@ export default function TransactionList() {
   )
 
   const onApproveHandler = useCallback(
-    async (item) => {
+    async (item: TxPropsApi) => {
       console.log('item', item)
 
-      // safeProxy?.approveHash(item.tx_hash).then((res) => {
-      //   console.log('res', res)
-      // })
+      const { id } = item
+
+      debugger
+      // return
 
       if (!library || !account) return
 
-      if (!safeProxy || !safeTx) return
+      if (!safeProxy) return
+
+      if (!id) return
+
+      const { tx_singal, tx_data }: TxPropsApi = (await getTxById(id))?.[0] || {}
 
       const signer = getSigner(library, account)
+
+      const safeTx = tx_data && JSON.parse(tx_data)
+
+      if (!safeTx) return
 
       const signature = await safeSignTypedData(signer, safeProxy, safeTx, chainId)
 
@@ -492,11 +515,19 @@ export default function TransactionList() {
 
       // send data to service
 
-      setSignatures((prev) => {
-        return [...prev, signature]
-      })
+      let signatures: SafeSignature[] | undefined = undefined
+
+      if (tx_singal) {
+        signatures = JSON.parse(tx_singal).push(signature)
+      } else {
+        signatures = [signature]
+      }
+
+      // const signatures = tx_singal ? JSON.parse(tx_singal).push(signature) : [signature]
+
+      await updateTxById(id, { tx_singal: JSON.stringify(signatures) })
     },
-    [account, chainId, library, nonce, safeProxy, safeTx]
+    [account, chainId, library, nonce, safeProxy]
   )
 
   // const onConfirmHandler = useCallback(
@@ -535,16 +566,31 @@ export default function TransactionList() {
   //   [chainId, safeProxy]
   // )
 
-  const onConfirmHandler = useCallback(async () => {
-    if (!safeProxy || !safeTx) return
+  const onConfirmHandler = useCallback(
+    async (item: TxPropsApi) => {
+      const { id } = item
 
-    console.log('[](safeTx):', safeTx, signatures)
+      if (!id) return
 
-    // exec
-    await executeTx(safeProxy, safeTx, signatures)
-  }, [safeProxy, safeTx, signatures])
+      if (!safeProxy) return
 
-  const onViewRowHandler = useCallback((row: RowItemType) => {
+      const { tx_singal, tx_data }: TxPropsApi = (await getTxById(id))?.[0] || {}
+
+      // console.log('[](safeTx):', safeTx, signatures)
+
+      if (!tx_singal) return message.error('签名不存在')
+      if (!tx_data) return message.error('数据不存在')
+
+      const signatures: SafeSignature[] = JSON.parse(tx_singal)
+      const safeTx: SafeTransaction = JSON.parse(tx_data)
+
+      // exec
+      await executeTx(safeProxy, safeTx, signatures)
+    },
+    [safeProxy]
+  )
+
+  const onViewRowHandler = useCallback((row: TxPropsApi) => {
     setRowData(row)
 
     setOpenRow(true)

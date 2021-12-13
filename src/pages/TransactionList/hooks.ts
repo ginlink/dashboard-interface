@@ -1,5 +1,4 @@
 import { BigNumberish, Contract } from 'ethers'
-import { RowItemType } from './TableRowModal'
 import {
   buildContractCall,
   buildSafeTransaction,
@@ -30,6 +29,7 @@ export const OWNERARR: Array<string> = [
 
 import { Erc20 } from '@/abis/types'
 import { useSingleCallResult } from '@/state/multicall/hooks'
+import { TxPropsApi } from '@/services/api'
 
 export type TransactionSubmitProps = {
   contract?: any
@@ -93,7 +93,7 @@ export function useSignatureBytes(owner: any[]) {
 }
 
 //事务状态处理
-export function useTxStatus(record: RowItemType) {
+export function useTxStatus(record: TxPropsApi) {
   const transactionProxy = useTransactionProxy()
   const [currentApproveNum, setCurrentApproveNum] = useState<number>(0)
 
@@ -107,17 +107,17 @@ export function useTxStatus(record: RowItemType) {
   useEffect(() => {
     if (!transactionProxy) return
     if (!record) return
-    const promiseArr: Array<any> = []
-    OWNERARR.map((v: string) => {
-      promiseArr.push(transactionProxy?.approvedHashes(v, record.tx_hash))
-    })
-    Promise.all(promiseArr).then((res) => {
-      let count = 0
-      res.map((v) => {
-        if (v.toNumber()) count += 1
-      })
-      setCurrentApproveNum(count)
-    })
+    // const promiseArr: Array<any> = []
+    // OWNERARR.map((v: string) => {
+    //   promiseArr.push(transactionProxy?.approvedHashes(v, record.tx_hash))
+    // })
+    // Promise.all(promiseArr).then((res) => {
+    //   let count = 0
+    //   res.map((v) => {
+    //     if (v.toNumber()) count += 1
+    //   })
+    //   setCurrentApproveNum(count)
+    // })
   }, [nonce, record, transactionProxy])
 
   return useMemo(() => {

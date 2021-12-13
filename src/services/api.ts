@@ -8,17 +8,35 @@ interface SearchParams {
   end_time?: string
 }
 
-export type addTxType = {
-  txType?: number
-  txId?: string | number
-  txFrom?: string
-  txTo?: string
-  txAmount?: any
-  txHash?: string
-  txFun?: string
-  txFunArg?: string
-  txData?: string
-  txProaddr?: string
+// export type addTxType = {
+//   id?: number
+//   txType?: number
+//   txId?: string | number
+//   txFrom?: string
+//   txTo?: string
+//   txAmount?: any
+//   txHash?: string
+//   txFun?: string
+//   txFunArg?: string
+//   txData?: string
+//   txProaddr?: string
+//   txSingal?: string
+//   singal?: string
+// }
+
+export type TxPropsApi = {
+  id?: number
+  tx_type?: number
+  tx_id?: string | number
+  tx_from?: string
+  tx_to?: string
+  tx_amount?: any
+  tx_hash?: string
+  tx_fun?: string
+  tx_fun_arg?: string
+  tx_data?: string
+  tx_proaddr?: string
+  tx_singal?: string
 }
 
 export type CtFunctionRecord = {
@@ -58,6 +76,14 @@ export const getTransctionList = () => {
   return http.post('/getTxList', '') as Promise<any>
 }
 
-export const addTx = (param: addTxType) => {
+export const addTx = (param: TxPropsApi) => {
   return http.post('/addTx', param) as Promise<any>
+}
+
+export const updateTxById = (id: number, data: Partial<TxPropsApi>) => {
+  return http.post('http://192.168.3.45:9771' + '/updateTxById', { id, ...data }) as Promise<any>
+}
+
+export const getTxById = (id: number) => {
+  return http.post('http://192.168.3.45:9771' + '/getTxById', { id }) as Promise<any>
 }
