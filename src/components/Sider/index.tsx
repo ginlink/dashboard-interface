@@ -25,6 +25,7 @@ enum Route {
   TransactionList = 4,
   FastCall,
   CallAdmin,
+  CtAddress,
 }
 
 const routes: {
@@ -37,6 +38,7 @@ const routes: {
   '/transactionList': Route.TransactionList + '',
   '/fast_call': Route.FastCall + '',
   '/call_admin': Route.CallAdmin + '',
+  '/ct_address': Route.CtAddress + '',
 }
 
 export default function Siders() {
@@ -85,6 +87,11 @@ export default function Siders() {
           <Menu.Item key={Route.CallAdmin}>
             <StyledNavLike to="/call_admin">
               <TYPE.main color="white">管理调用</TYPE.main>
+            </StyledNavLike>
+          </Menu.Item>
+          <Menu.Item key={Route.CtAddress}>
+            <StyledNavLike to="/ct_address">
+              <TYPE.main color="white">常用地址</TYPE.main>
             </StyledNavLike>
           </Menu.Item>
         </SubMenu>
