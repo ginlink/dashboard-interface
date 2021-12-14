@@ -79,6 +79,14 @@ export const ButtonPrimary = styled(Base)`
   }
 `
 
+export const ButtonPrimaryReverse = styled(Base)`
+  background-color: transparent;
+  color: ${({ theme }) => theme.primary1};
+  border: 1px solid ${({ theme }) => theme.primary1};
+
+  padding: 4px 16px;
+`
+
 // 所有自己按钮的基类
 const ButtonFirstBase = styled(ButtonPrimary)`
   width: initial; // 覆盖Base默认的100%，让按钮自适应内容

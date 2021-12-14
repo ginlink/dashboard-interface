@@ -72,8 +72,18 @@ export type CtAddress = {
   desc?: string
 }
 
+export class AddressSearchParams {
+  page?: number
+  limit?: number
+  key_address?: string
+  key_symbol?: string
+  key_chainid?: number;
+
+  [key: string]: any
+}
+
 export const getTableLists = (searchParams: SearchParams) => {
-  return http.post('/record/search', searchParams) as Promise<any>
+  return http.post(BASE_URL_15 + '/record/search', searchParams) as Promise<any>
 }
 
 export const addFunctionApi = (data: CtFunction) => {
@@ -92,19 +102,19 @@ export const searchFuncApi = (key: string) => {
 
 //事务列表
 export const getTransctionList = () => {
-  return http.post('http://192.168.3.45:9771' + '/getTxList', '') as Promise<any>
+  return http.post('/getTxList', '') as Promise<any>
 }
 
 export const addTx = (param: TxPropsApi) => {
-  return http.post('http://192.168.3.45:9771' + '/addTx', param) as Promise<any>
+  return http.post('/addTx', param) as Promise<any>
 }
 
 export const updateTxById = (id: number, data: Partial<TxPropsApi>) => {
-  return http.post('http://192.168.3.45:9771' + '/updateTxById', { id, ...data }) as Promise<any>
+  return http.post('/updateTxById', { id, ...data }) as Promise<any>
 }
 
 export const getTxById = (id: number) => {
-  return http.post('http://192.168.3.45:9771' + '/getTxById', { id }) as Promise<any>
+  return http.post('/getTxById', { id }) as Promise<any>
 }
 
 export const getCtAddressApi = () => {
@@ -121,4 +131,8 @@ export const deleteCtAddressApi = (id: number) => {
 
 export const updateCtAddressApi = (id: number, data: CtAddress) => {
   return http.patch(BASE_URL_15 + '/ct-address' + '/' + id, data) as Promise<any>
+}
+
+export const searchCtAddressApi = (addressSearchParams?: AddressSearchParams) => {
+  return http.get(BASE_URL_15 + '/ct-address' + '/search', addressSearchParams) as Promise<any>
 }

@@ -1,10 +1,8 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import styled from 'styled-components/macro'
 import Modal from '@/components/Modal'
 import CloseOutlined from '@ant-design/icons/lib/icons/CloseOutlined'
 import { Space, Radio, Input, Select, message, Form, Button } from 'antd'
-import { ButtonPrimary } from '@/components/Button'
-import { TYPESTATE } from './hooks'
 
 import swapMiningAbi from '@/abis/swap-mining.json'
 import ownableAbi from '@/abis/Ownable.json'
@@ -35,19 +33,8 @@ const CloseWrapper = styled.div`
   cursor: pointer;
 `
 
-const InputBox = styled.div`
-  margin-top: 18px;
-`
 const SpaceBox = styled.div`
   margin: 20px 0;
-`
-const InputItem = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 18px;
-  label {
-    width: 20%;
-  }
 `
 
 export type TransferParams = {
@@ -174,7 +161,7 @@ export default function CreateTransactionModal({
     return {
       fromAddress: [
         { required: true, message: '请输入token地址!' },
-        ({ getFieldValue }: { getFieldValue: any }) => ({
+        () => ({
           validator(_: any, value: string) {
             if (!isAddress(value)) return Promise.reject('地址格式错误')
 
@@ -184,7 +171,7 @@ export default function CreateTransactionModal({
       ],
       toAddress: [
         { required: true, message: '请输入接收人地址!' },
-        ({ getFieldValue }: { getFieldValue: any }) => ({
+        () => ({
           validator(_: any, value: string) {
             if (!isAddress(value)) return Promise.reject('地址格式错误')
 
