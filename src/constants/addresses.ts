@@ -45,6 +45,11 @@ export const TRANSACTION_MULTISEND_ADDRESS: AddressMap = {
   [SupportedChainId.BSC]: '',
 }
 
+export const TRANSACTION_ROUTER_ADDRESS: AddressMap = {
+  [SupportedChainId.BSCTEST]: '0xD4f9e77C09627986aC86243E89b0E4401264430D',
+  [SupportedChainId.BSC]: '',
+}
+
 // TODO    transaction  address  end
 
 export const UNI_ADDRESS: AddressMap = constructSameAddressMap('0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984', false)

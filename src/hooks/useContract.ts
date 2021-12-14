@@ -16,6 +16,7 @@ import {
   TRANSACTION_SWAPMING_ADDRESSES,
   TRANSACTION_OPERATABLE_ADDRESS,
   TRANSACTION_MULTISEND_ADDRESS,
+  TRANSACTION_ROUTER_ADDRESS,
   SAFE_FACTORY_ADDRESS,
   MULTICALL_ADDRESSES,
   AddressMap,
@@ -26,9 +27,11 @@ import { abi as multiSend } from 'abis/MultiSend.json'
 import { abi as positionReward } from 'abis/position-reward.json'
 import { abi as SAFE_FACTORY_ABI } from 'abis/safe_factory.json'
 import { abi as SWAP_MING_ABI } from 'abis/swap-mining.json'
+import { abi as SWAP_ROUTER_ABI } from 'abis/SwapRouter.json'
 import { GnosisSafe } from 'abis/types/GnosisSafe'
 import { PositionReward } from 'abis/types/PositionReward'
 import { MultiSend } from 'abis/types/MultiSend'
+import { SwapRouter } from 'abis/types/SwapRouter'
 
 import { UniswapInterfaceMulticall } from '@/types/v3'
 import { abi as MULTICALL_ABI } from 'plugins/@uniswap/v3-periphery/artifacts/contracts/lens/UniswapInterfaceMulticall.sol/UniswapInterfaceMulticall.json'
@@ -106,6 +109,10 @@ export function useTransactionReward() {
 
 export function useTransactionMultiSend() {
   return useContract<MultiSend>(TRANSACTION_MULTISEND_ADDRESS, multiSend)
+}
+
+export function useTransactionRouter() {
+  return useContract<SwapRouter>(TRANSACTION_ROUTER_ADDRESS, SWAP_ROUTER_ABI)
 }
 
 export function useTransactionSafeFactory() {
