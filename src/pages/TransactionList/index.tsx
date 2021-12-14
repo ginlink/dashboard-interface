@@ -2,17 +2,6 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import styled from 'styled-components/macro'
 import { Table } from 'antd'
 import { getTransctionList, addTx, TxPropsApi, updateTxById, getTxById, TxStatusEnum } from 'services/api'
-import { Modal, Button, Pagination } from 'antd'
-import {
-  APPROVENUM,
-  OWNERARR,
-  TransactionSubmitProps,
-  TXSTATE,
-  TYPESTATE,
-  useSignatureBytes,
-  useTransacitonSubmitData,
-} from './hooks'
-import { BigNumberish, CallOverrides } from 'ethers'
 import { message } from 'antd'
 import CreateTransactionModal, { CallType, MethodParams, TransferParams } from './CreateTransactionModal'
 import { ButtonPrimary } from '@/components/Button'
@@ -23,9 +12,9 @@ import fu from '@/assets/images/fu.png'
 import copy from 'copy-to-clipboard'
 import { txType } from '@/constants/txType'
 import TxStatus from './TxStatus'
-import { TRANSACTION_MULTISEND_ADDRESS, TRANSACTION_PROXY_ADDRESS } from '@/constants/addresses'
+import { TRANSACTION_PROXY_ADDRESS } from '@/constants/addresses'
 import { Contract } from '@ethersproject/contracts'
-import { bundleCallData, getExecByteData, isMeet, parseParam } from './util'
+import { isMeet, parseParam } from './util'
 import { buildContractCall, executeTx, SafeSignature, SafeTransaction } from '@/utils/execution'
 import BigFloatNumber from 'bignumber.js'
 import { useSingleCallResult } from '@/state/multicall/hooks'
@@ -203,14 +192,9 @@ export default function TransactionList() {
     return result[0]?.toNumber()
   }, [result])
 
-  // get table list
-  useEffect(() => {
-    getTransctionList().then((res) => {
-      console.log('[](res):', res)
-      setDataList(res)
-    })
-  }, [])
+  // fresh data list
   const resetDataList = useCallback(async () => {
+    debugger
     if (!nonce || !safeProxyInfo) return
 
     // const offsetNonce = nonce - 1
@@ -307,7 +291,7 @@ export default function TransactionList() {
       })
   }, [safeProxy])
 
-  // get table list
+  // init get table list
   useEffect(() => {
     resetDataList()
   }, [resetDataList])
