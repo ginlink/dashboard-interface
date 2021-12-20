@@ -76,6 +76,7 @@ export default function TableRowModal({
     }
     return false
   }, [item.txId, nonce])
+
   const { account } = useActiveWeb3React()
   const signatures = useMemo(() => {
     let _signaures: SafeSignature[] | undefined = undefined
@@ -87,12 +88,17 @@ export default function TableRowModal({
 
     return _signaures
   }, [item])
-  const findSigner = (address: string) => {
-    if (!signatures || nonce == undefined) return -1
-    return signatures?.findIndex((res) => {
-      return res.signer.toLocaleLowerCase() == address.toLocaleLowerCase()
-    })
-  }
+
+  const findSigner = useCallback(
+    (address: string) => {
+      if (!signatures || nonce == undefined) return -1
+      return signatures?.findIndex((res) => {
+        return res.signer.toLocaleLowerCase() == address.toLocaleLowerCase()
+      })
+    },
+    [nonce, signatures]
+  )
+
   const userIsApporve = useMemo(() => {
     if (!account || !safeProxyInfo) return true
     if (current) return true
@@ -104,7 +110,7 @@ export default function TableRowModal({
       return true
     }
     return false
-  }, [account, current, safeProxyInfo])
+  }, [account, current, findSigner, safeProxyInfo])
 
   const openSuccess = useMemo(() => {
     if (!signatures || !safeProxyInfo || safeProxyInfo.threshold == undefined || nonce == undefined) return true
