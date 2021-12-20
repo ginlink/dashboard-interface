@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from 'react'
 import styled from 'styled-components/macro'
 import Modal from '@/components/Modal'
 import CloseOutlined from '@ant-design/icons/lib/icons/CloseOutlined'
-import { Space, Radio, Input, Select, message, Form, Button } from 'antd'
+import { Space, Radio, Input, Select, message, Form, Button, FormInstance } from 'antd'
 
 import swapMiningAbi from '@/abis/swap-mining.json'
 import ownableAbi from '@/abis/Ownable.json'
@@ -23,6 +23,10 @@ import {
 } from '@/constants/addresses'
 import { isAddress } from '@ethersproject/address'
 import { FuncType } from '../CallAdmin/util'
+import { TYPE } from '@/theme'
+import Loader from '@/components/Loader'
+import Row from '@/components/Row'
+import { ButtonPrimary } from '@/components/Button'
 
 const { Option } = Select
 
@@ -35,6 +39,13 @@ const CloseWrapper = styled.div`
 
 const SpaceBox = styled.div`
   margin: 20px 0;
+`
+
+const MyButtonPrimary = styled(ButtonPrimary)`
+  width: fit-content;
+  border-radius: 4px;
+  /* padding: 8px 16px; */
+  line-height: 1;
 `
 
 export type TransferParams = {
@@ -56,6 +67,8 @@ export enum CallType {
 
 export type CreateTransactionProps = {
   isOpen: boolean
+  form: FormInstance
+  isCreating?: boolean
   onClose?: () => void
   onChangeCallType?: (type: CallType) => void
   onFinished?: (values: any) => void
@@ -70,6 +83,8 @@ console.log('[](parsedAbis):', parsedAbis)
 
 export default function CreateTransactionModal({
   isOpen,
+  form,
+  isCreating,
   onClose,
   onChangeCallType,
   onFinished,
@@ -84,7 +99,7 @@ export default function CreateTransactionModal({
 
   const [callType, setCallType] = useState(CallType.TRANSFER)
 
-  const [form] = Form.useForm()
+  // const [createTransactionForm] = Form.useForm()
 
   const contractAddresses: ContractAddresses | undefined = useMemo(() => {
     if (!chainId) return
@@ -233,11 +248,6 @@ export default function CreateTransactionModal({
             <Form.Item label="数量" name="amount" rules={rules.amount}>
               <Input allowClear={true} placeholder="数量" />
             </Form.Item>
-            <Form.Item wrapperCol={{ offset: 5, span: 20 }}>
-              <Button type="primary" htmlType="submit">
-                创建
-              </Button>
-            </Form.Item>
           </>
         ) : (
           <>
@@ -270,14 +280,25 @@ export default function CreateTransactionModal({
             <Form.Item label="合约参数" name="arg" rules={rules.arg}>
               <Input placeholder={funcName} allowClear={true} />
             </Form.Item>
-            <Form.Item wrapperCol={{ offset: 4, span: 20 }}>
-              {/* <Button type="primary" htmlType="submit" disabled={!isReady}> */}
-              <Button type="primary" htmlType="submit">
-                创建
-              </Button>
-            </Form.Item>
           </>
         )}
+
+        <Form.Item wrapperCol={{ offset: 5, span: 20 }}>
+          <MyButtonPrimary type="primary" disabled={isCreating}>
+            {isCreating ? (
+              <Row style={{ gap: '4px', alignItems: 'center' }}>
+                <TYPE.body fontSize={14} color="white">
+                  创建
+                </TYPE.body>
+                <Loader size="14px" stroke="white" />
+              </Row>
+            ) : (
+              <TYPE.body fontSize={14} color="#fff">
+                创建
+              </TYPE.body>
+            )}
+          </MyButtonPrimary>
+        </Form.Item>
       </Form>
     </Modal>
   )
