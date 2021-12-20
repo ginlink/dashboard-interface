@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import styled from 'styled-components/macro'
-import { Table } from 'antd'
+import { Form, Table } from 'antd'
 import { getTransctionList, addTx, TxPropsApi, updateTxById, getTxById, TxStatusEnum } from 'services/api'
 import { message } from 'antd'
 import CreateTransactionModal, { CallType, MethodParams, TransferParams } from './CreateTransactionModal'
@@ -177,11 +177,15 @@ export default function TransactionList() {
 
   const [safeProxyInfo, setSafeProxyInfo] = useState<SafeProxyInfo | undefined>(undefined)
 
+  const [isCreating, setIsCreating] = useState(false)
+
   const { library, account } = useActiveWeb3React()
 
   const safeProxy = useTransactionProxy()
   const multiSend = useTransactionMultiSend()
   const tokenContract = useTokenContract(tokenAddress)
+
+  const [createTransactionForm] = Form.useForm()
 
   // get dynamic nonce
   const { result } = useSingleCallResult(safeProxy, 'nonce')
@@ -302,84 +306,100 @@ export default function TransactionList() {
 
       if (!multiSend || !safeProxy) return
 
-      const nonce = (await safeProxy.nonce())?.toNumber()
+      const simpleError = new Error('')
 
-      // const tx0 = buildContractCall(simpleState, 'updateNum', ['1'], nonce)
+      setIsCreating(true)
+      try {
+        const nonce = (await safeProxy.nonce())?.toNumber()
 
-      // const tx1 = buildContractCall(simpleState, 'updateAge', ['1'], nonce)
+        // const tx0 = buildContractCall(simpleState, 'updateNum', ['1'], nonce)
 
-      let tx: SafeTransaction | undefined = undefined
+        // const tx1 = buildContractCall(simpleState, 'updateAge', ['1'], nonce)
 
-      const requestParam: TxPropsApi = {
-        txType: callType,
-        txId: nonce + '',
-        txFrom: '',
-        txTo: '',
-        txAmount: '',
-        txHash: '',
-        txFunArg: '',
-        txData: '',
-        txProaddr: safeProxy.address,
-        txFun: '',
-        txSingal: '',
-      }
+        let tx: SafeTransaction | undefined = undefined
 
-      if (callType === CallType.TRANSFER) {
-        if (!tokenContract || !amount) return
-
-        let decimals: number | undefined = undefined
-
-        try {
-          decimals = await tokenContract.decimals()
-        } catch (err) {
-          console.log('[decimals](err):', err)
-          message.warning('expect token address!')
+        const requestParam: TxPropsApi = {
+          txType: callType,
+          txId: nonce + '',
+          txFrom: '',
+          txTo: '',
+          txAmount: '',
+          txHash: '',
+          txFunArg: '',
+          txData: '',
+          txProaddr: safeProxy.address,
+          txFun: '',
+          txSingal: '',
         }
 
-        if (!decimals) return
+        if (callType === CallType.TRANSFER) {
+          if (!tokenContract || !amount) throw simpleError
 
-        const parsedAmount = new BigFloatNumber(amount).multipliedBy(new BigFloatNumber(10).pow(decimals)).toFixed()
+          let decimals: number | undefined = undefined
 
-        tx = buildContractCall(tokenContract, 'transfer', [toAddress, parsedAmount], nonce)
+          try {
+            decimals = await tokenContract.decimals()
+          } catch (err) {
+            console.log('[decimals](err):', err)
+            message.warning('expect token address!')
+          }
+
+          if (!decimals) throw simpleError
+
+          const parsedAmount = new BigFloatNumber(amount).multipliedBy(new BigFloatNumber(10).pow(decimals)).toFixed()
+
+          tx = buildContractCall(tokenContract, 'transfer', [toAddress, parsedAmount], nonce)
+
+          debugger
+          requestParam.txFrom = tokenContract.address
+          requestParam.txTo = toAddress
+          requestParam.txAmount = parsedAmount
+          requestParam.txFun = 'transfer'
+        } else if (callType === CallType.METHOD) {
+          if (!contract || !funcName) throw simpleError
+
+          // const param = arg?.split(',')
+          const param = parseParam(arg)
+
+          tx = buildContractCall(contract, funcName, param || [], nonce)
+
+          // const funcName = funcName.indexOf('(') != -1 ? funcName.slice(0, funcName.indexOf('(')) : funcName
+
+          requestParam.txFrom = contract.address
+          requestParam.txFunArg = arg
+          requestParam.txFun = funcName
+        }
+
+        if (!library || !account) throw simpleError
+
+        if (!tx) throw simpleError
+
+        const safeTx = buildMultiSendSafeTx(multiSend, [tx], nonce)
+
+        if (!safeTx) throw simpleError
+
+        requestParam.txData = JSON.stringify(safeTx)
 
         debugger
-        requestParam.txFrom = tokenContract.address
-        requestParam.txTo = toAddress
-        requestParam.txAmount = parsedAmount
-        requestParam.txFun = 'transfer'
-      } else if (callType === CallType.METHOD) {
-        if (!contract || !funcName) return
+        // send tx data to service
+        await addTx(requestParam)
 
-        // const param = arg?.split(',')
-        const param = parseParam(arg)
+        // await new Promise((resolve) => {
+        //   setTimeout(() => {
+        //     resolve(0)
+        //   }, 2000)
+        // })
 
-        tx = buildContractCall(contract, funcName, param || [], nonce)
-
-        // const funcName = funcName.indexOf('(') != -1 ? funcName.slice(0, funcName.indexOf('(')) : funcName
-
-        requestParam.txFrom = contract.address
-        requestParam.txFunArg = arg
-        requestParam.txFun = funcName
+        setIsOpen(false)
+        createTransactionForm.resetFields()
+        resetDataList()
+      } catch (err) {
+        console.log('[](err):', err)
+      } finally {
+        setIsCreating(false)
       }
-
-      if (!library || !account) return
-
-      if (!tx) return
-
-      const safeTx = buildMultiSendSafeTx(multiSend, [tx], nonce)
-
-      if (!safeTx) return
-
-      requestParam.txData = JSON.stringify(safeTx)
-
-      debugger
-      // send tx data to service
-
-      await addTx(requestParam)
-      setIsOpen(false)
-      resetDataList()
     },
-    [account, callType, contract, library, multiSend, resetDataList, safeProxy, tokenContract]
+    [account, callType, contract, createTransactionForm, library, multiSend, resetDataList, safeProxy, tokenContract]
   )
 
   const onApproveHandler = useCallback(
@@ -518,6 +538,8 @@ export default function TransactionList() {
       <CreateTransactionModal
         onClose={() => setIsOpen(false)}
         isOpen={isOpen}
+        form={createTransactionForm}
+        isCreating={isCreating}
         onChangeCallType={(type) => setCallType(type)}
         onChangeContract={(contract) => setContract(contract)}
         onChangeTokenAddress={(address) => setTokenAddress(address)}
