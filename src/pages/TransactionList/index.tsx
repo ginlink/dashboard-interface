@@ -198,7 +198,6 @@ export default function TransactionList() {
 
   // fresh data list
   const resetDataList = useCallback(async () => {
-    debugger
     if (nonce == undefined || !safeProxyInfo) return
 
     // const offsetNonce = nonce - 1
