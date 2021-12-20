@@ -1,14 +1,17 @@
 import { MultiSend } from '@/abis/types'
+import { TxPropsApi, TxStatusEnum } from '@/services/api'
 import {
   buildContractCall,
   buildSafeTransaction,
   buildSignatureBytes,
   calculateSafeTransactionHash,
+  SafeSignature,
   SafeTransaction,
   signer,
 } from '@/utils/execution'
 import { buildMultiSendSafeTx } from '@/utils/multisend'
 import { Contract } from 'ethers'
+import { SafeProxyInfo } from '.'
 import { FuncType, ParsedFunc } from '../CallAdmin/util'
 import { CallType } from './CreateTransactionModal'
 
@@ -269,4 +272,67 @@ export function isMeet(stable?: string[], target?: string[], num?: number) {
   }
 
   return false
+}
+
+export type NonceAdapterProps = {
+  data?: TxPropsApi[]
+  nonce?: number
+  safeProxyInfo?: SafeProxyInfo
+}
+
+export function nonceAdapter({ data, nonce: offsetNonce, safeProxyInfo }: NonceAdapterProps) {
+  if (!data || !TxStatusEnum || !offsetNonce || !safeProxyInfo) return
+  if (offsetNonce === undefined) return
+
+  return data.map((item) => {
+    const { txId: txIdString, txSingal } = item
+
+    let status = TxStatusEnum.UNKNOWN
+
+    if (!txIdString) return { ...item, txStatus: status }
+
+    const txId = parseInt(txIdString)
+
+    // illegal
+    if (txId > offsetNonce) {
+      return {
+        ...item,
+        txStatus: status,
+      }
+    }
+
+    let signatures: SafeSignature[] | undefined = undefined
+    try {
+      signatures = txSingal ? JSON.parse(txSingal) : undefined
+    } catch (err) {
+      console.log('[](err):', err)
+    }
+
+    const { owners, threshold } = safeProxyInfo
+
+    if (txId < offsetNonce) {
+      status = TxStatusEnum.FAILED
+    }
+
+    if (owners && signatures && threshold) {
+      if (
+        isMeet(
+          owners,
+          signatures.map((item) => item.signer),
+          threshold
+        )
+      ) {
+        status = TxStatusEnum.SUCCESS
+      }
+    }
+
+    if (txId == offsetNonce) {
+      status = TxStatusEnum.LOADING
+    }
+
+    return {
+      ...item,
+      txStatus: status,
+    }
+  })
 }

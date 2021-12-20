@@ -14,13 +14,14 @@ import { txType } from '@/constants/txType'
 import TxStatus from './TxStatus'
 import { TRANSACTION_PROXY_ADDRESS } from '@/constants/addresses'
 import { Contract } from '@ethersproject/contracts'
-import { isMeet, parseParam } from './util'
+import { isMeet, nonceAdapter, parseParam } from './util'
 import { buildContractCall, executeTx, SafeSignature, SafeTransaction } from '@/utils/execution'
 import BigFloatNumber from 'bignumber.js'
 import { useSingleCallResult } from '@/state/multicall/hooks'
 import { buildMultiSendSafeTx } from '@/utils/multisend'
 import { safeSignTypedData } from '@/utils'
 import { useBlockNumber } from '@/hooks/useBlockNumber'
+import { useTransactionList } from '@/state/http/hooks'
 
 const processingData = function (hash: string) {
   if (hash) {
@@ -198,71 +199,24 @@ export default function TransactionList() {
     return result[0]?.toNumber()
   }, [result])
 
+  const [transactionList, setTransactionList] = useState<TxPropsApi[] | undefined>(undefined)
+
+  const transactionListWithLoop = useTransactionList()
+
   // fresh data list
-  const resetDataList = useCallback(async () => {
+  const manualResetDataList = useCallback(async () => {
     if (nonce == undefined || !safeProxyInfo) return
 
-    // const offsetNonce = nonce - 1
-    const offsetNonce = nonce
+    const data: TxPropsApi[] | undefined = await getTransctionList()
 
-    getTransctionList().then((res: TxPropsApi[]) => {
-      // compute status
-      // 反转
-      res.reverse()
-      const list = res.map((item) => {
-        const { txId: txIdString, txSingal } = item
-
-        let status = TxStatusEnum.UNKNOWN
-
-        if (!txIdString) return { ...item, txStatus: status }
-
-        const txId = parseInt(txIdString)
-
-        // illegal
-        if (txId > offsetNonce) {
-          return {
-            ...item,
-            txStatus: status,
-          }
-        }
-
-        let signatures: SafeSignature[] | undefined = undefined
-        try {
-          signatures = txSingal ? JSON.parse(txSingal) : undefined
-        } catch (err) {
-          console.log('[](err):', err)
-        }
-
-        const { owners, threshold } = safeProxyInfo
-
-        if (txId < offsetNonce) {
-          status = TxStatusEnum.FAILED
-        }
-
-        if (owners && signatures && threshold) {
-          if (
-            isMeet(
-              owners,
-              signatures.map((item) => item.signer),
-              threshold
-            )
-          ) {
-            status = TxStatusEnum.SUCCESS
-          }
-        }
-
-        if (txId == offsetNonce) {
-          status = TxStatusEnum.LOADING
-        }
-
-        return {
-          ...item,
-          txStatus: status,
-        }
-      })
-
-      setDataList(list)
+    data?.reverse()
+    const list = nonceAdapter({
+      data,
+      nonce,
+      safeProxyInfo,
     })
+
+    setDataList(list)
   }, [nonce, safeProxyInfo])
 
   // get owners and threshold
@@ -299,9 +253,28 @@ export default function TransactionList() {
   }, [safeProxy, latestBlockNumber])
 
   // init get table list
+  // useEffect(() => {
+  //   manualResetDataList()
+  // }, [manualResetDataList])
+
+  // init get table list
   useEffect(() => {
-    resetDataList()
-  }, [resetDataList])
+    if (!transactionListWithLoop || !safeProxyInfo || !nonce) return
+
+    debugger
+
+    const data = [...transactionListWithLoop]
+
+    data.reverse()
+
+    const list = nonceAdapter({
+      data,
+      nonce,
+      safeProxyInfo,
+    })
+
+    setDataList(list)
+  }, [nonce, safeProxyInfo, transactionListWithLoop])
 
   const onCreateFinishedHandler = useCallback(
     async (values: TransferParams & MethodParams) => {
@@ -395,14 +368,24 @@ export default function TransactionList() {
 
         setIsOpen(false)
         createTransactionForm.resetFields()
-        resetDataList()
+        manualResetDataList()
       } catch (err) {
         console.log('[](err):', err)
       } finally {
         setIsCreating(false)
       }
     },
-    [account, callType, contract, createTransactionForm, library, multiSend, resetDataList, safeProxy, tokenContract]
+    [
+      account,
+      callType,
+      contract,
+      createTransactionForm,
+      library,
+      multiSend,
+      manualResetDataList,
+      safeProxy,
+      tokenContract,
+    ]
   )
 
   const onApproveHandler = useCallback(
@@ -453,10 +436,10 @@ export default function TransactionList() {
 
       await updateTxById(id, { txSingal: JSON.stringify(signatures) })
       message.success('授权成功！')
-      resetDataList()
+      manualResetDataList()
       setOpenRow(false)
     },
-    [account, chainId, library, nonce, resetDataList, safeProxy]
+    [account, chainId, library, nonce, manualResetDataList, safeProxy]
   )
 
   const onConfirmHandler = useCallback(
@@ -489,11 +472,11 @@ export default function TransactionList() {
       // exec
       await executeTx(safeProxy, safeTx, signatures)
       message.success('执行交易已发送！')
-      resetDataList()
+      manualResetDataList()
       setIsOpen(false)
       setOpenRow(false)
     },
-    [resetDataList, safeProxy]
+    [manualResetDataList, safeProxy]
   )
 
   const onViewRowHandler = useCallback((row: TxPropsApi) => {

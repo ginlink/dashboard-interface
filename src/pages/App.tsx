@@ -5,8 +5,15 @@ import TransactionList from './TransactionList'
 import FastCall from './FastCall'
 import CallAdmin from './CallAdmin'
 import CtAddress from './CtAddress'
+import { useTransactionList } from '@/state/http/hooks'
+import { useEffect } from 'react'
 
 export default function App() {
+  const list = useTransactionList()
+  useEffect(() => {
+    console.log('[](list):', list)
+  }, [list])
+
   return (
     <>
       <Switch>
