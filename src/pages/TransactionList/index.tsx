@@ -20,6 +20,7 @@ import BigFloatNumber from 'bignumber.js'
 import { useSingleCallResult } from '@/state/multicall/hooks'
 import { buildMultiSendSafeTx } from '@/utils/multisend'
 import { safeSignTypedData } from '@/utils'
+import { useBlockNumber } from '@/hooks/useBlockNumber'
 
 const processingData = function (hash: string) {
   if (hash) {
@@ -184,6 +185,7 @@ export default function TransactionList() {
   const safeProxy = useTransactionProxy()
   const multiSend = useTransactionMultiSend()
   const tokenContract = useTokenContract(tokenAddress)
+  const latestBlockNumber = useBlockNumber()
 
   const [createTransactionForm] = Form.useForm()
 
@@ -294,7 +296,7 @@ export default function TransactionList() {
       .catch((err) => {
         console.log('[](err):', err)
       })
-  }, [safeProxy])
+  }, [safeProxy, latestBlockNumber])
 
   // init get table list
   useEffect(() => {
