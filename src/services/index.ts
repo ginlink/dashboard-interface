@@ -31,7 +31,7 @@ instance.interceptors.response.use(
 
     const errCode = response?.status
     const data = response?.data
-    message.error(data?.msg)
+    data?.msg && message.error(data.msg)
 
     switch (errCode) {
       case 400:

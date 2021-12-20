@@ -1,12 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2021-09-01 11:19:52
- * @LastEditTime: 2021-09-12 22:14:46
- * @LastEditors: jiangjin
- * @Description: In User Settings Edit
- * @FilePath: /undefined/Users/jiangjin/Documents/00.convert/converter-bsc-web/src/constants/misc.ts
- */
-
 // 支持语言列表
 export const supportLangList = [
   { id: 1, title: 'English', symbol: 'en-US' },
@@ -34,7 +25,7 @@ export const MAX_ACCESS_SPACING = 2
 export const DEFAULT_FORMAT_DATE = 'yyyy-MM-DD HH:ss:mm'
 
 // 网络请求轮询间隔
-export const HTTP_POLL_DELAY = 10000
+export const HTTP_POLL_DELAY = 7000
 
 // 网络轮询队列元素请求间隔
 export const HTTP_QUEUEQUERY_DELAY = 500
