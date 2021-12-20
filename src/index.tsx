@@ -5,6 +5,7 @@ import { createWeb3ReactRoot, Web3ReactProvider } from '@web3-react/core'
 import ApplicationUpdater from './state/application/updater'
 import MulticallUpdater from './state/multicall/updater'
 import TransactionUpdater from './state/transactions/updater'
+import HttpUpdater from './state/http/updater'
 
 import 'antd/dist/antd.css'
 import '@/assets/css/reset.css'
@@ -45,6 +46,7 @@ function Updater() {
       <ApplicationUpdater />
       <TransactionUpdater />
       <MulticallUpdater />
+      <HttpUpdater />
     </>
   )
 }

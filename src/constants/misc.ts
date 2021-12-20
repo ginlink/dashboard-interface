@@ -32,3 +32,9 @@ export const NetworkContextName = 'NETWORK'
 export const MAX_ACCESS_SPACING = 2
 
 export const DEFAULT_FORMAT_DATE = 'yyyy-MM-DD HH:ss:mm'
+
+// 网络请求轮询间隔
+export const HTTP_POLL_DELAY = 10000
+
+// 网络轮询队列元素请求间隔
+export const HTTP_QUEUEQUERY_DELAY = 500
