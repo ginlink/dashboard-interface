@@ -189,9 +189,9 @@ export default function TransactionList() {
 
   // get dynamic nonce
   const { result } = useSingleCallResult(safeProxy, 'nonce')
-
+  console.log('result', result)
   const nonce: number | undefined = useMemo(() => {
-    if (!result) return
+    if (result == undefined) return
 
     return result[0]?.toNumber()
   }, [result])
@@ -199,13 +199,15 @@ export default function TransactionList() {
   // fresh data list
   const resetDataList = useCallback(async () => {
     debugger
-    if (!nonce || !safeProxyInfo) return
+    if (nonce == undefined || !safeProxyInfo) return
 
     // const offsetNonce = nonce - 1
     const offsetNonce = nonce
 
     getTransctionList().then((res: TxPropsApi[]) => {
       // compute status
+      // 反转
+      res.reverse()
       const list = res.map((item) => {
         const { txId: txIdString, txSingal } = item
 

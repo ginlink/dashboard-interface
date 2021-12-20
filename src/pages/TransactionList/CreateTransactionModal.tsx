@@ -7,6 +7,8 @@ import { Space, Radio, Input, Select, message, Form, Button, FormInstance } from
 import swapMiningAbi from '@/abis/swap-mining.json'
 import ownableAbi from '@/abis/Ownable.json'
 import positionRewardAbi from '@/abis/position-reward.json'
+import swapROuterAbi from 'abis/SwapRouter.json'
+import GnosisSafeAbi from 'abis/GnosisSafe.json'
 import { ContractAddresses, parseAbis, StaticBaseContract } from './util'
 import { Contract } from '@ethersproject/contracts'
 import { getSignerOrProvider } from '@/hooks/useContract'
@@ -15,6 +17,9 @@ import {
   TRANSACTION_OPERATABLE_ADDRESS,
   TRANSACTION_POSITION_REWARD_ADDRESS,
   TRANSACTION_SWAPMING_ADDRESSES,
+  TRANSACTION_ROUTER_ADDRESS,
+  TRANSACTION_MULTISEND_ADDRESS,
+  TRANSACTION_PROXY_ADDRESS,
 } from '@/constants/addresses'
 import { isAddress } from '@ethersproject/address'
 import { FuncType } from '../CallAdmin/util'
@@ -71,7 +76,7 @@ export type CreateTransactionProps = {
   onChangeTokenAddress?: (address: string) => void
 }
 
-const abiArr = [swapMiningAbi, ownableAbi, positionRewardAbi]
+const abiArr = [swapMiningAbi, ownableAbi, positionRewardAbi, swapROuterAbi, GnosisSafeAbi]
 
 const parsedAbis = parseAbis(abiArr as StaticBaseContract[])
 console.log('[](parsedAbis):', parsedAbis)
@@ -103,6 +108,8 @@ export default function CreateTransactionModal({
       SwapMining: TRANSACTION_SWAPMING_ADDRESSES[chainId],
       Ownable: TRANSACTION_OPERATABLE_ADDRESS[chainId],
       positionReward: TRANSACTION_POSITION_REWARD_ADDRESS[chainId],
+      SwapRouter: TRANSACTION_ROUTER_ADDRESS[chainId],
+      GnosisSafe: TRANSACTION_PROXY_ADDRESS[chainId],
     }
   }, [chainId])
 
