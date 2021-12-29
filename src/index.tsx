@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useMemo } from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { createWeb3ReactRoot, Web3ReactProvider } from '@web3-react/core'
@@ -7,11 +7,10 @@ import MulticallUpdater from './state/multicall/updater'
 import TransactionUpdater from './state/transactions/updater'
 import HttpUpdater from './state/http/updater'
 
-import 'antd/dist/antd.css'
 import '@/assets/css/reset.css'
-
 import App from './pages/App'
 
+import 'antd/dist/antd.css'
 import store from '@/state'
 
 import 'moment/locale/zh-cn'
@@ -30,7 +29,6 @@ import Web3ReactManager from './components/Web3ReactManager'
 import getLibrary from './utils/getLibrary'
 
 import BigFloatNumber from 'bignumber.js'
-
 // 设置全局BigFloatNumber的取舍模式，为向下取整
 BigFloatNumber.set({ ROUNDING_MODE: BigFloatNumber.ROUND_DOWN })
 
@@ -50,24 +48,26 @@ function Updater() {
     </>
   )
 }
-
-ReactDOM.render(
-  <Provider store={store}>
-    <HashRouter>
-      <Web3ReactProvider getLibrary={getLibrary}>
-        <Web3ProviderNetwork getLibrary={getLibrary}>
-          <Web3ReactManager>
-            <ThemeProvider>
-              <ThemedGlobalStyle />
-              <Updater />
-              <AppLayout>
+function Info() {
+  return (
+    <Provider store={store}>
+      <HashRouter>
+        <Web3ReactProvider getLibrary={getLibrary}>
+          <Web3ProviderNetwork getLibrary={getLibrary}>
+            <Web3ReactManager>
+              <ThemeProvider>
+                <ThemedGlobalStyle />
+                <Updater />
+                {/* <AppLayout> */}
                 <App />
-              </AppLayout>
-            </ThemeProvider>
-          </Web3ReactManager>
-        </Web3ProviderNetwork>
-      </Web3ReactProvider>
-    </HashRouter>
-  </Provider>,
-  document.getElementById('root')
-)
+                {/* </AppLayout> */}
+              </ThemeProvider>
+            </Web3ReactManager>
+          </Web3ProviderNetwork>
+        </Web3ReactProvider>
+      </HashRouter>
+    </Provider>
+  )
+}
+
+ReactDOM.render(<Info></Info>, document.getElementById('root'))

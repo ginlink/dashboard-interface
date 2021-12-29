@@ -77,7 +77,6 @@ export default function Siders() {
             <TYPE.main color="white">事务列表</TYPE.main>
           </StyledNavLike>
         </Menu.Item>
-
         <SubMenu key={'100'} icon={<DesktopOutlined />} title="合约助手">
           <Menu.Item key={Route.FastCall}>
             <StyledNavLike to="/fast_call">

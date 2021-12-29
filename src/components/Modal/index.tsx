@@ -77,27 +77,6 @@ export function ModalHeader({
   )
 }
 
-const ContentWrapper = styled.div<{ minHeight: number | false; maxHeight: string | false; radius: number }>`
-  min-height: ${(props) => props.minHeight && props.minHeight + 'px'};
-  max-height: ${(props) => props.maxHeight && props.maxHeight};
-
-  padding: 0;
-  /* overflow-y: scroll; */
-  overflow-y: auto;
-
-  &::-webkit-scrollbar {
-    width: 0 !important;
-  }
-  -ms-overflow-style: none;
-  overflow: -moz-scrollbars-none;
-
-  /* background-color: ${(props) => props.theme.black}; */
-  /* color: ${(props) => props.theme.white}; */
-
-  /* box-shadow: 0px 2px 23px 0px rgba(197, 201, 213, 0.2); */
-  border-radius: ${(props) => props.radius && props.radius + 'px'};
-`
-
 const Header = styled(RowBetween)<{ changePadding?: boolean }>`
   padding: ${({ changePadding }) => (changePadding ? '1rem;' : '0')};
   svg {

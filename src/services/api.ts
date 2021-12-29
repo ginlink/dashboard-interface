@@ -71,6 +71,10 @@ export type CtAddress = {
   logoURI?: string
   desc?: string
 }
+export type LoginType = {
+  username: string
+  password: string
+}
 
 export class AddressSearchParams {
   page?: number
@@ -97,6 +101,12 @@ export const getFunctionApi = () => {
 export const searchFuncApi = (key: string) => {
   return http.get(BASE_URL_15 + '/ct-function/search', {
     key,
+  }) as Promise<any>
+}
+
+export const loginApi = (loginData: LoginType) => {
+  return http.post('/login', {
+    loginData,
   }) as Promise<any>
 }
 
