@@ -1,36 +1,39 @@
-/*
- * @Author: your name
- * @Date: 2021-09-01 18:06:40
- * @LastEditTime: 2021-10-28 15:41:41
- * @LastEditors: jiangjin
- * @Description: In User Settings Edit
- * @FilePath: /converter-bsc-web/src/components/Header/header1.tsx
- */
 import { NETWORK_LABELS } from '@/constants/chains'
 import { useActiveWeb3React } from '@/hooks/web3'
-import React, { memo } from 'react'
+import { TYPE } from '@/theme'
+import React, { memo, useCallback } from 'react'
 import styled from 'styled-components/macro'
+import Row from '../Row'
 import Web3Status from '../Web3Status'
+import { useHistory } from 'react-router-dom'
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  position: relative;
-
-  z-index: 1;
-`
-const Empty = styled.div`
-  width: 23px;
+const Wrapper = styled(Row)`
+  gap: 8px;
 `
 
+const EnsWrapper = styled.div`
+  padding: 4px 8px;
+  background-color: ${({ theme }) => theme.yellow1};
+  border-radius: 4px;
+`
+const LoginOut = styled.div`
+  cursor: pointer;
+`
 function HeaderPC() {
+  const history = useHistory()
   const { chainId } = useActiveWeb3React()
+  const loginOutFn = useCallback(() => {
+    console.log('loginOutFn')
+    history.push('/login')
+    sessionStorage.removeItem('auth')
+  }, [history])
   return (
     <Wrapper>
-      {NETWORK_LABELS[chainId ?? -1] ?? 'ErrorNetWork'}
-      <Empty />
+      <EnsWrapper>
+        <TYPE.main>{NETWORK_LABELS[chainId ?? -1] ?? 'ErrorNetWork'}</TYPE.main>
+      </EnsWrapper>
       <Web3Status />
+      <LoginOut onClick={loginOutFn}>登出</LoginOut>
     </Wrapper>
   )
 }

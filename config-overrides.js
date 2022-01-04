@@ -1,11 +1,4 @@
-/*
- * @Author: your name
- * @Date: 2021-08-30 19:39:13
- * @LastEditTime: 2021-10-28 15:23:48
- * @LastEditors: jiangjin
- * @Description: In User Settings Edit
- * @FilePath: /converter-bsc-web/config-overrides.js
- */
+
 const { override, fixBabelImports, addWebpackExternals, addWebpackAlias, addLessLoader } = require('customize-cra')
 const path = require('path')
 // 修改打包路径除了output，这里也要修改

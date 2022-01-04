@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components/macro'
-import { darken, important, lighten, opacify, transparentize } from 'polished'
+import { darken, lighten, transparentize } from 'polished'
 
 import { RowBetween } from '../Row'
 import { ChevronDown, Check } from 'react-feather'
@@ -56,8 +56,8 @@ const Base = styled(RebassButton)<
 export const ButtonPrimary = styled(Base)`
   background-color: ${({ theme }) => theme.primary1};
   color: ${({ theme }) => theme.white};
-  /* 不能统一高度，否则样式错乱 */
-  /* height: 48px; */
+
+  padding: 4px 16px;
 
   &:focus {
     box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.01, theme.primary1)};
@@ -77,6 +77,14 @@ export const ButtonPrimary = styled(Base)`
     border: 1px solid transparent;
     outline: none;
   }
+`
+
+export const ButtonPrimaryReverse = styled(Base)`
+  background-color: transparent;
+  color: ${({ theme }) => theme.primary1};
+  border: 1px solid ${({ theme }) => theme.primary1};
+
+  padding: 4px 16px;
 `
 
 // 所有自己按钮的基类
@@ -490,3 +498,29 @@ export function ButtonRadioChecked({ active = false, children, ...rest }: { acti
     )
   }
 }
+
+export const SmallButtonError = styled(ButtonError)`
+  padding: 0 2px;
+  border-radius: 4px;
+  height: unset;
+  width: fit-content;
+`
+export const SmallButtonPrimary = styled(ButtonPrimary)`
+  padding: 0 2px;
+  border-radius: 4px;
+  width: fit-content;
+`
+export const SmallButtonYellow = styled(ButtonPrimary)`
+  padding: 0 2px;
+  border-radius: 4px;
+  width: fit-content;
+
+  background-color: ${({ theme }) => theme.yellow1};
+  :hover,
+  :active,
+  :focus {
+    background-color: ${({ theme }) => darken(0.1, theme.yellow1)};
+
+    box-shadow: unset;
+  }
+`

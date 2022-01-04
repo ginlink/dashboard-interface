@@ -26,27 +26,41 @@ interface poolItemInterface {
 }
 export default function PoolItemContentComponent({ item }: { item: poolItemInterface }) {
   const contract = usePositionContract(item.addr)
-  const [token0, setToken0] = useState<string>()
-  const [token1, setToken1] = useState<string>()
+  const [token0, setToken0] = useState<string>('')
+  const [token1, setToken1] = useState<string>('')
 
   useEffect(() => {
     if (contract) {
-      contract?.token0().then((res) => {
-        setToken0(res)
-      })
-      contract?.token1().then((res) => {
-        setToken1(res)
-      })
+      contract
+        ?.token0()
+        .then((res) => {
+          console.log('res0', res)
+          setToken0(res)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+      contract
+        ?.token1()
+        .then((res) => {
+          console.log('res1', res)
+          setToken1(res)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     }
   }, [contract])
 
   const clickQuery = useCallback(() => {
+    console.log('contract', contract)
     contract
       ?.collectProtocol(token0 || '')
       .then((res: any) => {
         console.log('success:', res)
       })
       .catch((err) => {
+        console.log('err', err)
         notification['error']({
           message: '错误信息',
           description: err.toString(),
@@ -59,7 +73,7 @@ export default function PoolItemContentComponent({ item }: { item: poolItemInter
       <TokenBox>token0：{token0}</TokenBox>
       <TokenBox>token1：{token1}</TokenBox>
       <Input value={token0} />
-      <QueryBtn onClick={() => clickQuery}>Write</QueryBtn>
+      <QueryBtn onClick={clickQuery}>Write</QueryBtn>
     </PoolItemContent>
   )
 }

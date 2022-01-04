@@ -129,8 +129,10 @@ export default function TestComponent() {
   const queryData = useCallback((searchParams) => {
     console.log('searchParams:', searchParams)
     getTableLists(searchParams).then((res) => {
-      setData((res.data as any).list)
-      setTotal((res as any).data.count)
+      const { count, list } = res
+
+      setData(list)
+      setTotal(count)
     })
   }, [])
   //hash处理
