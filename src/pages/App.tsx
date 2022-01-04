@@ -1,4 +1,4 @@
-import React, { Redirect, Route, Switch } from 'react-router'
+import React, { Redirect, Route, Switch, useHistory, useLocation } from 'react-router'
 
 import Home from './Home'
 import Tables from './Tables'
@@ -10,12 +10,18 @@ import { useTransactionList } from '@/state/http/hooks'
 import { useEffect } from 'react'
 import Login from './login'
 import AppLayout from './AppLayout'
-export default function App() {
-  const list = useTransactionList()
-  useEffect(() => {
-    console.log('[](list):', list)
-  }, [list])
+import SheepConifg from './sheepConfig'
 
+export default function App() {
+  const { pathname } = useLocation()
+  const history = useHistory()
+  useEffect(() => {
+    const auth = sessionStorage.getItem('auth')
+
+    if (!auth) {
+      history.push('/login')
+    }
+  }, [history, pathname])
   return (
     <>
       <Switch>
@@ -27,6 +33,7 @@ export default function App() {
           <Route strict exact path="/fast_call" component={FastCall} />
           <Route strict exact path="/call_admin" component={CallAdmin} />
           <Route strict exact path="/ct_address" component={CtAddress} />
+          <Route strict exact path="/sheepconfig" component={SheepConifg} />
 
           <Redirect from="/" to="/home" />
         </AppLayout>

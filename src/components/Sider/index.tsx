@@ -23,9 +23,11 @@ enum Route {
   Contract = 3,
   // MultiSign = 4,
   TransactionList = 4,
+
   FastCall,
   CallAdmin,
   CtAddress,
+  sheepConfig,
 }
 
 const routes: {
@@ -39,6 +41,7 @@ const routes: {
   '/fast_call': Route.FastCall + '',
   '/call_admin': Route.CallAdmin + '',
   '/ct_address': Route.CtAddress + '',
+  '/sheepconfig': Route.sheepConfig + '',
 }
 
 export default function Siders() {
@@ -94,6 +97,11 @@ export default function Siders() {
             </StyledNavLike>
           </Menu.Item>
         </SubMenu>
+        <Menu.Item key={Route.sheepConfig} icon={<PieChartOutlined />}>
+          <StyledNavLike to="/sheepconfig">
+            <TYPE.main color="white">sheep 配置</TYPE.main>
+          </StyledNavLike>
+        </Menu.Item>
       </Menu>
     </Sider>
   )

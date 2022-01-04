@@ -52,8 +52,12 @@ export default function LoginForm() {
     //请求接口，验证登录
     loginApi({ username, password })
       .then((res) => {
-        console.log('res:', res)
-        // localStorage.setItem('auth', res.token)
+        if (res.token) {
+          sessionStorage.setItem('auth', res.token)
+          history.push('/home')
+          return
+        }
+        message.error(res)
       })
       .catch(() => {
         message.error('网络错误')

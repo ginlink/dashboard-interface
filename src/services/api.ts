@@ -85,6 +85,10 @@ export class AddressSearchParams {
 
   [key: string]: any
 }
+export type SheepHomeStatusParams = {
+  homestatus?: string
+  lastversion?: string
+}
 
 export const getTableLists = (searchParams: SearchParams) => {
   return http.post(BASE_URL_15 + '/record/search', searchParams) as Promise<any>
@@ -105,9 +109,7 @@ export const searchFuncApi = (key: string) => {
 }
 
 export const loginApi = (loginData: LoginType) => {
-  return http.post('/login', {
-    loginData,
-  }) as Promise<any>
+  return http.post('/login', loginData) as Promise<any>
 }
 
 //事务列表
@@ -145,4 +147,14 @@ export const updateCtAddressApi = (id: number, data: CtAddress) => {
 
 export const searchCtAddressApi = (addressSearchParams?: AddressSearchParams) => {
   return http.get(BASE_URL_15 + '/ct-address' + '/search', addressSearchParams) as Promise<any>
+}
+
+//  sheep 配置
+
+export const sheepHomeStatus = () => {
+  return http.get('/homestatus') as Promise<any>
+}
+
+export const setSheepHomeStatus = (sheepHomeStatusParams?: SheepHomeStatusParams) => {
+  return http.put('/homestatus', sheepHomeStatusParams) as Promise<any>
 }

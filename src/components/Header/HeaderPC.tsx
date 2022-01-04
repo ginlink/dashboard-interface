@@ -25,6 +25,7 @@ function HeaderPC() {
   const loginOutFn = useCallback(() => {
     console.log('loginOutFn')
     history.push('/login')
+    sessionStorage.removeItem('auth')
   }, [history])
   return (
     <Wrapper>

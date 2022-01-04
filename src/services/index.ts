@@ -18,11 +18,9 @@ const instance: AxiosInstance = axios.create({
 
 instance.interceptors.request.use((config) => {
   // TODO加入token
-  const authInfo = localStorage.getItem('auth')
-  if (authInfo) {
-    console.log(authInfo)
-  }
-  // config.headers.token = authInfo
+  const authInfo = sessionStorage.getItem('auth')
+  if (!authInfo) location.href = '/#/login'
+  config.headers.token = authInfo
   console.log('config', config)
   return config
 })
