@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components/macro'
-import { darken, important, lighten, opacify, transparentize } from 'polished'
+import { darken, lighten, transparentize } from 'polished'
 
 import { RowBetween } from '../Row'
 import { ChevronDown, Check } from 'react-feather'
