@@ -11,6 +11,7 @@ import swapROuterAbi from 'abis/SwapRouter.json'
 import GnosisSafeAbi from 'abis/GnosisSafe.json'
 import SpcDAOAbi from 'abis/SpcDAO.json'
 import vSpcTokenAbi from 'abis/vSpcToken.json'
+import WBNBAbi from 'abis/erc20bnb.json'
 import { ContractAddresses, parseAbis, StaticBaseContract } from './util'
 import { Contract } from '@ethersproject/contracts'
 import { getSignerOrProvider } from '@/hooks/useContract'
@@ -24,6 +25,7 @@ import {
   TRANSACTION_PROXY_ADDRESS,
   TRANSACTION_DAO_ADDRESS,
   TRANSACTION_VSPC_ADDRESS,
+  WBNB_ADDRESS,
 } from '@/constants/addresses'
 import { isAddress } from '@ethersproject/address'
 import { FuncType } from '../CallAdmin/util'
@@ -80,7 +82,16 @@ export type CreateTransactionProps = {
   onChangeTokenAddress?: (address: string) => void
 }
 
-const abiArr = [swapMiningAbi, ownableAbi, positionRewardAbi, swapROuterAbi, GnosisSafeAbi, SpcDAOAbi, vSpcTokenAbi]
+const abiArr = [
+  swapMiningAbi,
+  ownableAbi,
+  positionRewardAbi,
+  swapROuterAbi,
+  GnosisSafeAbi,
+  SpcDAOAbi,
+  vSpcTokenAbi,
+  WBNBAbi,
+]
 
 const parsedAbis = parseAbis(abiArr as StaticBaseContract[])
 console.log('[](parsedAbis):', parsedAbis)
@@ -116,6 +127,7 @@ export default function CreateTransactionModal({
       GnosisSafe: TRANSACTION_PROXY_ADDRESS[chainId],
       SpcDAO: TRANSACTION_DAO_ADDRESS[chainId],
       vSpcToken: TRANSACTION_VSPC_ADDRESS[chainId],
+      WBNB: WBNB_ADDRESS[chainId],
     }
   }, [chainId])
 

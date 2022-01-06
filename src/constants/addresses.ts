@@ -69,3 +69,8 @@ export const SAFE_FACTORY_ADDRESS: AddressMap = {
   [SupportedChainId.BSCTEST]: '0x28D301F911202F4C366182E5B7f097C582A3ed03',
   [SupportedChainId.BSC]: '0x571521f8c16f3c4eD5f2490f19187bA7A5A3CBDf',
 }
+
+export const WBNB_ADDRESS: AddressMap = {
+  [SupportedChainId.BSCTEST]: '',
+  [SupportedChainId.BSC]: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
+}
