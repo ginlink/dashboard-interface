@@ -15,4 +15,4 @@ export const BASE_URL = 'http://16.162.188.15:9701'
 
 export const BASE_URL_15 = 'http://16.162.188.15:9010/api'
 
-export const BASE_URL_Mainnet = 'https://api.sheepdex.org/'
+export const BASE_URL_Mainnet = 'http://18.163.124.224:9701'
