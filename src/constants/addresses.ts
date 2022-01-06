@@ -52,12 +52,12 @@ export const TRANSACTION_ROUTER_ADDRESS: AddressMap = {
 
 export const TRANSACTION_VSPC_ADDRESS: AddressMap = {
   [SupportedChainId.BSCTEST]: '',
-  [SupportedChainId.BSC]: '',
+  [SupportedChainId.BSC]: '0x6d52D502A1526EcD49744610F9461b4C69950C3F',
 }
 
 export const TRANSACTION_DAO_ADDRESS: AddressMap = {
   [SupportedChainId.BSCTEST]: '',
-  [SupportedChainId.BSC]: '',
+  [SupportedChainId.BSC]: '0x17Fa4D6c9e34D4A5C9e331B7925BD49980851beD',
 }
 
 // TODO    transaction  address  end
