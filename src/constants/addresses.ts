@@ -50,6 +50,16 @@ export const TRANSACTION_ROUTER_ADDRESS: AddressMap = {
   [SupportedChainId.BSC]: '0xcD87782A717F40542e18C61Ebb7210d3132e17d8',
 }
 
+export const TRANSACTION_VSPC_ADDRESS: AddressMap = {
+  [SupportedChainId.BSCTEST]: '',
+  [SupportedChainId.BSC]: '',
+}
+
+export const TRANSACTION_DAO_ADDRESS: AddressMap = {
+  [SupportedChainId.BSCTEST]: '',
+  [SupportedChainId.BSC]: '',
+}
+
 // TODO    transaction  address  end
 
 export const UNI_ADDRESS: AddressMap = constructSameAddressMap('0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984', false)
