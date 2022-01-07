@@ -20,12 +20,12 @@ export const MULTICALL_ADDRESSES: AddressMap | string = {
 // TODO    transaction  address  start
 export const TRANSACTION_SWAPMING_ADDRESSES: AddressMap = {
   [SupportedChainId.BSCTEST]: '0xB8a8AE24916b23F7210C0DB52859AB1C1C57A876',
-  [SupportedChainId.BSC]: '0x58469aee3436A000698D0a8e648f5d14F31eE019',
+  [SupportedChainId.BSC]: '0xf312943Df52cd3DAf40ef12d87570dE63e4bB9f1',
 }
 
 export const TRANSACTION_POSITION_REWARD_ADDRESS: AddressMap = {
   [SupportedChainId.BSCTEST]: '0xaA860a57490fF900081118E51a70630fb331525D',
-  [SupportedChainId.BSC]: '0x8D6aa4D0cec1B49A1f738A7C6Ebd7C1AaAfAfC34',
+  [SupportedChainId.BSC]: '0x940342B10D73F8A00b672E23aCcCe6bd0587c458',
 }
 
 export const TRANSACTION_PROXY_ADDRESS: AddressMap = {
