@@ -10,6 +10,7 @@ export enum SupportedChainId {
 
   BSCTEST = 97,
   BSC = 56,
+  KCC = 321,
 }
 
 export const NETWORK_LABELS: { [chainId in SupportedChainId | number]: string } = {
@@ -22,4 +23,5 @@ export const NETWORK_LABELS: { [chainId in SupportedChainId | number]: string } 
 
   [SupportedChainId.BSCTEST]: 'BSCTEST',
   [SupportedChainId.BSC]: 'BSC',
+  [SupportedChainId.KCC]: 'KCC',
 }

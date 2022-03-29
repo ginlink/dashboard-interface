@@ -57,7 +57,6 @@ export function useContract<T extends Contract = Contract>(
     if (!chainId) return
     return typeof _address == 'string' ? _address : _address ? _address[chainId] : undefined
   }, [_address, chainId])
-
   return useMemo(() => {
     if (!library || !account || !address) return
 

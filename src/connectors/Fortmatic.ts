@@ -2,7 +2,7 @@ import { FortmaticConnector as FortmaticConnectorCore } from '@web3-react/fortma
 
 export const OVERLAY_READY = 'OVERLAY_READY'
 
-type FormaticSupportedChains = 1 | 3 | 4 | 42 | 97 | 56
+type FormaticSupportedChains = 1 | 3 | 4 | 42 | 97 | 56 | 233
 
 const CHAIN_ID_NETWORK_ARGUMENT: { readonly [chainId in FormaticSupportedChains]: string | undefined } = {
   [1]: undefined,
@@ -11,6 +11,7 @@ const CHAIN_ID_NETWORK_ARGUMENT: { readonly [chainId in FormaticSupportedChains]
   [42]: 'kovan',
   [97]: 'BSCTEST',
   [56]: 'BSC',
+  [233]: 'KCC',
 }
 
 export class FortmaticConnector extends FortmaticConnectorCore {

@@ -5,8 +5,11 @@ import CloseOutlined from '@ant-design/icons/lib/icons/CloseOutlined'
 import { Space, Radio, Input, Select, message, Form, Button, FormInstance } from 'antd'
 
 import swapMiningAbi from '@/abis/swap-mining.json'
+import swapMiningAbi_v1 from '@/abis/swap-mining_v1.json'
+import SPCTokenABI from 'abis/SPCToken.json'
 import ownableAbi from '@/abis/Ownable.json'
 import positionRewardAbi from '@/abis/position-reward.json'
+import positionRewardAbi_v1 from '@/abis/position-reward_v1.json'
 import swapROuterAbi from 'abis/SwapRouter.json'
 import GnosisSafeAbi from 'abis/GnosisSafe.json'
 import { ContractAddresses, parseAbis, StaticBaseContract } from './util'
@@ -16,9 +19,12 @@ import { useActiveWeb3React } from '@/hooks/web3'
 import {
   TRANSACTION_OPERATABLE_ADDRESS,
   TRANSACTION_POSITION_REWARD_ADDRESS,
+  TRANSACTION_POSITION_REWARD_ADDRESS_V1,
   TRANSACTION_SWAPMING_ADDRESSES,
+  TRANSACTION_SWAPMING_ADDRESSES_V1,
   TRANSACTION_ROUTER_ADDRESS,
   TRANSACTION_MULTISEND_ADDRESS,
+  TRANSACTION_SPCTOKEN_ADDRESS,
   TRANSACTION_PROXY_ADDRESS,
 } from '@/constants/addresses'
 import { isAddress } from '@ethersproject/address'
@@ -76,7 +82,16 @@ export type CreateTransactionProps = {
   onChangeTokenAddress?: (address: string) => void
 }
 
-const abiArr = [swapMiningAbi, ownableAbi, positionRewardAbi, swapROuterAbi, GnosisSafeAbi]
+const abiArr = [
+  swapMiningAbi,
+  ownableAbi,
+  positionRewardAbi,
+  swapROuterAbi,
+  GnosisSafeAbi,
+  swapMiningAbi_v1,
+  positionRewardAbi_v1,
+  SPCTokenABI,
+]
 
 const parsedAbis = parseAbis(abiArr as StaticBaseContract[])
 console.log('[](parsedAbis):', parsedAbis)
@@ -110,6 +125,9 @@ export default function CreateTransactionModal({
       positionReward: TRANSACTION_POSITION_REWARD_ADDRESS[chainId],
       SwapRouter: TRANSACTION_ROUTER_ADDRESS[chainId],
       GnosisSafe: TRANSACTION_PROXY_ADDRESS[chainId],
+      SwapMining_v1: TRANSACTION_SWAPMING_ADDRESSES_V1[chainId],
+      positionReward_v1: TRANSACTION_POSITION_REWARD_ADDRESS_V1[chainId],
+      SPCToken: TRANSACTION_SPCTOKEN_ADDRESS[chainId],
     }
   }, [chainId])
 
