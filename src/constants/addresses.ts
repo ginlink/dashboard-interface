@@ -31,6 +31,10 @@ export const TRANSACTION_POSITION_REWARD_ADDRESS: AddressMap = {
   [SupportedChainId.BSCTEST]: '0xaA860a57490fF900081118E51a70630fb331525D',
   [SupportedChainId.BSC]: '0x940342B10D73F8A00b672E23aCcCe6bd0587c458',
 }
+export const TRANSACTION_POSITION_REWARD_ADDRESS_V1: AddressMap = {
+  [SupportedChainId.BSCTEST]: '0xaA860a57490fF900081118E51a70630fb331525D',
+  [SupportedChainId.BSC]: '0xF29852f5dE1958Cadfa3879712B724cf1c2AC81F',
+}
 
 export const TRANSACTION_PROXY_ADDRESS: AddressMap = {
   [SupportedChainId.BSCTEST]: '0x9574bdc63DD214903eB0BC268494F7B3A97D3340',
@@ -57,11 +61,10 @@ export const TRANSACTION_ROUTER_ADDRESS: AddressMap = {
   [SupportedChainId.BSC]: '0xcD87782A717F40542e18C61Ebb7210d3132e17d8',
 }
 
-export const TRANSACTION_VSPC_ADDRESS: AddressMap = {
-  [SupportedChainId.BSCTEST]: '',
-  [SupportedChainId.BSC]: '0x6d52D502A1526EcD49744610F9461b4C69950C3F',
+export const TRANSACTION_SPCTOKEN_ADDRESS: AddressMap = {
+  [SupportedChainId.BSCTEST]: '0xD4f9e77C09627986aC86243E89b0E4401264430D',
+  [SupportedChainId.BSC]: '0x6a428FF9BfEC2C8F676b8c905d49146c6106AF90',
 }
-
 export const TRANSACTION_DAO_ADDRESS: AddressMap = {
   [SupportedChainId.BSCTEST]: '',
   [SupportedChainId.BSC]: '0x17Fa4D6c9e34D4A5C9e331B7925BD49980851beD',
@@ -80,4 +83,8 @@ export const SAFE_FACTORY_ADDRESS: AddressMap = {
 export const WBNB_ADDRESS: AddressMap = {
   [SupportedChainId.BSCTEST]: '',
   [SupportedChainId.BSC]: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
+}
+export const TRANSACTION_VSPC_ADDRESS: AddressMap = {
+  [SupportedChainId.BSCTEST]: '',
+  [SupportedChainId.BSC]: '0x6d52D502A1526EcD49744610F9461b4C69950C3F',
 }
