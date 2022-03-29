@@ -1,4 +1,4 @@
-import { Wallet, utils, BigNumber, BigNumberish, Signer, PopulatedTransaction } from 'ethers'
+import { BigNumberish, Signer } from 'ethers'
 
 import { TypedDataSigner } from '@ethersproject/abstract-signer'
 

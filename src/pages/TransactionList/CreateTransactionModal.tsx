@@ -12,6 +12,9 @@ import positionRewardAbi from '@/abis/position-reward.json'
 import positionRewardAbi_v1 from '@/abis/position-reward_v1.json'
 import swapROuterAbi from 'abis/SwapRouter.json'
 import GnosisSafeAbi from 'abis/GnosisSafe.json'
+import SpcDAOAbi from 'abis/SpcDAO.json'
+import vSpcTokenAbi from 'abis/vSpcToken.json'
+import WBNBAbi from 'abis/erc20bnb.json'
 import { ContractAddresses, parseAbis, StaticBaseContract } from './util'
 import { Contract } from '@ethersproject/contracts'
 import { getSignerOrProvider } from '@/hooks/useContract'
@@ -26,6 +29,9 @@ import {
   TRANSACTION_MULTISEND_ADDRESS,
   TRANSACTION_SPCTOKEN_ADDRESS,
   TRANSACTION_PROXY_ADDRESS,
+  TRANSACTION_DAO_ADDRESS,
+  TRANSACTION_VSPC_ADDRESS,
+  WBNB_ADDRESS,
 } from '@/constants/addresses'
 import { isAddress } from '@ethersproject/address'
 import { FuncType } from '../CallAdmin/util'
@@ -91,6 +97,9 @@ const abiArr = [
   swapMiningAbi_v1,
   positionRewardAbi_v1,
   SPCTokenABI,
+  SpcDAOAbi,
+  vSpcTokenAbi,
+  WBNBAbi,
 ]
 
 const parsedAbis = parseAbis(abiArr as StaticBaseContract[])
@@ -128,6 +137,9 @@ export default function CreateTransactionModal({
       SwapMining_v1: TRANSACTION_SWAPMING_ADDRESSES_V1[chainId],
       positionReward_v1: TRANSACTION_POSITION_REWARD_ADDRESS_V1[chainId],
       SPCToken: TRANSACTION_SPCTOKEN_ADDRESS[chainId],
+      SpcDAO: TRANSACTION_DAO_ADDRESS[chainId],
+      vSpcToken: TRANSACTION_VSPC_ADDRESS[chainId],
+      WBNB: WBNB_ADDRESS[chainId],
     }
   }, [chainId])
 
@@ -173,7 +185,6 @@ export default function CreateTransactionModal({
 
   const onChangeMethodHandler = useCallback(
     (methodName: string, option: any) => {
-      debugger
       if (!methodName || !contractMethods) return
 
       // update placeholder param

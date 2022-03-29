@@ -1,5 +1,5 @@
 import { FuncType } from '@/pages/CallAdmin/util'
-import { BASE_URL_15 } from './config'
+import { BASE_URL_15, BASE_URL_Mainnet } from './config'
 import http from './index'
 
 interface SearchParams {
@@ -71,6 +71,10 @@ export type CtAddress = {
   logoURI?: string
   desc?: string
 }
+export type LoginType = {
+  username: string
+  password: string
+}
 
 export class AddressSearchParams {
   page?: number
@@ -80,6 +84,10 @@ export class AddressSearchParams {
   key_chainid?: number;
 
   [key: string]: any
+}
+export type SheepHomeStatusParams = {
+  homestatus?: string
+  lastversion?: string
 }
 
 export const getTableLists = (searchParams: SearchParams) => {
@@ -98,6 +106,10 @@ export const searchFuncApi = (key: string) => {
   return http.get(BASE_URL_15 + '/ct-function/search', {
     key,
   }) as Promise<any>
+}
+
+export const loginApi = (loginData: LoginType) => {
+  return http.post('/login', loginData) as Promise<any>
 }
 
 //事务列表
@@ -135,4 +147,14 @@ export const updateCtAddressApi = (id: number, data: CtAddress) => {
 
 export const searchCtAddressApi = (addressSearchParams?: AddressSearchParams) => {
   return http.get(BASE_URL_15 + '/ct-address' + '/search', addressSearchParams) as Promise<any>
+}
+
+//  sheep 配置
+
+export const sheepHomeStatus = () => {
+  return http.get(BASE_URL_Mainnet + '/homestatus') as Promise<any>
+}
+
+export const setSheepHomeStatus = (sheepHomeStatusParams?: SheepHomeStatusParams) => {
+  return http.put(BASE_URL_Mainnet + '/homestatus', sheepHomeStatusParams) as Promise<any>
 }
