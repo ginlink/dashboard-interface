@@ -1,5 +1,5 @@
 import { FuncType } from '@/pages/CallAdmin/util'
-import { BASE_URL_15 } from './config'
+import { BASE_URL_15, BASE_URL_Mainnet } from './config'
 import http from './index'
 
 interface SearchParams {
@@ -152,9 +152,9 @@ export const searchCtAddressApi = (addressSearchParams?: AddressSearchParams) =>
 //  sheep 配置
 
 export const sheepHomeStatus = () => {
-  return http.get('/homestatus') as Promise<any>
+  return http.get(BASE_URL_Mainnet + '/homestatus') as Promise<any>
 }
 
 export const setSheepHomeStatus = (sheepHomeStatusParams?: SheepHomeStatusParams) => {
-  return http.put('/homestatus', sheepHomeStatusParams) as Promise<any>
+  return http.put(BASE_URL_Mainnet + '/homestatus', sheepHomeStatusParams) as Promise<any>
 }

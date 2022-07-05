@@ -8,9 +8,11 @@ export function constructSameAddressMap<T extends string>(
     return {
       [SupportedChainId.BSCTEST]: address,
       [SupportedChainId.BSC]: address,
+      [SupportedChainId.KCC]: address,
     }
   return {
     [SupportedChainId.BSCTEST]: address,
     [SupportedChainId.BSC]: address,
+    [SupportedChainId.KCC]: address,
   }
 }

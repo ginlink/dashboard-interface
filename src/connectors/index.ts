@@ -32,13 +32,14 @@ const NETWORK_URLS: {
 } = {
   [SupportedChainId.BSCTEST]: `https://arb1.arbitrum.io/rpc`,
   [SupportedChainId.BSC]: `https://arb1.arbitrum.io/rpc`,
+  [SupportedChainId.KCC]: `https://arb1.arbitrum.io/rpc`,
 }
 
-const SUPPORTED_CHAIN_IDS: SupportedChainId[] = [SupportedChainId.BSCTEST, SupportedChainId.BSC]
+const SUPPORTED_CHAIN_IDS: SupportedChainId[] = [SupportedChainId.BSCTEST, SupportedChainId.BSC, SupportedChainId.KCC]
 
 export const network = new NetworkConnector({
   urls: NETWORK_URLS,
-  defaultChainId: 97,
+  defaultChainId: SupportedChainId.KCC,
 })
 
 let networkLibrary: Web3Provider | undefined
@@ -72,7 +73,7 @@ export const portis = new PortisConnector({
 
 // mainnet only
 export const walletlink = new WalletLinkConnector({
-  url: NETWORK_URLS[97],
+  url: NETWORK_URLS[SupportedChainId.KCC],
   appName: 'Uniswap',
   appLogoUrl: UNISWAP_LOGO_URL,
 })

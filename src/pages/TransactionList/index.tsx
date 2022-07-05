@@ -7,7 +7,7 @@ import CreateTransactionModal, { CallType, MethodParams, TransferParams } from '
 import { ButtonPrimary } from '@/components/Button'
 import TableRowModal from './TableRowModal'
 import { getSigner, useTokenContract, useTransactionMultiSend, useTransactionProxy } from '@/hooks/useContract'
-import { useActiveWeb3React } from '@/hooks/web3'
+import { useAccountList, useActiveWeb3React } from '@/hooks/web3'
 import fu from '@/assets/images/fu.png'
 import copy from 'copy-to-clipboard'
 import { txType } from '@/constants/txType'
@@ -187,7 +187,12 @@ export default function TransactionList() {
   const multiSend = useTransactionMultiSend()
   const tokenContract = useTokenContract(tokenAddress)
   const latestBlockNumber = useBlockNumber()
+  useAccountList()
 
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    console.log('safeProxy', safeProxy)
+  }, [safeProxy])
   const [createTransactionForm] = Form.useForm()
 
   // get dynamic nonce
@@ -206,17 +211,15 @@ export default function TransactionList() {
   // fresh data list
   const manualResetDataList = useCallback(async () => {
     if (nonce == undefined || !safeProxyInfo) return
-
     const data: TxPropsApi[] | undefined = await getTransctionList()
 
     data?.reverse()
-    const list = nonceAdapter({
-      data,
-      nonce,
-      safeProxyInfo,
-    })
-
-    setDataList(list)
+    // const list = nonceAdapter({
+    //   data,
+    //   nonce,
+    //   safeProxyInfo,
+    // })
+    setDataList(data)
   }, [nonce, safeProxyInfo])
 
   // get owners and threshold
@@ -259,27 +262,25 @@ export default function TransactionList() {
 
   // init get table list
   useEffect(() => {
-    if (!transactionListWithLoop || !safeProxyInfo || !nonce) return
-
-    debugger
+    if (!transactionListWithLoop || !safeProxyInfo || nonce == undefined) return
 
     const data = [...transactionListWithLoop]
 
     data.reverse()
 
-    const list = nonceAdapter({
-      data,
-      nonce,
-      safeProxyInfo,
-    })
-
-    setDataList(list)
+    // const list = nonceAdapter({
+    //   data,
+    //   nonce,
+    //   safeProxyInfo,
+    // })
+    setDataList(data)
   }, [nonce, safeProxyInfo, transactionListWithLoop])
 
   const onCreateFinishedHandler = useCallback(
     async (values: TransferParams & MethodParams) => {
-      const { fromAddress, toAddress, amount, contractName, funcName, arg } = values
+      debugger
 
+      const { fromAddress, toAddress, amount, contractName, funcName, arg } = values
       if (!multiSend || !safeProxy) return
 
       const simpleError = new Error('')
@@ -404,7 +405,7 @@ export default function TransactionList() {
 
       const signer = getSigner(library, account)
       let safeTx: SafeTransaction | undefined = undefined
-
+      debugger
       try {
         safeTx = txData && JSON.parse(txData)
       } catch (err) {
@@ -445,7 +446,7 @@ export default function TransactionList() {
   const onConfirmHandler = useCallback(
     async (item: TxPropsApi) => {
       const { id } = item
-
+      debugger
       if (!id) return
 
       if (!safeProxy) return
@@ -492,8 +493,8 @@ export default function TransactionList() {
 
   // debug
   useEffect(() => {
-    console.log('[](contract):', contract)
-  }, [contract])
+    console.log('[](contract):', dataList)
+  }, [dataList])
 
   return (
     <Wrapper>
