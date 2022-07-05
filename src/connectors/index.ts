@@ -33,6 +33,7 @@ const NETWORK_URLS: {
   [SupportedChainId.BSCTEST]: `https://arb1.arbitrum.io/rpc`,
   [SupportedChainId.BSC]: `https://arb1.arbitrum.io/rpc`,
   [SupportedChainId.KCC]: `https://arb1.arbitrum.io/rpc`,
+  [SupportedChainId.KCCTEST]: `https://arb1.arbitrum.io/rpc`,
 }
 
 const SUPPORTED_CHAIN_IDS: SupportedChainId[] = [SupportedChainId.BSCTEST, SupportedChainId.BSC, SupportedChainId.KCC]

@@ -33,15 +33,15 @@ enum Route {
 const routes: {
   [route: string]: string
 } = {
-  '/home': Route.Home + '', //to string
-  '/strategy': Route.Strategy + '',
-  '/contract': Route.Contract + '',
+  // '/home': Route.Home + '', //to string
+  // '/strategy': Route.Strategy + '',
+  // '/contract': Route.Contract + '',
   // '/multiSign': Route.MultiSign + '',
   '/transactionList': Route.TransactionList + '',
-  '/fast_call': Route.FastCall + '',
-  '/call_admin': Route.CallAdmin + '',
-  '/ct_address': Route.CtAddress + '',
-  '/sheepconfig': Route.sheepConfig + '',
+  // '/fast_call': Route.FastCall + '',
+  // '/call_admin': Route.CallAdmin + '',
+  // '/ct_address': Route.CtAddress + '',
+  // '/sheepconfig': Route.sheepConfig + '',
 }
 
 export default function Siders() {
@@ -60,16 +60,16 @@ export default function Siders() {
     <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
       <SiderLogo />
       <Menu theme="dark" defaultSelectedKeys={selectKeys} selectedKeys={selectKeys} mode="inline">
-        <Menu.Item key={Route.Home} icon={<PieChartOutlined />}>
-          <StyledNavLike to="/home">
+        {/* <Menu.Item key={Route.Home} icon={<PieChartOutlined />}> */}
+        {/* <StyledNavLike to="/home">
             <TYPE.main color="white">首页</TYPE.main>
-          </StyledNavLike>
-        </Menu.Item>
-        <Menu.Item key={Route.Strategy} icon={<PieChartOutlined />}>
+          </StyledNavLike> */}
+        {/* </Menu.Item> */}
+        {/* <Menu.Item key={Route.Strategy} icon={<PieChartOutlined />}>
           <StyledNavLike to="/strategy">
             <TYPE.main color="white">策略列表</TYPE.main>
           </StyledNavLike>
-        </Menu.Item>
+        </Menu.Item> */}
         {/* <Menu.Item key={Route.MultiSign} icon={<PieChartOutlined />}>
           <StyledNavLike to="/multiSign">
             <TYPE.main color="white">多签</TYPE.main>
@@ -80,7 +80,7 @@ export default function Siders() {
             <TYPE.main color="white">事务列表</TYPE.main>
           </StyledNavLike>
         </Menu.Item>
-        <SubMenu key={'100'} icon={<DesktopOutlined />} title="合约助手">
+        {/* <SubMenu key={'100'} icon={<DesktopOutlined />} title="合约助手">
           <Menu.Item key={Route.FastCall}>
             <StyledNavLike to="/fast_call">
               <TYPE.main color="white">快速调用</TYPE.main>
@@ -101,7 +101,7 @@ export default function Siders() {
           <StyledNavLike to="/sheepconfig">
             <TYPE.main color="white">sheep 配置</TYPE.main>
           </StyledNavLike>
-        </Menu.Item>
+        </Menu.Item> */}
       </Menu>
     </Sider>
   )
