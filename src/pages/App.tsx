@@ -27,15 +27,15 @@ export default function App() {
       <Switch>
         <Route strict exact path="/login" component={Login} />
         <AppLayout>
-          <Route strict exact path="/home" component={Home} />
-          <Route strict exact path="/strategy" component={Tables} />
+          {/* <Route strict exact path="/home" component={Home} />
+          <Route strict exact path="/strategy" component={Tables} /> */}
           <Route strict exact path="/transactionList" component={TransactionList} />
-          <Route strict exact path="/fast_call" component={FastCall} />
+          {/* <Route strict exact path="/fast_call" component={FastCall} />
           <Route strict exact path="/call_admin" component={CallAdmin} />
           <Route strict exact path="/ct_address" component={CtAddress} />
-          <Route strict exact path="/sheepconfig" component={SheepConifg} />
+          <Route strict exact path="/sheepconfig" component={SheepConifg} /> */}
 
-          <Redirect from="/" to="/home" />
+          <Redirect from="/" to="/transactionList" />
         </AppLayout>
       </Switch>
     </>

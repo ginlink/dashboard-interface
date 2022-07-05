@@ -40,6 +40,20 @@ import Loader from '@/components/Loader'
 import Row from '@/components/Row'
 import { ButtonPrimary } from '@/components/Button'
 
+// crv abi
+
+import RegistryAbi from 'abis/PoolRegistry.json'
+import crv_factoryAbi from 'abis/crv_factory.json'
+import crypto_factoryAbi from 'abis/crypto_factory.json'
+import CurveCryptoSwap3ETHAbi from 'abis/CurveCryptoSwap3ETH_abi.json'
+import CryptoBasePoolabi from 'abis/CryptoBasePool_abi.json'
+import stockAbi from 'abis/Stock.json'
+import lockerAbi from 'abis/lock.json'
+import boostAbi from 'abis/Boost.json'
+import crvswapMiningAbi from 'abis/CRVSwapMining.json'
+import GaugeControllerAbi from 'abis/GaugeController.json'
+import SwapMiningControllerAbi from 'abis/SwapMiningController.json'
+
 const { Option } = Select
 
 const CloseWrapper = styled.div`
@@ -69,6 +83,7 @@ export type TransferParams = {
 export type MethodParams = {
   contractName?: string
   funcName?: string
+  contractAddr?: string
   arg?: string
 }
 
@@ -100,6 +115,17 @@ const abiArr = [
   SpcDAOAbi,
   vSpcTokenAbi,
   WBNBAbi,
+  RegistryAbi,
+  crv_factoryAbi,
+  crypto_factoryAbi,
+  CurveCryptoSwap3ETHAbi,
+  CryptoBasePoolabi,
+  stockAbi,
+  lockerAbi,
+  boostAbi,
+  crvswapMiningAbi,
+  GaugeControllerAbi,
+  SwapMiningControllerAbi,
 ]
 
 const parsedAbis = parseAbis(abiArr as StaticBaseContract[])
@@ -118,6 +144,8 @@ export default function CreateTransactionModal({
   const { library, account, chainId } = useActiveWeb3React()
 
   const [funcName, setFuncParams] = useState<string | undefined>(undefined)
+
+  const [contractAddress, setContractAddress] = useState<string | undefined>(undefined)
 
   const [contractName, setContractName] = useState<string | undefined>(undefined)
 
@@ -162,26 +190,28 @@ export default function CreateTransactionModal({
 
   const onChangeContractHandler = useCallback(
     (contractName: string, option: any) => {
-      if (!contractName) return
-
-      const { key } = option
-
+      if (!contractName || !contractAddresses) return
       // update
       setContractName(contractName)
-      if (!contractAddresses || !parsedAbis || !library || !account) return
-
-      // update parent contract
-      const contractAddress = contractAddresses[contractName]
-      const contractAbi = parsedAbis[contractName]?.abi
-
-      const contract = new Contract(contractAddress, contractAbi, getSignerOrProvider(library, account))
-
-      if (!contract) return message.warning('[err] create contract')
-
-      onChangeContract && onChangeContract(contract)
+      const address = contractAddresses[contractName]
+      if (address) {
+        setContractAddress(address)
+      }
     },
-    [account, onChangeContract, contractAddresses, library]
+    [contractAddresses]
   )
+
+  const newContract = useCallback(() => {
+    if (!contractAddresses || !parsedAbis || !library || !account || !contractAddress || !contractName) return
+
+    const contractAbi = parsedAbis[contractName]?.abi
+
+    const contract = new Contract(contractAddress, contractAbi, getSignerOrProvider(library, account))
+
+    if (!contract) return message.warning('[err] create contract')
+
+    onChangeContract && onChangeContract(contract)
+  }, [account, contractAddress, contractAddresses, contractName, library, onChangeContract])
 
   const onChangeMethodHandler = useCallback(
     (methodName: string, option: any) => {
@@ -198,6 +228,7 @@ export default function CreateTransactionModal({
   const onFinish = (values: any) => {
     if (!onFinished) return
     console.log('参数', values)
+    newContract()
     onFinished(values)
   }
 
@@ -213,8 +244,19 @@ export default function CreateTransactionModal({
           },
         }),
       ],
+      contractAddr: [
+        { required: true, message: '' },
+        () => ({
+          validator(_: any, value: string) {
+            if (!isAddress(value)) return Promise.reject('地址格式错误')
+            setContractAddress(value)
+            return Promise.resolve()
+          },
+        }),
+      ],
+
       toAddress: [
-        { required: true, message: '请输入接收人地址!' },
+        { required: true },
         () => ({
           validator(_: any, value: string) {
             if (!isAddress(value)) return Promise.reject('地址格式错误')
@@ -280,6 +322,9 @@ export default function CreateTransactionModal({
           </>
         ) : (
           <>
+            <Form.Item label="合约地址" name="contractAddr" rules={rules.contractAddr}>
+              <Input placeholder={'合约地址'} allowClear={true} />
+            </Form.Item>
             <Form.Item label="合约类型" name="contractName" rules={rules.contractName}>
               <Select style={{ width: '100%' }} allowClear onChange={onChangeContractHandler}>
                 {parsedAbis &&
@@ -292,6 +337,7 @@ export default function CreateTransactionModal({
                   })}
               </Select>
             </Form.Item>
+
             <Form.Item label="合约方法" name="funcName" rules={rules.funcName}>
               {/* <Select onChange={onChangeMethodHandler} style={{ width: '100%' }} allowClear> */}
               <Select onChange={onChangeMethodHandler} allowClear>
