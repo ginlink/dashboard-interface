@@ -1,7 +1,7 @@
 #!/bin/sh
 yarn
 
-yarn build:pro
+yarn build:prod
 
 docker build -t  coinflow/defi-admin:latest .
 
