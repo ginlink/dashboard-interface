@@ -1,15 +1,10 @@
 export const isDev = process.env.NODE_ENV === 'development'
-// 注意，在测试环境中isDev为false
-// console.log('[isDev]:', isDev)
-
-// bsc浏览器地址，请不要加上http前缀
-export const BSC_URL = isDev ? 'testnet.bscscan.com' : 'bscscan.com'
 
 export const EXPLORER_LINK: {
   [chainId: number]: string
 } = {
-  [322]: '',
-  [321]: '',
+  [322]: 'https://scan-testnet.kcc.network',
+  [321]: 'https://explorer.kcc.io',
 }
 
 // TODO 后端Api接口地址

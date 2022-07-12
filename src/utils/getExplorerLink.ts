@@ -1,13 +1,4 @@
-/*
- * @Author: jiangjin
- * @Date: 2021-09-16 15:56:49
- * @LastEditTime: 2021-09-16 16:00:45
- * @LastEditors: jiangjin
- * @Description:
- *
- */
-
-import { BSC_URL } from 'services/config'
+import { EXPLORER_LINK } from 'services/config'
 
 export enum ExplorerDataType {
   TRANSACTION = 'transaction',
@@ -23,7 +14,7 @@ export enum ExplorerDataType {
  * @param type the type of the data
  */
 export function getExplorerLink(chainId: number, data: string, type: ExplorerDataType): string {
-  const prefix = `https://${BSC_URL}`
+  const prefix = `${EXPLORER_LINK[chainId]}`
 
   switch (type) {
     case ExplorerDataType.TRANSACTION:
