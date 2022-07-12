@@ -1,12 +1,3 @@
-// /*
-//  * @Author: jiangjin
-//  * @Date: 2021-09-23 16:06:11
-//  * @LastEditTime: 2021-09-23 16:30:09
-//  * @LastEditors: jiangjin
-//  * @Description:
-//  *
-//  */
-
 // import { getLiquidityList } from './api'
 // import http from './index'
 

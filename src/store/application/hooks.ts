@@ -1,11 +1,3 @@
-/*
- * @Author: jiangjin
- * @Date: 2021-09-14 18:32:09
- * @LastEditTime: 2021-09-16 16:53:05
- * @LastEditors: jiangjin
- * @Description:
- *
- */
 import { useCallback, useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../state'

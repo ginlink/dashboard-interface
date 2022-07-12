@@ -1,11 +1,3 @@
-/*
- * @Author: jiangjin
- * @Date: 2021-08-30 19:39:13
- * @LastEditTime: 2021-09-13 13:12:27
- * @LastEditors: jiangjin
- * @Description:
- *
- */
 /**
  * @description 登录状态记录
  */

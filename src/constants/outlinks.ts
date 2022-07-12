@@ -1,12 +1,3 @@
-/*
- * @Author: jiangjin
- * @Date: 2021-09-06 17:57:16
- * @LastEditTime: 2021-09-06 17:57:17
- * @LastEditors: jiangjin
- * @Description:
- *  外部链接
- */
-
 export const gongGao = 'https://dev-38.gitbook.io/sheepdex/annoucements'
 export const Audit = 'https://dev-38.gitbook.io/sheepdex/audit'
 export const Doc = 'https://dev-38.gitbook.io/sheepdex/'

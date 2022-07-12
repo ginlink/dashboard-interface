@@ -1,12 +1,3 @@
-/*
- * @Author: jiangjin
- * @Date: 2021-09-19 00:33:35
- * @LastEditTime: 2021-09-19 00:37:31
- * @LastEditors: jiangjin
- * @Description:
- *
- */
-
 export const BUSD_ADDRESS = '0x110887Fc420292dCe51C08504ceE377872D0Db66'
 export const SPC_ADDRESS = '0x5032d4f51A4D0278504BBdcaCB24f61CAd384DC8'
 export const CON_ADDRESS = '0x4781A0EF2A705C44Cc401E8670571b7ef94d6461'

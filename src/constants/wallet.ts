@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2021-09-01 22:35:46
- * @LastEditTime: 2021-09-01 22:41:38
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: /converter-bsc-web/src/constants/wallet.ts
- */
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import INJECTED_ICON_URL from '../assets/images/arrow-right.svg'
 

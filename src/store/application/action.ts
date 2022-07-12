@@ -1,12 +1,3 @@
-/*
- * @Author: jiangjin
- * @Date: 2021-09-16 14:50:58
- * @LastEditTime: 2021-09-16 15:30:59
- * @LastEditors: jiangjin
- * @Description:
- *
- */
-
 import { ApplicationModal } from './reducer'
 
 export const SET_SCREEN_WIDTH = 'SET_SCREEN_WIDTH'

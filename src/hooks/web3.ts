@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2021-09-01 19:21:05
- * @LastEditTime: 2021-09-27 18:31:08
- * @LastEditors: jiangjin
- * @Description: In User Settings Edit
- * @FilePath: /converter-bsc-web/src/hooks/web3.ts
- */
 import { Web3Provider } from '@ethersproject/providers'
 import { useWeb3React as useWeb3ReactCore } from '@web3-react/core'
 import { Web3ReactContextInterface } from '@web3-react/core/dist/types'

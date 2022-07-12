@@ -1,12 +1,3 @@
-/*
- * @Author: jiangjin
- * @Date: 2021-10-08 10:13:27
- * @LastEditTime: 2021-10-09 10:38:50
- * @LastEditors: jiangjin
- * @Description:
- *
- */
-
 import { isMain } from 'constants/addresses'
 
 export declare const FACTORY_ADDRESS = isMain

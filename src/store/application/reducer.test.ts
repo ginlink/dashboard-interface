@@ -2,14 +2,6 @@ import { createStore, Store } from 'redux'
 import { addPopupAction, removePopupAction } from './action'
 import reducer, { ApplicationState, initData } from './reducer'
 
-/*
- * @Author: jiangjin
- * @Date: 2021-09-16 15:19:34
- * @LastEditTime: 2021-09-16 16:25:05
- * @LastEditors: jiangjin
- * @Description:
- *
- */
 describe('application test', () => {
   let store: Store<ApplicationState>
   beforeEach(() => {

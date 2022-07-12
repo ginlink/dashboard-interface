@@ -1,12 +1,3 @@
-/*
- * @Author: jiangjin
- * @Date: 2021-09-26 10:51:46
- * @LastEditTime: 2021-09-27 15:50:30
- * @LastEditors: jiangjin
- * @Description:
- *
- */
-
 import { farmData, setData, singleData } from './api'
 
 export interface DataListBase {

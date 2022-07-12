@@ -1,12 +1,3 @@
-/*
- * @Author: jiangjin
- * @Date: 2021-09-09 18:30:44
- * @LastEditTime: 2021-09-09 18:36:54
- * @LastEditors: jiangjin
- * @Description:
- *
- */
-
 import { RootState } from '@/store/state'
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
