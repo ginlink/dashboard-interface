@@ -268,12 +268,12 @@ export default function TransactionList() {
 
     data.reverse()
 
-    // const list = nonceAdapter({
-    //   data,
-    //   nonce,
-    //   safeProxyInfo,
-    // })
-    setDataList(data)
+    const list = nonceAdapter({
+      data,
+      nonce,
+      safeProxyInfo,
+    })
+    setDataList(list)
   }, [nonce, safeProxyInfo, transactionListWithLoop])
 
   const onCreateFinishedHandler = useCallback(

@@ -19,4 +19,4 @@ export const BASE_URL = process.env.REACT_APP_BASE_URL
 
 export const BASE_URL_15 = 'ttp://18.163.77.160:4801/'
 
-export const BASE_URL_Mainnet = 'http://18.163.124.224:9701'
+export const BASE_URL_Mainnet = 'http://16.162.14.42:9010/'
