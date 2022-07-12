@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2021-08-30 19:39:13
- * @LastEditTime: 2021-09-01 22:39:50
- * @LastEditors: your name
- * @Description: In User Settings Edit
- * @FilePath: /converter-bsc-web/src/react-app-env.d.ts
- */
 /// <reference types="react-scripts" />
 
 declare module '@metamask/jazzicon' {

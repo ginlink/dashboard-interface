@@ -17,7 +17,7 @@ const instance: AxiosInstance = axios.create({
 })
 
 instance.interceptors.request.use((config) => {
-  // TODO加入token
+  // Add token
   const authInfo = sessionStorage.getItem('auth')
   if (!authInfo) location.href = '/#/login'
   config.headers.token = authInfo
@@ -92,7 +92,6 @@ export default {
   delete: <T = any>(url: string): Promise<HttpResponse<T>> => {
     return instance.delete(url)
   },
-  // 更新操作，但本项目用put居多
   patch: <T = any>(url: string, params: any): Promise<HttpResponse<T>> => {
     return instance.patch(url, params)
   },

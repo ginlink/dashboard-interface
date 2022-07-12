@@ -1,12 +1,3 @@
-/*
- * @Author: jiangjin
- * @Date: 2021-09-09 18:59:59
- * @LastEditTime: 2021-09-16 14:52:40
- * @LastEditors: jiangjin
- * @Description:
- *  Application轮询数据
- */
-
 import useDebounce from '@/hooks/useDebounce'
 import useIsWindowVisible from '@/hooks/useIsWindowVisible'
 import { useActiveWeb3React } from '@/hooks/web3'

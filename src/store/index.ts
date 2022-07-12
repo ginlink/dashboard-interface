@@ -1,11 +1,3 @@
-/*
- * @Author: jiangjin
- * @Date: 2021-08-30 19:39:13
- * @LastEditTime: 2021-09-09 15:28:10
- * @LastEditors: jiangjin
- * @Description:
- *
- */
 import { createStore, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 import logger from 'redux-logger'

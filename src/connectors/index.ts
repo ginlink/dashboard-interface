@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2021-09-01 19:01:46
- * @LastEditTime: 2021-10-28 15:31:28
- * @LastEditors: jiangjin
- * @Description: In User Settings Edit
- * @FilePath: /converter-bsc-web/src/connectors/index.ts
- */
 import { Web3Provider } from '@ethersproject/providers'
 import { InjectedConnector } from '@web3-react/injected-connector'
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector'

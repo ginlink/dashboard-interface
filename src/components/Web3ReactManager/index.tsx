@@ -1,11 +1,3 @@
-/*
- * @Author: 切换到大头
- * @Date: 2021-07-07 14:21:54
- * @LastEditTime: 2021-09-27 18:22:52
- * @LastEditors: jiangjin
- * @Description: In User Settings Edit
- * @FilePath: /spweb/src/components/Web3ReactManager/index.tsx
- */
 import React, { useState, useEffect } from 'react'
 import { useWeb3React } from '@web3-react/core'
 import styled from 'styled-components/macro'

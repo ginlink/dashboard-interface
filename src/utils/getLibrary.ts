@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2021-09-01 19:02:56
- * @LastEditTime: 2021-09-17 14:40:23
- * @LastEditors: jiangjin
- * @Description: In User Settings Edit
- * @FilePath: /converter-bsc-web/src/utils/getLibrary.ts
- */
 import { Web3Provider } from '@ethersproject/providers'
 
 // import { SupportedChainId } from '../constants/chains'

@@ -1,11 +1,3 @@
-/*
- * @Author: jiangjin
- * @Date: 2021-09-12 11:58:48
- * @LastEditTime: 2021-09-12 14:27:57
- * @LastEditors: jiangjin
- * @Description:
- *  用于useSelector比较函数
- */
 import { shallowEqual } from 'react-redux'
 
 /**

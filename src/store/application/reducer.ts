@@ -1,12 +1,3 @@
-/*
- * @Author: jiangjin
- * @Date: 2021-09-01 14:25:47
- * @LastEditTime: 2021-09-16 16:25:58
- * @LastEditors: jiangjin
- * @Description:
- *  与应用相关的全局状态
- */
-
 import { SET_SCREEN_WIDTH, SET_OPENMODAL, UPDATE_BLOCK_NUMBER, ADD_POPUP, REMOVE_POPUP, PopupContent } from './action'
 import { nanoid } from 'nanoid'
 
